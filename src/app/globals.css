@@ -2322,7 +2322,8 @@ nav a{ font-weight:500; }
    Kept in markup for now; remove the JSX later to stop loading their assets. */
 #product,
 #developers,
-#who{ display:none; }
+#who,
+#beforeyougo{ display:none; }
 
 #beforeyougo{
 	background:var(--coral);
