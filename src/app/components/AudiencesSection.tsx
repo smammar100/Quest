@@ -2,9 +2,6 @@
 
 import { useState } from 'react';
 
-const img = (id: string) =>
-  `https://images.unsplash.com/${id}?w=600&h=760&fit=crop&crop=faces&auto=format&q=80`;
-
 type Aud = {
   key: string;
   icon: string;
@@ -15,7 +12,7 @@ type Aud = {
   card: { label: string; value: string; badge: string };
   asideText: string;
   link: string;
-  cta: string;
+  chip: { icon: string; text: string };
 };
 
 const AUDS: Aud[] = [
@@ -23,37 +20,37 @@ const AUDS: Aud[] = [
     key: 'business',
     icon: 'storefront',
     title: 'Flexible human help for your business.',
-    body: "Scale your team for a day or a season — vetted people for the real-world work software can't touch, no headcount, no hassle.",
-    image: img('photo-1517841905240-472988babdf9'),
+    body: "Hire vetted people for events, deliveries, content, field work, and last-minute support — scaled up for a busy season or down to a single shift. No headcount, no hassle.",
+    image: '/images/cards/for-business.jpg',
     tint: 'var(--coral-tint)',
     card: { label: 'Event crew booked', value: '$1,200', badge: '+18%' },
-    asideText: 'Flexible, vetted help that scales up and down with you.',
-    link: 'Set your team up in minutes',
-    cta: 'Hire for your business',
+    chip: { icon: 'verified_user', text: 'Vetted & insured' },
+    asideText: 'Vetted, reliable people you can book in minutes and trust on the job.',
+    link: 'Hire for your business',
   },
   {
     key: 'hero',
     icon: 'bolt',
     title: 'Become a Hero.',
-    body: 'Pick up real-world tasks that fit your skills and schedule. Get paid fast and build your rating as you go.',
-    image: img('photo-1500648767791-00dcc994a43e'),
+    body: "Get paid to help people and businesses with real-world tasks. Choose what you take on, work when it suits you, and earn doing the things AI can't.",
+    image: '/images/cards/for-people.jpg',
     tint: '#DCEAFF',
     card: { label: 'Earned this week', value: '$740', badge: '★ 4.9' },
-    asideText: 'Work as much or as little as you want, on your own terms.',
-    link: 'Start earning as a Hero',
-    cta: 'Become a Hero',
+    chip: { icon: 'bolt', text: 'Same-day pay' },
+    asideText: 'Get paid fast for work that fits your life.',
+    link: 'Start earning',
   },
   {
     key: 'agent',
     icon: 'smart_toy',
     title: 'Let your AI agent hire humans.',
-    body: 'Give your agent hands in the real world. It searches, hires, and coordinates trusted people through our API.',
-    image: img('photo-1599566150163-29194dcaad36'),
+    body: 'Soon, AI agents will search, hire, and coordinate trusted people through Quest — giving your agent real hands in the physical world.',
+    image: '/images/cards/for-ai.jpg',
     tint: '#E7E0FF',
     card: { label: 'Tasks dispatched', value: '128', badge: 'live' },
-    asideText: 'It only pays when the work is verified done — built for trust.',
+    chip: { icon: 'sync', text: 'Auto-coordinated' },
+    asideText: 'It only pays once the work is verified done — built for trust.',
     link: 'Join the developer preview',
-    cta: 'Join the developer preview',
   },
 ];
 
@@ -103,18 +100,19 @@ export default function AudiencesSection() {
               <span className="aud-media__badge">{a.card.badge}</span>
             </span>
           </div>
+          <div className="aud-media__chip">
+            <span className="material-symbols-outlined">{a.chip.icon}</span>
+            {a.chip.text}
+          </div>
         </div>
 
         <div className="aud-aside">
           <p className="aud-aside__text">{a.asideText}</p>
           <a href="#welcome" className="aud-aside__link">
             {a.link}
-            <span className="material-symbols-outlined">arrow_forward</span>
           </a>
         </div>
       </div>
-
-      <a href="#welcome" className="aud-cta">{a.cta}</a>
     </section>
   );
 }

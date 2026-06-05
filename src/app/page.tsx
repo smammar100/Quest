@@ -1,6 +1,21 @@
 import PageScript from './components/PageScript';
 import TasksShowcase from './components/TasksShowcase';
 import AudiencesSection from './components/AudiencesSection';
+import SocialProof from './components/SocialProof';
+
+// #bento use-case tiles — colour-blocked across the full Quest palette.
+// `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
+// back to the card colour until generated; 3 reuse existing assets.
+const useCases = [
+  { key: 'errands',  color: 'coral',    title: 'Run errands',               desc: 'Groceries, returns, pickups, and the small jobs that eat your day.', img: '/images/cards/for-everyday-tasks.png', fit: 'auto 115%' },
+  { key: 'events',   color: 'marigold', title: 'Staff events',              desc: 'Vetted hands for setup, hosting, and teardown, booked in minutes.', img: '/images/cards/for-onsite-crew.png', fit: 'cover' },
+  { key: 'move',     color: 'electric', title: 'Move and set up',           desc: 'Lift, assemble, mount, and install, with muscle and know-how on tap.', img: '/images/cards/for-heavy-lifting.png', fit: '110%' },
+  { key: 'deliver',  color: 'lime',     title: 'Deliver locally',           desc: 'Hand-delivered drop-offs across town by a real person nearby.', img: '/images/cards/for-same-day-delivery.png', fit: 'auto 115%' },
+  { key: 'content',  color: 'violet',   title: 'Create real-world content', desc: 'Photo, video, and UGC shot where it actually happens.', img: '/images/cards/for-onlocation-ugc.png', fit: 'auto 115%' },
+  { key: 'check',    color: 'sky',      title: 'Check places in person',    desc: 'Store audits, site visits, and mystery checks with photo proof.', img: '/images/cards/for-boots-on-grounds.png', fit: '110%' },
+  { key: 'business', color: 'ink',      title: 'Help your business',        desc: 'Scale a flexible, on-demand crew for ops, field, and retail.', img: '/images/cards/for-teams.png', fit: '110%' },
+  { key: 'anything', color: 'blush',    title: "Do anything AI can't",      desc: 'If it takes a human in the real world, someone here will do it.', img: '/images/cards/for-anything-else.png', fit: 'cover' },
+];
 
 export default function Home() {
   return (
@@ -26,9 +41,9 @@ export default function Home() {
             <ul>
               <li><a href="#how">How it works</a></li>
               <li><a href="#bento">For Business</a></li>
-              <li><a href="#developers">For Developers</a></li>
-              <li><a href="#">Pricing</a></li>
-              <li><a href="#">Blog</a></li>
+              <li><a href="#audiences">For AI Agents</a></li>
+              <li><a href="#audiences">Earn as a Hero</a></li>
+              <li><a href="#video">Manifesto</a></li>
             </ul>
           </nav>
 
@@ -39,8 +54,8 @@ export default function Home() {
       <section id="welcome" className="center">
         <h1><span className="sr-only">Google Antigravity</span></h1>
         <div className="quest-hero">
-          <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Introducing AI agents</span><span className="quest-hero__eyebrow-arrow">→</span></p>
-          <h2 className="quest-hero__title">AI <span className="rn-cross">can</span> do everything.<br />But <span className="rn-mark">humans</span> can.</h2>
+          <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></p>
+          <h2 className="quest-hero__title">AI can&apos;t do everything.<br />But <span className="rn-mark">humans</span> can.</h2>
           <p className="quest-hero__subtitle">Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can&apos;t do.</p>
 
           <div className="quest-prompt">
@@ -85,44 +100,30 @@ export default function Home() {
         <div className="bento-head">
           <div className="bento-head__text">
             <h2 className="bento-title">AI can write the plan.<br />Humans still show up.</h2>
-            <p className="bento-lede">Whatever you&apos;re trying to get done in the real world, there&apos;s a person ready to do it, well, today.</p>
+            <p className="bento-lede">Hire people for the physical, local, social, messy, urgent, and uniquely human work that AI cannot complete on its own.</p>
           </div>
-          <a href="#" className="bento-seeall">See all</a>
+          <div className="bento-arrows">
+            <button type="button" className="bento-arrow" data-dir="prev" aria-label="Previous use case"><span className="material-symbols-outlined">arrow_back</span></button>
+            <button type="button" className="bento-arrow" data-dir="next" aria-label="Next use case"><span className="material-symbols-outlined">arrow_forward</span></button>
+          </div>
         </div>
 
-        <div className="bento-grid">
-          <article className="bento-card bento-card--humans">
-            <div className="bento-card__body">
-              <h3>For humans</h3>
-              <p>Hire trusted humans for errands, events, deliveries, and the everyday tasks AI can&apos;t do.</p>
-              <a href="#" className="bento-btn">Hire a Human</a>
-            </div>
-            <div className="bento-card__media">
-              <img src="/images/cards/for-people.jpg" alt="A parcel parachuting down to a doorstep" loading="lazy" />
-            </div>
-          </article>
-
-          <article className="bento-card bento-card--business">
-            <div className="bento-card__body">
-              <h3>For business</h3>
-              <p>Scale your team on demand, vetted crew for events, ops, store checks, and field work.</p>
-              <a href="#" className="bento-btn">Hire for business</a>
-            </div>
-            <div className="bento-card__media">
-              <img src="/images/cards/for-business.jpg" alt="A crew setting up an outdoor event tent at golden hour" loading="lazy" />
-            </div>
-          </article>
-
-          <article className="bento-card bento-card--agents">
-            <div className="bento-card__body">
-              <h3>For AI agents</h3>
-              <p>Let your AI agent search, hire, and coordinate trusted humans to get real-world work done.</p>
-              <a href="#" className="bento-btn">Join developer preview</a>
-            </div>
-            <div className="bento-card__media">
-              <img src="/images/cards/for-ai.jpg" alt="A friendly robot handing a task to a person on a map" loading="lazy" />
-            </div>
-          </article>
+        <div className="bento-carousel">
+          <div className="bento-track">
+            {useCases.map((c) => (
+              <a key={c.key} href="#" className={`bento-card bento-card--${c.color}`}>
+                <div className="bento-card__top">
+                  <h3 className="bento-card__title">{c.title}</h3>
+                  <p className="bento-card__desc">{c.desc}</p>
+                </div>
+                <div
+                  className="bento-card__media"
+                  style={{ backgroundImage: `url(${c.img})`, backgroundSize: c.fit }}
+                  aria-hidden="true"
+                />
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -213,6 +214,8 @@ export default function Home() {
       <TasksShowcase />
 
       <AudiencesSection />
+
+      <SocialProof />
 
       <section id="product">
         <h2><span className="typewriter">Antigravity is our agentic development platform, evolving the IDE into the agent-first era.</span></h2>

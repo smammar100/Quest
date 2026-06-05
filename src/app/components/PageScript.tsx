@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { annotate, annotationGroup } from 'rough-notation';
+import { annotate } from 'rough-notation';
 
 export default function PageScript() {
   useEffect(() => {
@@ -30,25 +30,16 @@ export default function PageScript() {
       }
     }
 
-    // Hero headline: cross off "can", highlight "humans"
+    // Hero headline: highlight "humans"
     function drawHeroAnnotations() {
-      const crossEl = document.querySelector<HTMLElement>('.quest-hero__title .rn-cross');
       const markEl = document.querySelector<HTMLElement>('.quest-hero__title .rn-mark');
-      if (!crossEl || !markEl) return;
+      if (!markEl) return;
 
-      const highlight = annotate(markEl, {
+      annotate(markEl, {
         type: 'highlight',
         color: '#FF5A47',
         animationDuration: 800,
-      });
-      const crossOff = annotate(crossEl, {
-        type: 'crossed-off',
-        color: '#FF5A47',
-        strokeWidth: 3,
-        animationDuration: 700,
-      });
-
-      annotationGroup([highlight, crossOff]).show();
+      }).show();
       markEl.style.color = '#FFFFFF';
     }
 
@@ -112,6 +103,112 @@ export default function PageScript() {
         if (prev) prev.addEventListener('click', () => setActive(active - 1));
         if (next) next.addEventListener('click', () => setActive(active + 1));
         setActive(0);
+      }
+    }
+
+    // "AI can write the plan": centre-focused, draggable carousel.
+    // Translate the track so the active card sits at the viewport centre; CSS
+    // scales it up. Pointer drag scrubs the strip and snaps to the nearest card.
+    const bento = document.querySelector('#bento');
+    if (bento) {
+      const viewport = bento.querySelector<HTMLElement>('.bento-carousel');
+      const track = bento.querySelector<HTMLElement>('.bento-track');
+      const cards = [...bento.querySelectorAll<HTMLElement>('.bento-card')];
+      const bPrev = bento.querySelector<HTMLButtonElement>('.bento-arrow[data-dir="prev"]');
+      const bNext = bento.querySelector<HTMLButtonElement>('.bento-arrow[data-dir="next"]');
+      if (viewport && track && cards.length) {
+        let active = Math.floor((cards.length - 1) / 2);
+        let currentShift = 0;
+
+        // Clamp bounds: pin the first card to the content margin and the last to
+        // its mirror so the strip never reveals an empty gutter past the ends.
+        const bounds = () => {
+          const head = bento.querySelector<HTMLElement>('.bento-head');
+          const pad = head ? head.getBoundingClientRect().left : 24;
+          const vw = viewport.clientWidth;
+          return { vw, max: pad, min: Math.min(pad, vw - pad - track.scrollWidth) };
+        };
+        const clamp = (shift: number) => {
+          const { max, min } = bounds();
+          return Math.min(max, Math.max(min, shift));
+        };
+        const shiftForIndex = (i: number) => {
+          const { vw } = bounds();
+          const card = cards[i];
+          return clamp(vw / 2 - (card.offsetLeft + card.offsetWidth / 2));
+        };
+        const apply = (shift: number, animate: boolean) => {
+          currentShift = shift;
+          track.style.transition = animate ? '' : 'none';
+          track.style.transform = `translateX(${shift}px)`;
+        };
+        const markActive = () => {
+          cards.forEach((c, i) => c.classList.toggle('is-active', i === active));
+          if (bPrev) bPrev.disabled = active <= 0;
+          if (bNext) bNext.disabled = active >= cards.length - 1;
+        };
+        const render = (animate = true) => { apply(shiftForIndex(active), animate); markActive(); };
+        const setActive = (i: number) => {
+          active = Math.max(0, Math.min(cards.length - 1, i));
+          render();
+        };
+        const nearestIndex = (shift: number) => {
+          const { vw } = bounds();
+          let best = 0;
+          let bestDist = Infinity;
+          cards.forEach((c, i) => {
+            const dist = Math.abs(shift + c.offsetLeft + c.offsetWidth / 2 - vw / 2);
+            if (dist < bestDist) { bestDist = dist; best = i; }
+          });
+          return best;
+        };
+
+        // Pointer drag — scrub freely, live-feature the centred card, snap on release.
+        let dragging = false;
+        let moved = false;
+        let startX = 0;
+        let startShift = 0;
+        const onDown = (e: PointerEvent) => {
+          dragging = true;
+          moved = false;
+          startX = e.clientX;
+          startShift = currentShift;
+          viewport.classList.add('is-dragging');
+        };
+        const onMove = (e: PointerEvent) => {
+          if (!dragging) return;
+          const dx = e.clientX - startX;
+          if (Math.abs(dx) > 4) moved = true;
+          apply(clamp(startShift + dx), false);
+          const ni = nearestIndex(currentShift);
+          if (ni !== active) { active = ni; markActive(); }
+        };
+        const onUp = () => {
+          if (!dragging) return;
+          dragging = false;
+          viewport.classList.remove('is-dragging');
+          active = nearestIndex(currentShift);
+          render();
+        };
+        track.addEventListener('pointerdown', onDown);
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
+        track.addEventListener('dragstart', (e) => e.preventDefault());
+
+        cards.forEach((c, i) =>
+          c.addEventListener('click', (e) => { e.preventDefault(); if (!moved && i !== active) setActive(i); })
+        );
+        if (bPrev) bPrev.addEventListener('click', () => setActive(active - 1));
+        if (bNext) bNext.addEventListener('click', () => setActive(active + 1));
+
+        let bRaf = 0;
+        window.addEventListener('resize', () => {
+          cancelAnimationFrame(bRaf);
+          bRaf = requestAnimationFrame(() => render(false));
+        });
+        render(false);
+        if (document.fonts?.ready) void document.fonts.ready.then(() => render(false));
       }
     }
 
