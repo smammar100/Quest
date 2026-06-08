@@ -20,29 +20,29 @@ const avatar = (i: number) =>
 type Task = { cat: string; title: string; price: string; a: number };
 
 const TABS: { key: string; label: string; icon: string }[] = [
-  { key: 'moving', label: 'Moving in', icon: 'local_shipping' },
-  { key: 'home', label: 'Home & garden', icon: 'yard' },
-  { key: 'events', label: 'Events', icon: 'celebration' },
-  { key: 'content', label: 'Content', icon: 'videocam' },
+  { key: 'field', label: 'Field data', icon: 'pin_drop' },
   { key: 'errands', label: 'Errands', icon: 'bolt' },
+  { key: 'content', label: 'Content', icon: 'videocam' },
+  { key: 'events', label: 'Events', icon: 'celebration' },
+  { key: 'home', label: 'Home', icon: 'home_repair_service' },
 ];
 
 const DATA: Record<string, Task[]> = {
-  moving: [
-    { cat: 'Removals', title: 'Help moving house', price: '$500', a: 2 },
-    { cat: 'Delivery', title: 'King mattress pickup & delivery', price: '$85', a: 0 },
-    { cat: 'Removals', title: '2-bed apartment move', price: '$420', a: 4 },
-    { cat: 'Delivery', title: 'Sofa delivery', price: '$95', a: 1 },
-    { cat: 'Removals', title: 'Pack & load a moving truck', price: '$260', a: 6 },
-    { cat: 'Delivery', title: 'Fridge pickup & drop-off', price: '$110', a: 9 },
+  errands: [
+    { cat: 'Delivery', title: 'Same-day grocery run', price: '$40', a: 9 },
+    { cat: 'Errands', title: 'Pick up & deliver a parcel', price: '$35', a: 2 },
+    { cat: 'Pets', title: 'Daily dog walking', price: '$30', a: 6 },
+    { cat: 'Errands', title: 'Pick up dry cleaning', price: '$25', a: 1 },
+    { cat: 'Delivery', title: 'Airport drop-off ride', price: '$60', a: 3 },
+    { cat: 'Errands', title: 'Queue for a sneaker drop', price: '$50', a: 7 },
   ],
-  home: [
-    { cat: 'Cleaning', title: 'End of lease clean', price: '$450', a: 1 },
-    { cat: 'Yard work', title: 'Mow lawn in Dallas', price: '$100', a: 4 },
-    { cat: 'Handyman', title: 'Assemble flat-pack furniture', price: '$120', a: 5 },
-    { cat: 'Cleaning', title: 'Deep kitchen clean', price: '$180', a: 7 },
-    { cat: 'Gardening', title: 'Trim hedges & weed the beds', price: '$140', a: 3 },
-    { cat: 'Handyman', title: 'Mount a TV on the wall', price: '$90', a: 8 },
+  content: [
+    { cat: 'Content', title: 'Film a UGC video', price: '$250', a: 4 },
+    { cat: 'Photo', title: 'Product photoshoot on location', price: '$400', a: 0 },
+    { cat: 'Social', title: 'Shoot 10 Reels on location', price: '$500', a: 5 },
+    { cat: 'Photo', title: 'Real-estate listing photos', price: '$220', a: 8 },
+    { cat: 'Photo', title: 'Restaurant menu shoot', price: '$300', a: 6 },
+    { cat: 'Content', title: 'Event highlight video', price: '$650', a: 2 },
   ],
   events: [
     { cat: 'Events', title: 'Birthday party photographer', price: '$300', a: 3 },
@@ -52,21 +52,21 @@ const DATA: Record<string, Task[]> = {
     { cat: 'Music', title: 'DJ for a house party', price: '$400', a: 4 },
     { cat: 'Events', title: 'Balloon & decor styling', price: '$180', a: 7 },
   ],
-  content: [
-    { cat: 'Content', title: 'Create a UGC video', price: '$250', a: 4 },
-    { cat: 'Web', title: 'Build a landing page', price: '$900', a: 8 },
-    { cat: 'Design', title: 'Design a brand logo', price: '$350', a: 6 },
-    { cat: 'Content', title: 'Product photoshoot', price: '$400', a: 0 },
-    { cat: 'Web', title: 'Fix my Shopify store', price: '$300', a: 2 },
-    { cat: 'Social', title: '10 Reels for Instagram', price: '$500', a: 5 },
+  field: [
+    { cat: 'Data capture', title: 'Record street video for AI training', price: '$120', a: 4 },
+    { cat: 'Survey', title: 'Run a 50-person field survey', price: '$200', a: 3 },
+    { cat: 'Site visit', title: 'Site visit & inspection report', price: '$150', a: 8 },
+    { cat: 'Mystery shop', title: 'Mystery shop a retail store', price: '$70', a: 1 },
+    { cat: 'Photo capture', title: 'Photograph 30 store shelves', price: '$90', a: 0 },
+    { cat: 'Verification', title: 'Verify a business address on-site', price: '$45', a: 6 },
   ],
-  errands: [
-    { cat: 'Delivery', title: 'Same-day grocery run', price: '$40', a: 9 },
-    { cat: 'Pets', title: 'Daily dog walking', price: '$30', a: 6 },
-    { cat: 'Errands', title: 'Pick up dry cleaning', price: '$25', a: 2 },
-    { cat: 'Delivery', title: 'Airport drop-off ride', price: '$60', a: 1 },
-    { cat: 'Pets', title: 'Cat sitting for a weekend', price: '$120', a: 3 },
-    { cat: 'Errands', title: 'Queue for a sneaker drop', price: '$50', a: 7 },
+  home: [
+    { cat: 'Cleaning', title: 'End of lease clean', price: '$450', a: 1 },
+    { cat: 'Handyman', title: 'Assemble flat-pack furniture', price: '$120', a: 5 },
+    { cat: 'Yard work', title: 'Mow & tidy the lawn', price: '$100', a: 4 },
+    { cat: 'Cleaning', title: 'Deep kitchen clean', price: '$180', a: 7 },
+    { cat: 'Gardening', title: 'Trim hedges & weed the beds', price: '$140', a: 3 },
+    { cat: 'Handyman', title: 'Mount a TV on the wall', price: '$90', a: 8 },
   ],
 };
 
@@ -90,24 +90,26 @@ function Card({ t, hidden }: { t: Task; hidden?: boolean }) {
 
 function Row({ items, dir }: { items: Task[]; dir: 'ltr' | 'rtl' }) {
   // Render the set twice so the CSS marquee (translateX -50%) loops seamlessly.
+  const loop = [...items, ...items];
   return (
     <div className={`tasks-row tasks-row--${dir}`}>
-      {items.map((t, i) => <Card key={`a${i}`} t={t} />)}
-      {items.map((t, i) => <Card key={`b${i}`} t={t} hidden />)}
+      {loop.map((t, i) => (
+        <Card key={i} t={t} hidden={i >= items.length} />
+      ))}
     </div>
   );
 }
 
 export default function TasksShowcase() {
-  const [active, setActive] = useState('moving');
+  const [active, setActive] = useState('field');
   const cards = DATA[active];
   const row2 = [...cards].reverse();
 
   return (
     <section id="tasks">
       <div className="tasks-head">
-        <h2 className="tasks-title">See what others are getting done</h2>
-        <a href="#welcome" className="tasks-post">Post your task for free</a>
+        <h2 className="tasks-title">Real tasks. Real humans. Real work done.</h2>
+        <a href="#welcome" className="tasks-post">Describe a task, free</a>
       </div>
       <div className="tasks-tabs">
         {TABS.map((tab) => (
