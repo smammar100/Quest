@@ -4,6 +4,7 @@ import TasksShowcase from './components/TasksShowcase';
 import AudiencesSection from './components/AudiencesSection';
 import SocialProof from './components/SocialProof';
 import FaqSection from './components/FaqSection';
+import CtaSection from './components/CtaSection';
 import SiteFooter from './components/SiteFooter';
 
 // #bento use-case tiles — colour-blocked across the full Quest palette.
@@ -221,6 +222,8 @@ export default function Home() {
       <SocialProof />
 
       <FaqSection />
+
+      <CtaSection />
 
       <SiteFooter />
 

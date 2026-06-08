@@ -1,5 +1,4 @@
-// Combined CTA + footer on ONE moving gradient (Figma "Invoice.AI" section+footer style,
-// recolored to Quest's coral→violet→near-black). Centered CTA → 4-column footer.
+// White-background footer (the closing CTA is now a separate <CtaSection> above this).
 const COLUMNS = [
   {
     title: 'Product',
@@ -62,36 +61,12 @@ const SOCIALS = [
   },
 ];
 
-// "Trusted by" avatar group (replaces the CTA eyebrow) — Unsplash portrait thumbnails.
-const TRUST_AVATARS = [
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=faces&auto=format&q=80',
-  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=96&h=96&fit=crop&crop=faces&auto=format&q=80',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=96&h=96&fit=crop&crop=faces&auto=format&q=80',
-];
-
 export default function SiteFooter() {
   return (
     <footer className="site-footer">
-      <div className="ft-cta">
-        <div className="ft-cta__content">
-          <div className="ft-trust">
-            <div className="ft-trust__avatars" aria-hidden="true">
-              {TRUST_AVATARS.map((src, i) => (
-                <img key={i} className="ft-trust__avatar" src={src} alt="" width={28} height={28} loading="lazy" />
-              ))}
-            </div>
-            <p className="ft-trust__text">Trusted by <strong>750k+</strong> Heroes</p>
-          </div>
-          <h2 className="ft-cta__title">Creating the next million jobs uniquely human</h2>
-          <p className="ft-cta__sub">Hire trusted people for the real-world work AI can&apos;t do &mdash; describe a task in a sentence and a Hero gets it done.</p>
-          <a href="#welcome" className="ft-cta-btn ft-cta-btn--primary">Hire a human now</a>
-        </div>
-      </div>
-
       <div className="ft-inner">
         <div className="ft-top">
-          <a href="#welcome" className="quest-logo quest-logo--light" aria-label="Quest">
+          <a href="#welcome" className="quest-logo" aria-label="Quest">
             <svg className="quest-logo__mark" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
               <circle cx="11" cy="11" r="8" stroke="#FF5A47" strokeWidth="3.2" />
               <line x1="16.8" y1="16.8" x2="22.5" y2="22.5" stroke="#FF5A47" strokeWidth="3.2" strokeLinecap="round" />
