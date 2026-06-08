@@ -30,24 +30,23 @@ export default function PageScript() {
       }
     }
 
-    // Hero headline: highlight "humans"
-    function drawHeroAnnotations() {
-      const markEl = document.querySelector<HTMLElement>('.quest-hero__title .rn-mark');
-      if (!markEl) return;
-
-      annotate(markEl, {
-        type: 'highlight',
-        color: '#FF5A47',
-        animationDuration: 800,
-      }).show();
-      markEl.style.color = '#FFFFFF';
-    }
-
-    const startHero = () => setTimeout(drawHeroAnnotations, 120);
-    if (document.fonts?.ready) {
-      void document.fonts.ready.then(startHero);
-    } else {
-      window.addEventListener('load', startHero);
+    // Hero headline: hand-drawn highlight on "human" (rough-notation). Draw only once the
+    // span is laid out (fonts loaded), and redraw on resize so the marker tracks layout shifts.
+    const heroMark = document.querySelector<HTMLElement>('.quest-hero__title .rn-mark');
+    if (heroMark) {
+      let heroAnno: ReturnType<typeof annotate> | null = null;
+      const drawHeroMark = () => {
+        if (heroMark.getBoundingClientRect().width < 1) { requestAnimationFrame(drawHeroMark); return; }
+        heroAnno?.remove();
+        heroAnno = annotate(heroMark, { type: 'highlight', color: '#FF5A47', animationDuration: 700 });
+        heroMark.style.color = '#FFFFFF';
+        heroAnno.show();
+      };
+      const startHeroMark = () => requestAnimationFrame(() => requestAnimationFrame(drawHeroMark));
+      if (document.fonts?.ready) void document.fonts.ready.then(startHeroMark);
+      else window.addEventListener('load', startHeroMark);
+      let heroResizeT: ReturnType<typeof setTimeout>;
+      window.addEventListener('resize', () => { clearTimeout(heroResizeT); heroResizeT = setTimeout(drawHeroMark, 150); });
     }
 
     // Video section: click-to-play

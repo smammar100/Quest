@@ -1,7 +1,10 @@
+import type { CSSProperties } from 'react';
 import PageScript from './components/PageScript';
 import TasksShowcase from './components/TasksShowcase';
 import AudiencesSection from './components/AudiencesSection';
 import SocialProof from './components/SocialProof';
+import FaqSection from './components/FaqSection';
+import SiteFooter from './components/SiteFooter';
 
 // #bento use-case tiles — colour-blocked across the full Quest palette.
 // `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
@@ -55,29 +58,28 @@ export default function Home() {
         <h1><span className="sr-only">Google Antigravity</span></h1>
         <div className="quest-hero">
           <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></p>
-          <h2 className="quest-hero__title">AI can&apos;t do everything.<br />But <span className="rn-mark">humans</span> can.</h2>
+          <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything, hire a <span className="rn-mark">human</span></h2>
           <p className="quest-hero__subtitle">Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can&apos;t do.</p>
 
           <div className="quest-prompt">
-            <input className="quest-prompt__input" type="text" placeholder="I need a lawn mower in Dallas for 100$" aria-label="Describe what you need" />
+            <input className="quest-prompt__input" type="text" placeholder="Pick up a parcel in New York for $40" aria-label="Describe what you need" />
             <div className="quest-prompt__toolbar">
               <button type="button" className="quest-prompt__icon-btn quest-prompt__add" aria-label="Add attachment"><span className="material-symbols-outlined">add</span></button>
               <div className="quest-prompt__actions">
                 <button type="button" className="quest-prompt__icon-btn" aria-label="Adjust filters"><span className="material-symbols-outlined">tune</span></button>
                 <button type="button" className="quest-prompt__icon-btn" aria-label="Voice input"><span className="material-symbols-outlined">mic</span></button>
-                <button type="button" className="quest-prompt__submit">Submit</button>
+                <button type="button" className="quest-prompt__submit">Hire a human</button>
               </div>
             </div>
           </div>
 
           <div className="quest-suggest">
-            <p className="quest-suggest__label">Not sure where to start? Try one of these:</p>
+            <p className="quest-suggest__label">What do you need a human to do?</p>
             <div className="quest-suggest__pills">
-              <button type="button" className="quest-pill">Deliver food</button>
-              <button type="button" className="quest-pill">Create a UGC Video</button>
-              <button type="button" className="quest-pill">Develop a website</button>
-              <button type="button" className="quest-pill">Install a furniture</button>
-              <button type="button" className="quest-pill">Do Event Photography</button>
+              <button type="button" className="quest-pill">Pick up a parcel in New York</button>
+              <button type="button" className="quest-pill">Shoot a UGC video</button>
+              <button type="button" className="quest-pill">Check an apartment &amp; take photos</button>
+              <button type="button" className="quest-pill">Assemble furniture</button>
             </div>
           </div>
         </div>
@@ -110,8 +112,8 @@ export default function Home() {
 
         <div className="bento-carousel">
           <div className="bento-track">
-            {useCases.map((c) => (
-              <a key={c.key} href="#" className={`bento-card bento-card--${c.color}`}>
+            {useCases.map((c, i) => (
+              <a key={c.key} href="#" className={`bento-card bento-card--${c.color}`} style={{ '--i': i } as CSSProperties}>
                 <div className="bento-card__top">
                   <h3 className="bento-card__title">{c.title}</h3>
                   <p className="bento-card__desc">{c.desc}</p>
@@ -129,8 +131,9 @@ export default function Home() {
 
       <section id="video">
         <div className="video-head">
-          <h2 className="video-title">Why humans still matter<br />when AI <span className="video-cross">can</span> do almost everything.</h2>
-          <a href="#" className="video-cta">Learn more about Manifesto <span className="material-symbols-outlined">arrow_forward</span></a>
+          <h2 className="video-title">Why humans still matter<br />in the age of AI.</h2>
+          <p className="video-sub">For 5 years, Quest called them Heroes. Today, we&apos;re saying what we&apos;ve always believed more clearly: real-world work still needs humans.</p>
+          <a href="#" className="video-cta">Read the Manifesto <span className="material-symbols-outlined">arrow_forward</span></a>
         </div>
         <div className="video-frame">
           <video className="video-el" preload="metadata" playsInline>
@@ -156,7 +159,7 @@ export default function Home() {
         <div className="how-track">
           <article className="how-card is-active">
             <h3 className="how-card__title">Tell us what you need</h3>
-            <p className="how-card__desc">Post your task in a sentence — when, where, and what done looks like.</p>
+            <p className="how-card__desc">Describe the task, location, deadline, and budget in one sentence.</p>
             <span className="how-card__num">/ 01</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--post">
@@ -174,11 +177,11 @@ export default function Home() {
           </article>
           <article className="how-card">
             <h3 className="how-card__title">Get matched with humans</h3>
-            <p className="how-card__desc">We surface trusted Heroes nearby with the right skills and reviews.</p>
+            <p className="how-card__desc">Quest matches you with trusted humans who have the right skills, location, and track record.</p>
             <span className="how-card__num">/ 02</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--match">
-                <div className="qmock__head"><span className="qmock__title">Matched Heroes</span><span className="qmock__pill">5 new offers</span></div>
+                <div className="qmock__head"><span className="qmock__title">Matched humans</span><span className="qmock__pill">5 new offers</span></div>
                 <ul className="qmock__heroes">
                   <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Maya R.</b><small>★ 4.9 · Lawn care · 0.8 mi</small></span><button className="qmock__assign">Assign</button></li>
                   <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Arjun P.</b><small>★ 4.8 · Gardening · 1.2 mi</small></span><button className="qmock__assign">Assign</button></li>
@@ -186,13 +189,13 @@ export default function Home() {
                   <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Daniel T.</b><small>★ 4.7 · Landscaping · 2.4 mi</small></span><button className="qmock__assign">Assign</button></li>
                   <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Liam K.</b><small>★ 4.8 · Yard care · 1.6 mi</small></span><button className="qmock__assign">Assign</button></li>
                 </ul>
-                <div className="qmock__foot"><span className="material-symbols-outlined">verified_user</span>12 background-checked Heroes nearby</div>
+                <div className="qmock__foot"><span className="material-symbols-outlined">verified_user</span>12 background-checked humans nearby</div>
               </div>
             </div>
           </article>
           <article className="how-card">
             <h3 className="how-card__title">Hire, pay, and get it done</h3>
-            <p className="how-card__desc">Agree the price, track the work, and pay securely when it&apos;s complete.</p>
+            <p className="how-card__desc">Hire the right person, track progress, and pay securely through Quest. Funds are held safely until the work is done.</p>
             <span className="how-card__num">/ 03</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--pay">
@@ -216,6 +219,10 @@ export default function Home() {
       <AudiencesSection />
 
       <SocialProof />
+
+      <FaqSection />
+
+      <SiteFooter />
 
       <section id="product">
         <h2><span className="typewriter">Antigravity is our agentic development platform, evolving the IDE into the agent-first era.</span></h2>
