@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import PageScript from './components/PageScript';
+import ScrollFX from './components/ScrollFX';
 import TasksShowcase from './components/TasksShowcase';
 import AudiencesSection from './components/AudiencesSection';
 import SocialProof from './components/SocialProof';
@@ -365,6 +366,7 @@ export default function Home() {
       </section>
 
       <PageScript />
+      <ScrollFX />
     </>
   );
 }
