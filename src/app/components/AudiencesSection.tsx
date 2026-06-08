@@ -85,7 +85,7 @@ export default function AudiencesSection() {
                   <span className="aud-item__icon material-symbols-outlined">{it.icon}</span>
                   <span className="aud-item__title">{it.title}</span>
                 </div>
-                {on && <p className="aud-item__body">{it.body}</p>}
+                <p className="aud-item__body">{it.body}</p>
               </div>
             );
           })}
