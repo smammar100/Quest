@@ -44,11 +44,11 @@ export default function Home() {
 
           <nav>
             <ul>
-              <li><a href="#how">How it works</a></li>
-              <li><a href="#bento">For Business</a></li>
-              <li><a href="#audiences">For AI Agents</a></li>
-              <li><a href="#audiences">Earn as a Hero</a></li>
-              <li><a href="#video">Manifesto</a></li>
+              <li><a href="#how"><span className="nav-rn">How it works</span></a></li>
+              <li><a href="#bento"><span className="nav-rn">For Business</span></a></li>
+              <li><a href="#audiences"><span className="nav-rn">For AI Agents</span></a></li>
+              <li><a href="#audiences"><span className="nav-rn">Earn as a Hero</span></a></li>
+              <li><a href="#video"><span className="nav-rn">Manifesto</span></a></li>
             </ul>
           </nav>
 
@@ -60,7 +60,7 @@ export default function Home() {
         <h1><span className="sr-only">Google Antigravity</span></h1>
         <div className="quest-hero">
           <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></p>
-          <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything, hire a <span className="rn-mark">human</span></h2>
+          <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything. Hire a <span className="rn-mark">human</span></h2>
           <p className="quest-hero__subtitle">Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can&apos;t do.</p>
 
           <div className="quest-prompt">

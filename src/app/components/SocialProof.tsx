@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react';
 // big number, accent icon badge top-right, description at the bottom.
 const CARDS = [
   { key: 'people', tint: 'coral',    num: '750k+',  icon: 'groups',     desc: 'From weekend helpers to seasoned pros, hundreds of thousands are ready to work.' },
+  { key: 'income', tint: 'teal',     num: '$2M+',   icon: 'payments',   desc: 'Flexible income that adds up, earned by Heroes doing real-world work.' },
   { key: 'quests', tint: 'violet',   num: '3,500+', icon: 'task_alt',   desc: 'Every week, thousands of real-world tasks get done through real people.' },
   { key: 'biz',    tint: 'lime',     num: '600+',   icon: 'store',      desc: 'From corner shops to global brands, hundreds of businesses rely on Quest.' },
   { key: 'geo',    tint: 'sky',      num: '5',      icon: 'public',     desc: 'Live across Singapore, the Philippines, Indonesia, Malaysia, and the US.' },
