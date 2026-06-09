@@ -1860,14 +1860,14 @@ button.secondary:focus-visible{
 .proof-card:nth-child(odd){  --rest-tilt:0deg; }   /* tilt removed — cards sit straight (user request) */
 .proof-card:nth-child(even){ --rest-tilt:0deg; }
 
-/* card colours synced to the #bento palette. --accent (number + badge) uses the exact bento
-   brand tokens; for the pale fills (lime/marigold) --ink darkens the small description so it
-   stays readable on white, and the badge icon flips to dark. */
+/* card colours synced to the #bento palette — number, unit AND description all use the one
+   bento --accent per card. The pale lime/marigold fills get a dark badge icon so it stays
+   visible on the light circle. */
 .proof-card--coral{    --accent:var(--coral); }
 .proof-card--violet{   --accent:var(--violet); }
-.proof-card--lime{     --accent:var(--lime);     --ink:#5d8a00; }   /* bento "Deliver locally" green */
+.proof-card--lime{     --accent:var(--lime); }       /* bento "Deliver locally" green */
 .proof-card--sky{      --accent:var(--electric); }
-.proof-card--marigold{ --accent:var(--marigold); --ink:#b06f00; }  /* bento "Staff events" orange */
+.proof-card--marigold{ --accent:var(--marigold); }   /* bento "Staff events" orange */
 .proof-card--teal{     --accent:#0d9488; }           /* income — no bento equivalent; kept distinct */
 .proof-card--lime.proof-card .proof-card__icon,
 .proof-card--marigold.proof-card .proof-card__icon{ color:var(--near-black); }
@@ -1907,7 +1907,7 @@ button.secondary:focus-visible{
 	align-self:end;
 	margin:0; max-width:30ch;
 	font-family:var(--q-work); font-weight:600; font-size:clamp(.95rem, 1.15vw, 1.12rem);
-	line-height:1.45; color:var(--ink, var(--accent));
+	line-height:1.45; color:var(--accent);
 }
 
 /* Mobile: drop sticky/tilt/aspect → plain readable vertical stack */
