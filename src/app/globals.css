@@ -1887,10 +1887,18 @@ button.secondary:focus-visible{
 	line-height:1;
 	font-variation-settings:'FILL' 1;   /* solid icon (needs FILL axis loaded in layout.tsx) */
 }
+.proof-card__stat{
+	align-self:start; justify-self:start;    /* number + unit sit at the TOP of the card */
+	display:flex; flex-direction:column; align-items:flex-start; gap:clamp(4px, 0.6vw, 10px);
+}
 .proof-card__num{
-	align-self:center; justify-self:start;   /* big number, upper-middle */
 	font-family:var(--q-display); font-weight:800;
 	font-size:clamp(3rem, 7vw, 6.5rem); line-height:.9; letter-spacing:-0.03em;
+	color:var(--accent);
+}
+.proof-card__unit{
+	font-family:var(--q-work); font-weight:700;
+	font-size:clamp(.95rem, 1.5vw, 1.35rem); letter-spacing:.04em; text-transform:uppercase;
 	color:var(--accent);
 }
 .proof-card__desc{
