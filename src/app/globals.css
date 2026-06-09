@@ -1642,6 +1642,8 @@ button.secondary:focus-visible{
 	padding:20px;
 	display:flex; flex-direction:column; gap:18px;
 }
+/* phones: smaller task cards so the marquee shows ~1.5 cards + a clear peek of the next */
+@media (max-width:480px){ .task-card{ width:clamp(210px, 64vw, 300px); } }
 .task-card__head{ display:flex; align-items:flex-start; gap:12px; }
 .task-card__avatar{ flex:none; width:44px; height:44px; border-radius:50%; object-fit:cover; background:var(--offwhite); }
 .task-card__meta{ min-width:0; }
@@ -2618,22 +2620,23 @@ nav a{ font-weight:500; }
 }
 .site-footer .quest-logo__word{ color:var(--near-black); }
 @keyframes ft-drift{
-	0%   { transform:translate3d(-2.5%, -1.5%, 0) scale(1.04) rotate(-2deg); }
-	100% { transform:translate3d(2.5%, 2%, 0) scale(1.10) rotate(2deg); }
+	0%,100% { transform:translate3d(-5%, -3%, 0) scale(1.06) rotate(-3deg); }
+	33%     { transform:translate3d(5%, 3%, 0)   scale(1.18) rotate(3deg); }
+	66%     { transform:translate3d(-2%, 5%, 0)  scale(1.10) rotate(-1deg); }
 }
 /* animated CTA card gradient: slowly sweeps the coral→violet→electric blend */
 @keyframes cta-gradient{
-	from { background-position:0% 0%; }
-	to   { background-position:100% 100%; }
+	from { background-position:0% 50%; }
+	to   { background-position:100% 50%; }
 }
 
 .ft-cta{   /* the gradient card itself, contained in the main column */
 	grid-column:main;
 	position:relative; isolation:isolate; overflow:hidden;
 	border-radius:clamp(20px, 2.5vw, 34px);
-	background:linear-gradient(150deg, var(--coral) 0%, var(--violet) 52%, var(--electric) 100%);
-	background-size:200% 200%;                 /* >100% so the position shift is visible */
-	animation:cta-gradient 14s ease-in-out infinite alternate;
+	background:linear-gradient(120deg, var(--coral) 0%, var(--violet) 50%, var(--electric) 100%);
+	background-size:240% 240%;                 /* big so the horizontal sweep travels far + reads as flow */
+	animation:cta-gradient 9s ease-in-out infinite alternate;
 	padding:clamp(64px, 8vw, 96px) clamp(24px, 5vw, 72px);
 	box-shadow:0 32px 72px -44px rgba(123,92,255,.5);
 }
@@ -2644,11 +2647,11 @@ nav a{ font-weight:500; }
 .ft-cta::after{    /* moving blob mesh (clipped to the rounded card) */
 	content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
 	background:
-		radial-gradient(44% 46% at 20% 26%, rgba(255,90,71,.42), transparent 64%),
-		radial-gradient(48% 50% at 82% 28%, rgba(123,92,255,.46), transparent 64%),
-		radial-gradient(42% 44% at 60% 82%, rgba(255,182,39,.26), transparent 64%),
-		radial-gradient(28% 30% at 46% 50%, rgba(255,255,255,.12), transparent 60%);
-	animation:ft-drift 22s ease-in-out infinite alternate;
+		radial-gradient(48% 50% at 18% 24%, rgba(255,90,71,.34), transparent 64%),
+		radial-gradient(52% 54% at 84% 30%, rgba(123,92,255,.38), transparent 64%),
+		radial-gradient(46% 48% at 62% 84%, rgba(255,182,39,.22), transparent 64%),
+		radial-gradient(32% 34% at 44% 52%, rgba(255,255,255,.10), transparent 60%);
+	animation:ft-drift 16s ease-in-out infinite;
 }
 .ft-cta__content{
 	display:flex; flex-direction:column; align-items:center; text-align:center;

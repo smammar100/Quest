@@ -45,6 +45,8 @@ export default function PageScript() {
       const startHeroMark = () => requestAnimationFrame(() => requestAnimationFrame(drawHeroMark));
       if (document.fonts?.ready) void document.fonts.ready.then(startHeroMark);
       else window.addEventListener('load', startHeroMark);
+      // Timer fallback: rAF can be throttled before the first paint, so guarantee one draw.
+      setTimeout(drawHeroMark, 700);
       let heroResizeT: ReturnType<typeof setTimeout>;
       window.addEventListener('resize', () => { clearTimeout(heroResizeT); heroResizeT = setTimeout(drawHeroMark, 150); });
     }
