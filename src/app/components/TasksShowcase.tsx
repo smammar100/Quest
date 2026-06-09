@@ -24,7 +24,7 @@ const TABS: { key: string; label: string; icon: string }[] = [
   { key: 'errands', label: 'Errands', icon: 'bolt' },
   { key: 'content', label: 'Content', icon: 'videocam' },
   { key: 'events', label: 'Events', icon: 'celebration' },
-  { key: 'home', label: 'Home', icon: 'home_repair_service' },
+  { key: 'home', label: 'Home', icon: 'home' },
 ];
 
 const DATA: Record<string, Task[]> = {
@@ -108,7 +108,7 @@ export default function TasksShowcase() {
   return (
     <section id="tasks">
       <div className="tasks-head">
-        <h2 className="tasks-title">Real tasks. Real humans. Real work done.</h2>
+        <h2 className="tasks-title">Real tasks. Real humans.<br />Real work done.</h2>
         <a href="#welcome" className="tasks-post">Describe a task, free</a>
       </div>
       <div className="tasks-tabs">

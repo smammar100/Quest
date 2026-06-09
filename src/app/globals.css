@@ -1866,6 +1866,7 @@ button.secondary:focus-visible{
 .proof-card--lime{     --accent:#5fa600; }           /* vivid green (brand lime #C6F23C is too pale for text) */
 .proof-card--sky{      --accent:var(--electric); }   /* #2E5BFF (brand sky #9FD2FF is too pale for text) */
 .proof-card--marigold{ --accent:#db7d00; }           /* vivid amber (brand marigold #FFB627 is too pale for text) */
+.proof-card--teal{     --accent:#0d9488; }           /* income card — fresh teal, distinct from the lime green */
 
 /* filled circular icon badge — sized to fit fully inside the peeking sliver (top-right).
    NOTE: selector is `.proof-card .proof-card__icon` (specificity 0,2,0) on purpose — it must
@@ -1985,6 +1986,17 @@ a:focus-visible, button:focus-visible{
 	backdrop-filter:none;
 }
 nav a{ font-weight:500; }
+/* nav hover indicator = a hand-drawn coral underline that draws in left→right (replaces the pill) */
+.header-wrapper nav a:hover,
+.header-wrapper nav a:focus-visible{ background:transparent; }
+.header-wrapper nav .nav-rn{ position:relative; display:inline-block; }
+.header-wrapper nav .nav-rn::after{
+	content:""; position:absolute; left:0; right:0; bottom:-3px; height:.42em; pointer-events:none;
+	background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='8' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1.5 5.5 C18 2.5 34 6.5 50 4.5 C66 2.5 82 6.5 98.5 4' fill='none' stroke='%23FF5A47' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+	transform:scaleX(0); transform-origin:left center; transition:transform .28s ease;
+}
+.header-wrapper nav a:hover .nav-rn::after,
+.header-wrapper nav a:focus-visible .nav-rn::after{ transform:scaleX(1); }
 
 /* Navbar layout: Logo (left) — Nav links (center) — CTA (right) */
 @media (width >= 930px){
@@ -2692,12 +2704,19 @@ nav a{ font-weight:500; }
 }
 .ft-col__list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
 .ft-link{
-	display:inline; padding:0;
+	position:relative; display:inline-block; padding:0;
 	font-family:var(--q-work); font-size:.95rem;
 	color:var(--near-black); text-decoration:none;
 	transition:color .15s ease;
 }
-.ft-link:hover{ color:var(--coral); }
+.ft-link::after{
+	content:""; position:absolute; left:0; right:0; bottom:-3px; height:.42em; pointer-events:none;
+	background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='8' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M1.5 5.5 C18 2.5 34 6.5 50 4.5 C66 2.5 82 6.5 98.5 4' fill='none' stroke='%23FF5A47' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+	transform:scaleX(0); transform-origin:left center; transition:transform .28s ease;
+}
+.ft-link:hover::after{ transform:scaleX(1); }
+/* footer links live inside <nav class="ft-cols">, so they inherit the Antigravity nav-pill on hover — kill it */
+.ft-link:hover, .ft-link:focus-visible{ background:transparent; }
 
 /* bottom: copyright (left) + socials (right) */
 .ft-bottom{
@@ -2730,7 +2749,7 @@ nav a{ font-weight:500; }
 @media (prefers-reduced-motion:reduce){
 	.faq-item::details-content{ transition:none; }
 	.faq-item, .faq-q__icon{ transition:background .2s ease, color .2s ease; }
-	.cta-btn, .ft-cta-btn, .ft-social, .ft-link{ transition:none; }
+	.cta-btn, .ft-cta-btn, .ft-social, .ft-link, .ft-link::after, .header-wrapper nav .nav-rn::after{ transition:none; }
 	.ft-cta, .ft-cta::after{ animation:none; }
 }
 
