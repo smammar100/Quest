@@ -1860,15 +1860,17 @@ button.secondary:focus-visible{
 .proof-card:nth-child(odd){  --rest-tilt:0deg; }   /* tilt removed — cards sit straight (user request) */
 .proof-card:nth-child(even){ --rest-tilt:0deg; }
 
-/* per-card --accent = the bright vibrant brand colour used for the number, description + badge.
-   Brand coral/violet/electric are used directly; lime & marigold are too light to read on white,
-   so a vivid darker-but-same-hue version is used (the pure brand values are background colours). */
-.proof-card--coral{    --accent:var(--coral); }      /* #FF5A47 */
-.proof-card--violet{   --accent:var(--violet); }     /* #7B5CFF */
-.proof-card--lime{     --accent:#5fa600; }           /* vivid green (brand lime #C6F23C is too pale for text) */
-.proof-card--sky{      --accent:var(--electric); }   /* #2E5BFF (brand sky #9FD2FF is too pale for text) */
-.proof-card--marigold{ --accent:#db7d00; }           /* vivid amber (brand marigold #FFB627 is too pale for text) */
-.proof-card--teal{     --accent:#0d9488; }           /* income card — fresh teal, distinct from the lime green */
+/* card colours synced to the #bento palette. --accent (number + badge) uses the exact bento
+   brand tokens; for the pale fills (lime/marigold) --ink darkens the small description so it
+   stays readable on white, and the badge icon flips to dark. */
+.proof-card--coral{    --accent:var(--coral); }
+.proof-card--violet{   --accent:var(--violet); }
+.proof-card--lime{     --accent:var(--lime);     --ink:#5d8a00; }   /* bento "Deliver locally" green */
+.proof-card--sky{      --accent:var(--electric); }
+.proof-card--marigold{ --accent:var(--marigold); --ink:#b06f00; }  /* bento "Staff events" orange */
+.proof-card--teal{     --accent:#0d9488; }           /* income — no bento equivalent; kept distinct */
+.proof-card--lime.proof-card .proof-card__icon,
+.proof-card--marigold.proof-card .proof-card__icon{ color:var(--near-black); }
 
 /* filled circular icon badge — sized to fit fully inside the peeking sliver (top-right).
    NOTE: selector is `.proof-card .proof-card__icon` (specificity 0,2,0) on purpose — it must
@@ -1905,7 +1907,7 @@ button.secondary:focus-visible{
 	align-self:end;
 	margin:0; max-width:30ch;
 	font-family:var(--q-work); font-weight:600; font-size:clamp(.95rem, 1.15vw, 1.12rem);
-	line-height:1.45; color:var(--accent);
+	line-height:1.45; color:var(--ink, var(--accent));
 }
 
 /* Mobile: drop sticky/tilt/aspect → plain readable vertical stack */
