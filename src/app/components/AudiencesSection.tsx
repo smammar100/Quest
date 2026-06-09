@@ -50,7 +50,7 @@ const AUDS: Aud[] = [
     card: { label: 'Earned this week', value: '$740', badge: '★ 4.9' },
     chip: { icon: 'bolt', text: 'Same-day pay' },
     asideText: 'Get paid fast for work that fits your life.',
-    link: 'Become a human',
+    link: 'Earn as a human on Quest',
   },
 ];
 
