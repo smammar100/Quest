@@ -2247,6 +2247,23 @@ nav a{ font-weight:500; }
 	min-height:auto;
 	padding-top:clamp(96px, 10vw, 140px);
 	padding-bottom:var(--section-pad-y);
+	position:relative; isolation:isolate;   /* host the cross-browser dot fallback below */
+}
+/* Cross-browser dotted field. The Houdini ring-particles paint worklet (the interactive
+   version) is Chromium-only, so Safari/Firefox fall back to this CSS dot pattern. It's
+   hidden again wherever paint() is supported, so the two never double up. */
+#welcome::before{
+	content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+	background-image:
+		radial-gradient(circle, rgba(255,90,71,.26) 1.1px, transparent 1.7px),
+		radial-gradient(circle, rgba(255,90,71,.16) 1px,   transparent 1.5px);
+	background-size:34px 34px, 52px 52px;
+	background-position:0 0, 17px 26px;
+	-webkit-mask-image:radial-gradient(78% 68% at 50% 36%, #000 22%, transparent 88%);
+	        mask-image:radial-gradient(78% 68% at 50% 36%, #000 22%, transparent 88%);
+}
+@supports (background: paint(something)){
+	#welcome::before{ display:none; }   /* Chromium draws the Houdini particles instead */
 }
 #welcome > h1{ display:none; }
 

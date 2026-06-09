@@ -10,12 +10,12 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'For Heroes',
+    title: 'For Humans',
     links: [
-      { label: 'Earn as a Hero', href: '#audiences' },
+      { label: 'Earn as a human', href: '#audiences' },
       { label: 'How payouts work', href: '#faq' },
       { label: 'Safety & trust', href: '#faq' },
-      { label: 'Hero app', href: '#' },
+      { label: 'Human app', href: '#' },
     ],
   },
   {

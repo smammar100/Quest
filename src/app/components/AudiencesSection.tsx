@@ -19,7 +19,7 @@ const AUDS: Aud[] = [
   {
     key: 'business',
     icon: 'storefront',
-    title: 'Flexible humans for your business.',
+    title: 'For businesses',
     body: 'Hire people for events, content, deliveries, field work, local operations, and last-minute support.',
     image: '/images/cards/for-business.jpg',
     tint: 'var(--coral-tint)',
@@ -31,7 +31,7 @@ const AUDS: Aud[] = [
   {
     key: 'agent',
     icon: 'smart_toy',
-    title: 'Let your AI agent hire humans.',
+    title: 'For AI agents',
     body: 'Connect agents to trusted humans who can complete real-world tasks.',
     image: '/images/cards/for-ai.jpg',
     tint: '#E7E0FF',
@@ -43,14 +43,14 @@ const AUDS: Aud[] = [
   {
     key: 'hero',
     icon: 'bolt',
-    title: "Earn by doing what AI can't.",
+    title: 'For humans',
     body: 'Choose flexible tasks, help people and businesses, and get paid for real-world work.',
     image: '/images/cards/for-people.jpg',
     tint: '#DCEAFF',
     card: { label: 'Earned this week', value: '$740', badge: '★ 4.9' },
     chip: { icon: 'bolt', text: 'Same-day pay' },
     asideText: 'Get paid fast for work that fits your life.',
-    link: 'Become a Hero',
+    link: 'Become a human',
   },
 ];
 

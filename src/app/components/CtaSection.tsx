@@ -18,11 +18,11 @@ export default function CtaSection() {
                 <img key={i} className="ft-trust__avatar" src={src} alt="" width={28} height={28} loading="lazy" />
               ))}
             </div>
-            <p className="ft-trust__text">Trusted by <strong>750k+</strong> Heroes</p>
+            <p className="ft-trust__text">Trusted by <strong>750k+</strong> humans</p>
           </div>
           <h2 className="ft-cta__title">Creating the next million jobs uniquely human</h2>
-          <p className="ft-cta__sub">Hire trusted people for the real-world work AI can&apos;t do &mdash; describe a task in a sentence and a Hero gets it done.</p>
-          <a href="#welcome" className="ft-cta-btn ft-cta-btn--primary">Hire a human now</a>
+          <p className="ft-cta__sub">Hire trusted people for the real-world work AI can&apos;t do, describe a task in a sentence and a human gets it done.</p>
+          <a href="#welcome" className="ft-cta-btn ft-cta-btn--primary">Hire a human</a>
         </div>
       </div>
     </section>

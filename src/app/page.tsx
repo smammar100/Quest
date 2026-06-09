@@ -47,20 +47,20 @@ export default function Home() {
               <li><a href="#how"><span className="nav-rn">How it works</span></a></li>
               <li><a href="#bento"><span className="nav-rn">For Business</span></a></li>
               <li><a href="#audiences"><span className="nav-rn">For AI Agents</span></a></li>
-              <li><a href="#audiences"><span className="nav-rn">Earn as a Hero</span></a></li>
+              <li><a href="#audiences"><span className="nav-rn">Earn as a human</span></a></li>
               <li><a href="#video"><span className="nav-rn">Manifesto</span></a></li>
             </ul>
           </nav>
 
-          <button className="secondary"><span>Get started</span></button>
+          <button className="secondary"><span>Hire a human</span></button>
         </header>
       </div>
 
       <section id="welcome" className="center">
-        <h1><span className="sr-only">Google Antigravity</span></h1>
+        <h1><span className="sr-only">Quest. Hire trusted humans for real-world work AI can&apos;t do.</span></h1>
         <div className="quest-hero">
           <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></p>
-          <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything. Hire a <span className="rn-mark">human</span></h2>
+          <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything. Hire a <span className="rn-mark">human</span>.</h2>
           <p className="quest-hero__subtitle">Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can&apos;t do.</p>
 
           <div className="quest-prompt">
@@ -89,7 +89,7 @@ export default function Home() {
 
       <section id="logos">
         <div className="logos-wrap">
-          <p className="logos-label">Trusted by teams at<br />600+ businesses</p>
+          <p className="logos-label">Trusted by teams at<br />1,000+ businesses</p>
           <ul className="logos-row">
             <li><img src="/images/logos/meta.png" alt="Meta" /></li>
             <li><img src="/images/logos/google.png" alt="Google" /></li>
@@ -166,7 +166,7 @@ export default function Home() {
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--post">
                 <div className="qmock__head"><span className="qmock__title">New task</span><span className="qmock__step">Step 1 of 3</span></div>
-                <div className="qmock__prompt"><span>I need a lawn mower in Dallas for $100</span><span className="qmock__send material-symbols-outlined">arrow_upward</span></div>
+                <div className="qmock__prompt"><span>Mow my lawn in Dallas, $100</span><span className="qmock__send material-symbols-outlined">arrow_upward</span></div>
                 <div className="qmock__chips"><span className="qmock__chip">Sat, 9am</span><span className="qmock__chip">Dallas, TX</span><span className="qmock__chip">Lawn mowed</span></div>
                 <ul className="qmock__list">
                   <li className="qmock__row"><span className="qmock__rowicon material-symbols-outlined">payments</span><span className="qmock__rowlabel">Budget</span><b>$100</b></li>
@@ -227,143 +227,6 @@ export default function Home() {
       <CtaSection />
 
       <SiteFooter />
-
-      <section id="product">
-        <h2><span className="typewriter">Antigravity is our agentic development platform, evolving the IDE into the agent-first era.</span></h2>
-
-        <div className="icons">
-          <div className="icon"><span className="material-symbols-outlined">keyboard_return</span></div>
-          <div className="icon"><span className="material-symbols-outlined">keyboard_tab</span></div>
-          <div className="icon"><span className="material-symbols-outlined">merge</span></div>
-          <div className="icon"><span className="material-symbols-outlined">folder</span></div>
-          <div className="icon"><span className="material-symbols-outlined">deployed_code</span></div>
-          <div className="icon"><span className="material-symbols-outlined">dashboard_customize</span></div>
-          <div className="icon"><span className="material-symbols-outlined">commit</span></div>
-          <div className="icon"><span className="material-symbols-outlined">chat_add_on</span></div>
-          <div className="icon"><span className="material-symbols-outlined">device_hub</span></div>
-          <div className="icon"><span className="material-symbols-outlined">refresh</span></div>
-          <div className="icon"><span className="material-symbols-outlined">code</span></div>
-          <div className="icon"><span className="material-symbols-outlined">file_copy</span></div>
-          <div className="icon"><span className="material-symbols-outlined">code_blocks</span></div>
-          <div className="icon"><span className="material-symbols-outlined">keyboard_command_key</span></div>
-          <div className="icon"><span className="material-symbols-outlined">upload</span></div>
-          <div className="icon"><span className="material-symbols-outlined">terminal</span></div>
-          <div className="icon"><span className="material-symbols-outlined">swap_horiz</span></div>
-          <div className="icon"><span className="material-symbols-outlined">last_page</span></div>
-          <div className="icon"><span className="material-symbols-outlined">apps_outage</span></div>
-          <div className="icon"><span className="material-symbols-outlined">keyboard_option_key</span></div>
-          <div className="icon"><span className="material-symbols-outlined">recenter</span></div>
-          <div className="icon"><span className="material-symbols-outlined">power_settings_new</span></div>
-          <div className="icon"><span className="material-symbols-outlined">design_services</span></div>
-          <div className="icon"><span className="material-symbols-outlined">widgets</span></div>
-        </div>
-
-        <div id="features">
-          <div className="feature">
-            <div className="img-wrapper">
-              <img src="https://antigravity.google/assets/image/landing/editor_suggestions.png" alt="" />
-            </div>
-            <div className="content">
-              <h3>An AI IDE Core</h3>
-              <p>Google Antigravity&apos;s Editor view offers tab autocompletion, natural language code commands, and a configurable, and context-aware configurable agent.</p>
-            </div>
-          </div>
-          <div className="feature">
-            <div className="img-wrapper">
-              <img src="https://antigravity.google/assets/image/landing/task_based.png" alt="" />
-            </div>
-            <div className="content">
-              <h3>Higher-level Abstractions</h3>
-              <p>A more intuitive task-based approach to monitoring agent activity, presenting you with essential artifacts and verification results to build trust.</p>
-            </div>
-          </div>
-          <div className="feature">
-            <div className="img-wrapper">
-              <img src="https://antigravity.google/assets/image/landing/browser_use.png" alt="" />
-            </div>
-            <div className="content">
-              <h3>Cross-surface Agents</h3>
-              <p>Synchronized agentic control across your editor, terminal, and browser for powerful development workflows.</p>
-            </div>
-          </div>
-          <div className="feature">
-            <div className="img-wrapper">
-              <img src="https://antigravity.google/assets/image/landing/implementation_comment.png" alt="" />
-            </div>
-            <div className="content">
-              <h3>User Feedback</h3>
-              <p>Intuitively integrate feedback across surfaces and artifacts to guide and refine the agent&apos;s work.</p>
-            </div>
-          </div>
-          <div className="feature">
-            <div className="img-wrapper">
-              <img src="https://antigravity.google/assets/image/landing/inbox.png" alt="" />
-            </div>
-            <div className="content">
-              <h3>An Agent-First Experience</h3>
-              <p>Manage multiple agents at the same time, across any workspace, from one central mission control view.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="developers">
-        <div>
-          <h2>Built for developers for the agent-first era</h2>
-          <p className="intro">Google Antigravity is built for user trust, whether you&apos;re a professional developer working in a large enterprise codebase, a hobbyist vibe-coding in their spare time, or anyone in between.</p>
-        </div>
-
-        <div className="carousel">
-          <div className="developer">
-            <figure>
-              <img src="https://antigravity.google/assets/image/landing/landing-thumbnail-frontend.jpg" alt="Frontend developer" />
-              <figcaption className="typewriter">Frontend Developer</figcaption>
-            </figure>
-            <h3>Frontend developer</h3>
-            <p>Streamline UX development by leveraging browser-in-the-loop agents to automate repetitive tasks.</p>
-            <a href="#">View case</a>
-          </div>
-          <div className="developer">
-            <figure>
-              <img src="https://antigravity.google/assets/image/landing/landing-thumbnail-fullstack.jpg" alt="Full stack developer" />
-              <figcaption className="typewriter">Full stack developer</figcaption>
-            </figure>
-            <h3>Full stack developer</h3>
-            <p>Build production-ready applications with confidence with thoroughly designed artifacts and comprehensive verification tests.</p>
-            <a href="#">View case</a>
-          </div>
-          <div className="developer">
-            <figure>
-              <img src="https://antigravity.google/assets/image/landing/landing-thumbnail-enterprise.jpg" alt="Enterprise Developer" />
-              <figcaption className="typewriter">Enterprise Developer</figcaption>
-            </figure>
-            <h3>Enterprise Developer</h3>
-            <p>Streamline operations and reduce context switching by orchestrating agents across workspaces using the Agent Manager.</p>
-            <a href="#">View case</a>
-          </div>
-        </div>
-      </section>
-
-      <section id="who" className="center">
-        <div>
-          <h3>For developers<br /><span>Achieve new heights</span></h3>
-          <button>Download</button>
-        </div>
-        <div>
-          <h3>For organizations<br /><span>Level up your entire team</span></h3>
-          <button className="secondary">Notify me</button>
-        </div>
-      </section>
-
-      <section id="beforeyougo">
-        <div className="card dark">
-          <p><span className="typewriter">Download Google Antigravity for macOS</span></p>
-          <div className="buttons">
-            <button>Download for Apple Silicon</button>
-            <button className="secondary">Download for Intel</button>
-          </div>
-        </div>
-      </section>
 
       <PageScript />
       <ScrollFX />
