@@ -21,7 +21,7 @@ const AUDS: Aud[] = [
     icon: 'storefront',
     title: 'For businesses',
     body: 'Hire people for events, content, deliveries, field work, local operations, and last-minute support.',
-    image: '/images/cards/for-business.jpg',
+    image: '/images/cards/for-business.webp',
     tint: 'var(--coral-tint)',
     card: { label: 'Event crew booked', value: '$1,200', badge: '+18%' },
     chip: { icon: 'verified_user', text: 'Vetted & insured' },
@@ -33,7 +33,7 @@ const AUDS: Aud[] = [
     icon: 'smart_toy',
     title: 'For AI agents',
     body: 'Connect agents to trusted humans who can complete real-world tasks.',
-    image: '/images/cards/for-ai.jpg',
+    image: '/images/cards/for-ai.webp',
     tint: '#E7E0FF',
     card: { label: 'Tasks dispatched', value: '128', badge: 'live' },
     chip: { icon: 'sync', text: 'Auto-coordinated' },
@@ -45,7 +45,7 @@ const AUDS: Aud[] = [
     icon: 'bolt',
     title: 'For humans',
     body: 'Choose flexible tasks, help people and businesses, and get paid for real-world work.',
-    image: '/images/cards/for-people.jpg',
+    image: '/images/cards/for-people.webp',
     tint: '#DCEAFF',
     card: { label: 'Earned this week', value: '$740', badge: '★ 4.9' },
     chip: { icon: 'bolt', text: 'Same-day pay' },
@@ -92,7 +92,7 @@ export default function AudiencesSection() {
         </div>
 
         <div className="aud-media" style={{ background: a.tint }}>
-          <img className="aud-media__img" src={a.image} alt="" />
+          <img className="aud-media__img" src={a.image} alt="" width={825} height={1100} loading="lazy" decoding="async" />
           <div className="aud-media__card">
             <span className="aud-media__label">{a.card.label}</span>
             <span className="aud-media__price">

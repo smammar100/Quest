@@ -12,14 +12,14 @@ import SiteFooter from './components/SiteFooter';
 // `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
 // back to the card colour until generated; 3 reuse existing assets.
 const useCases = [
-  { key: 'errands',  color: 'coral',    title: 'Run errands',               desc: 'Groceries, returns, pickups, and the small jobs that eat your day.', img: '/images/cards/for-everyday-tasks.png', fit: 'auto 115%' },
-  { key: 'events',   color: 'marigold', title: 'Staff events',              desc: 'Vetted hands for setup, hosting, and teardown, booked in minutes.', img: '/images/cards/for-onsite-crew.png', fit: 'cover' },
-  { key: 'move',     color: 'electric', title: 'Move and set up',           desc: 'Lift, assemble, mount, and install, with muscle and know-how on tap.', img: '/images/cards/for-heavy-lifting.png', fit: '110%' },
-  { key: 'deliver',  color: 'lime',     title: 'Deliver locally',           desc: 'Hand-delivered drop-offs across town by a real person nearby.', img: '/images/cards/for-same-day-delivery.png', fit: 'auto 115%' },
-  { key: 'content',  color: 'violet',   title: 'Create real-world content', desc: 'Photo, video, and UGC shot where it actually happens.', img: '/images/cards/for-onlocation-ugc.png', fit: 'auto 115%' },
-  { key: 'check',    color: 'sky',      title: 'Check places in person',    desc: 'Store audits, site visits, and mystery checks with photo proof.', img: '/images/cards/for-boots-on-grounds.png', fit: '110%' },
-  { key: 'business', color: 'ink',      title: 'Help your business',        desc: 'Scale a flexible, on-demand crew for ops, field, and retail.', img: '/images/cards/for-teams.png', fit: '110%' },
-  { key: 'anything', color: 'blush',    title: "Do anything AI can't",      desc: 'If it takes a human in the real world, someone here will do it.', img: '/images/cards/for-anything-else.png', fit: 'cover' },
+  { key: 'errands',  color: 'coral',    title: 'Run errands',               desc: 'Groceries, returns, pickups, and the small jobs that eat your day.', img: '/images/cards/for-everyday-tasks.webp', fit: 'auto 115%' },
+  { key: 'events',   color: 'marigold', title: 'Staff events',              desc: 'Vetted hands for setup, hosting, and teardown, booked in minutes.', img: '/images/cards/for-onsite-crew.webp', fit: 'cover' },
+  { key: 'move',     color: 'electric', title: 'Move and set up',           desc: 'Lift, assemble, mount, and install, with muscle and know-how on tap.', img: '/images/cards/for-heavy-lifting.webp', fit: '110%' },
+  { key: 'deliver',  color: 'lime',     title: 'Deliver locally',           desc: 'Hand-delivered drop-offs across town by a real person nearby.', img: '/images/cards/for-same-day-delivery.webp', fit: 'auto 115%' },
+  { key: 'content',  color: 'violet',   title: 'Create real-world content', desc: 'Photo, video, and UGC shot where it actually happens.', img: '/images/cards/for-onlocation-ugc.webp', fit: 'auto 115%' },
+  { key: 'check',    color: 'sky',      title: 'Check places in person',    desc: 'Store audits, site visits, and mystery checks with photo proof.', img: '/images/cards/for-boots-on-grounds.webp', fit: '110%' },
+  { key: 'business', color: 'ink',      title: 'Help your business',        desc: 'Scale a flexible, on-demand crew for ops, field, and retail.', img: '/images/cards/for-teams.webp', fit: '110%' },
+  { key: 'anything', color: 'blush',    title: "Do anything AI can't",      desc: 'If it takes a human in the real world, someone here will do it.', img: '/images/cards/for-anything-else.webp', fit: 'cover' },
 ];
 
 export default function Home() {
@@ -44,11 +44,9 @@ export default function Home() {
 
           <nav>
             <ul>
-              <li><a href="#how"><span className="nav-rn">How it works</span></a></li>
-              <li><a href="#bento"><span className="nav-rn">For Business</span></a></li>
-              <li><a href="#audiences"><span className="nav-rn">For AI Agents</span></a></li>
-              <li><a href="#audiences"><span className="nav-rn">Earn as a human</span></a></li>
-              <li><a href="#video"><span className="nav-rn">Manifesto</span></a></li>
+              <li><a href="#bento"><span className="nav-rn">For business</span></a></li>
+              <li><a href="#tasks"><span className="nav-rn">For humans</span></a></li>
+              <li><a href="#audiences"><span className="nav-rn">For AI agents</span></a></li>
             </ul>
           </nav>
 
@@ -91,11 +89,11 @@ export default function Home() {
         <div className="logos-wrap">
           <p className="logos-label">Trusted by teams at<br />1,000+ businesses</p>
           <ul className="logos-row">
-            <li><img src="/images/logos/meta.png" alt="Meta" /></li>
-            <li><img src="/images/logos/google.png" alt="Google" /></li>
-            <li><img src="/images/logos/gojek.png" alt="Gojek" /></li>
-            <li><img src="/images/logos/antler.png" alt="Antler" /></li>
-            <li><img src="/images/logos/ascott.png" alt="The Ascott" /></li>
+            <li><img src="/images/logos/meta.webp" alt="Meta" width={360} height={97} loading="lazy" decoding="async" /></li>
+            <li><img src="/images/logos/google.webp" alt="Google" width={360} height={132} loading="lazy" decoding="async" /></li>
+            <li><img src="/images/logos/gojek.webp" alt="Gojek" width={300} height={85} loading="lazy" decoding="async" /></li>
+            <li><img src="/images/logos/antler.webp" alt="Antler" width={360} height={116} loading="lazy" decoding="async" /></li>
+            <li><img src="/images/logos/ascott.webp" alt="The Ascott" width={140} height={136} loading="lazy" decoding="async" /></li>
           </ul>
         </div>
       </section>
@@ -185,11 +183,11 @@ export default function Home() {
               <div className="qmock qmock--match">
                 <div className="qmock__head"><span className="qmock__title">Matched humans</span><span className="qmock__pill">5 new offers</span></div>
                 <ul className="qmock__heroes">
-                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Maya R.</b><small>★ 4.9 · Lawn care · 0.8 mi</small></span><button className="qmock__assign">Assign</button></li>
-                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Arjun P.</b><small>★ 4.8 · Gardening · 1.2 mi</small></span><button className="qmock__assign">Assign</button></li>
-                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Siti N.</b><small>★ 5.0 · Yard work · 2.0 mi</small></span><button className="qmock__assign">Assign</button></li>
-                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Daniel T.</b><small>★ 4.7 · Landscaping · 2.4 mi</small></span><button className="qmock__assign">Assign</button></li>
-                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Liam K.</b><small>★ 4.8 · Yard care · 1.6 mi</small></span><button className="qmock__assign">Assign</button></li>
+                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Maya R.</b><small>★ 4.9 · Lawn care · 0.8 mi</small></span><button className="qmock__assign">Assign</button></li>
+                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Arjun P.</b><small>★ 4.8 · Gardening · 1.2 mi</small></span><button className="qmock__assign">Assign</button></li>
+                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Siti N.</b><small>★ 5.0 · Yard work · 2.0 mi</small></span><button className="qmock__assign">Assign</button></li>
+                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Daniel T.</b><small>★ 4.7 · Landscaping · 2.4 mi</small></span><button className="qmock__assign">Assign</button></li>
+                  <li className="qmock__hero"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Liam K.</b><small>★ 4.8 · Yard care · 1.6 mi</small></span><button className="qmock__assign">Assign</button></li>
                 </ul>
                 <div className="qmock__foot"><span className="material-symbols-outlined">verified_user</span>12 background-checked humans nearby</div>
               </div>
@@ -202,7 +200,7 @@ export default function Home() {
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--pay">
                 <div className="qmock__head"><span className="qmock__title">Confirm &amp; pay</span><span className="qmock__pill">Matched</span></div>
-                <div className="qmock__hero qmock__hero--lg"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" /><span className="qmock__who"><b>Maya R.</b><small>Lawn mowing · Sat 9am · Dallas</small></span></div>
+                <div className="qmock__hero qmock__hero--lg"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Maya R.</b><small>Lawn mowing · Sat 9am · Dallas</small></span></div>
                 <ul className="qmock__lines">
                   <li className="qmock__line"><span>Task</span><span>$90.00</span></li>
                   <li className="qmock__line"><span>Service fee</span><span>$10.00</span></li>

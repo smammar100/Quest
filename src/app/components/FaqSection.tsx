@@ -10,20 +10,12 @@ const FAQS = [
     a: "They're real people near you, from weekend helpers to seasoned pros. Each builds a profile with ratings and reviews, and anyone who takes on sensitive work is background-checked. You always see ratings and recent reviews before you assign someone.",
   },
   {
-    q: 'What kinds of things can I ask for?',
-    a: "Anything that takes a human in the physical world: groceries and returns, moving and assembly, local deliveries, event setup and hosting, photo and video shot on location, store audits and site visits, and plenty AI simply can't do on its own.",
-  },
-  {
     q: 'How do payments work, and is it safe?',
     a: "You agree the price up front. Funds are held securely and only released to the person once the work is done and you're happy. Everything runs through Quest, with no cash needed and a clear receipt for every task.",
   },
   {
     q: 'What does Quest cost?',
     a: "Posting a task and getting matched is free. You only pay the agreed price for the work plus a small, transparent service fee shown before you confirm. No subscriptions, no surprises.",
-  },
-  {
-    q: 'How do I get started?',
-    a: "Type what you need in the prompt at the top of the page: when, where, and what done looks like. We surface matching people nearby in minutes; you pick one, agree the details, and track it through to completion.",
   },
   {
     q: 'Can my AI agent hire people through Quest?',
