@@ -3,19 +3,19 @@
 const FAQS = [
   {
     q: 'What exactly is Quest?',
-    a: "Quest is a marketplace for real-world work. You describe a task in a sentence — an errand, a delivery, event help, on-location content, an in-person check — and we match you with trusted local people (we call them Heroes) who get it done.",
+    a: "Quest is a marketplace for real-world work. You describe a task in a sentence, like an errand, a delivery, event help, on-location content, or an in-person check, and we match you with trusted local people who get it done.",
   },
   {
-    q: 'Who are the Heroes, and are they vetted?',
-    a: "Heroes are real people near you, from weekend helpers to seasoned pros. Every Hero builds a profile with ratings and reviews, and Heroes who take on sensitive work are background-checked. You always see ratings and recent reviews before you assign anyone.",
+    q: 'Who are the humans, and are they vetted?',
+    a: "They're real people near you, from weekend helpers to seasoned pros. Each builds a profile with ratings and reviews, and anyone who takes on sensitive work is background-checked. You always see ratings and recent reviews before you assign someone.",
   },
   {
     q: 'What kinds of things can I ask for?',
-    a: "Anything that takes a human in the physical world: groceries and returns, moving and assembly, local deliveries, event setup and hosting, photo and video shot on location, store audits and site visits — and plenty AI simply can't do on its own.",
+    a: "Anything that takes a human in the physical world: groceries and returns, moving and assembly, local deliveries, event setup and hosting, photo and video shot on location, store audits and site visits, and plenty AI simply can't do on its own.",
   },
   {
     q: 'How do payments work, and is it safe?',
-    a: "You agree the price up front. Funds are held securely and only released to your Hero once the work is done and you're happy. Everything runs through Quest — no cash needed, with a clear receipt for every task.",
+    a: "You agree the price up front. Funds are held securely and only released to the person once the work is done and you're happy. Everything runs through Quest, with no cash needed and a clear receipt for every task.",
   },
   {
     q: 'What does Quest cost?',
@@ -23,11 +23,11 @@ const FAQS = [
   },
   {
     q: 'How do I get started?',
-    a: "Type what you need in the prompt at the top of the page — when, where, and what done looks like. We surface matching Heroes nearby in minutes; you pick one, agree the details, and track it through to completion.",
+    a: "Type what you need in the prompt at the top of the page: when, where, and what done looks like. We surface matching people nearby in minutes; you pick one, agree the details, and track it through to completion.",
   },
   {
     q: 'Can my AI agent hire people through Quest?',
-    a: "Yes. Quest is built for the agent-first era: an AI agent can post tasks, compare matched Heroes, and dispatch real-world work on your behalf — so the things software can't finish still get done by a person.",
+    a: "Yes. Quest is built for the agent-first era: an AI agent can post tasks, compare matched people, and dispatch real-world work on your behalf, so the things software can't finish still get done by a person.",
   },
 ];
 

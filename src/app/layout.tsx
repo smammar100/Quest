@@ -3,7 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Quest — Real work for real people",
+  title: "Your AI can't do everything. Hire a human.",
   description: "Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can't do.",
 };
 
