@@ -2043,6 +2043,7 @@ nav a{ font-weight:500; }
 }
 .quest-logo__mark{ flex:none; display:block; }
 .quest-logo__word{ margin-left:-3px; color:#5B5667; }
+.quest-logo__img{ height:clamp(26px, 2.4vw, 32px); width:auto; display:block; }
 
 #bento{
 	grid-column:fullbleed;
