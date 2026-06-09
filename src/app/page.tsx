@@ -28,11 +28,7 @@ export default function Home() {
       <div className="header-wrapper">
         <header>
           <a href="#" className="quest-logo" aria-label="Quest">
-            <svg className="quest-logo__mark" width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" stroke="#FF5A47" strokeWidth="3.2"/>
-              <line x1="16.8" y1="16.8" x2="22.5" y2="22.5" stroke="#FF5A47" strokeWidth="3.2" strokeLinecap="round"/>
-            </svg>
-            <span className="quest-logo__word">uest</span>
+            <img className="quest-logo__img" src="/images/logos/Logo.svg" alt="Quest" width={80} height={30} />
           </a>
 
           <input className="menu-checkbox" type="checkbox" id="menu-checkbox" />
