@@ -51,6 +51,14 @@ export default function PageScript() {
       window.addEventListener('resize', () => { clearTimeout(heroResizeT); heroResizeT = setTimeout(drawHeroMark, 150); });
     }
 
+    // Mobile menu: tapping a link (or the drawer CTA) closes the drawer before scrolling
+    const menuCb = document.querySelector<HTMLInputElement>('.menu-checkbox');
+    if (menuCb) {
+      document.querySelectorAll<HTMLAnchorElement>('.header-wrapper nav a').forEach((a) =>
+        a.addEventListener('click', () => { menuCb.checked = false; })
+      );
+    }
+
     // Video section: click-to-play
     const frame = document.querySelector<HTMLElement>('#video .video-frame');
     if (frame) {

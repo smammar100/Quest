@@ -44,6 +44,7 @@ export default function Home() {
               <li><a href="#tasks"><span className="nav-rn">For humans</span></a></li>
               <li><a href="#audiences"><span className="nav-rn">For AI agents</span></a></li>
             </ul>
+            <a href="#welcome" className="nav-cta">Hire a human</a>
           </nav>
 
           <button className="secondary"><span>Hire a human</span></button>
