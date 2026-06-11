@@ -1340,7 +1340,7 @@ button.secondary:focus-visible{
 }
 
 @media (max-width:930px){ :root{ --page-pad:2.5rem; } }
-@media (max-width:600px){ :root{ --page-pad:1.25rem; } }
+@media (max-width:600px){ :root{ --page-pad:1rem; } }   /* exactly 16px gutters on phones */
 
 #video{
 	grid-column:fullbleed;
@@ -2534,6 +2534,13 @@ nav a{ font-weight:500; }
 /* Navbar: align the header gutter to the page content (--page-pad) on mobile */
 @media (max-width:930px){
 	.header-wrapper header{ padding-inline:var(--page-pad); }
+	.header-wrapper header > button.secondary{ display:none; }   /* CTA is mobile-hidden; unlayered so nothing re-shows it */
+	/* nothing may poke past the viewport on phones — full-bleed marquees are
+	   already inside overflow:hidden wrappers; clip (not hidden) keeps sticky working */
+	body{ overflow-x:clip; }
+}
+@media (max-width:600px){
+	.quest-hero{ width:calc(100% - 2 * var(--page-pad)); }   /* hero follows the 16px gutter too (was 92vw) */
 }
 
 /* Prompt suggestion pills → 2 per row on phones */
