@@ -2286,7 +2286,16 @@ nav a{ font-weight:500; }
 	background-position:0 0, 17px 26px;
 	-webkit-mask-image:radial-gradient(78% 68% at 50% 36%, #000 22%, transparent 88%);
 	        mask-image:radial-gradient(78% 68% at 50% 36%, #000 22%, transparent 88%);
+	/* Safari/Firefox have no Houdini ring-particles worklet → give the otherwise-static
+	   fallback dot field a living "breathing" pulse (echoes the Chromium expanding rings). */
+	transform-origin:50% 36%;
+	animation:hero-dots-breathe 7s ease-in-out infinite;
 }
+@keyframes hero-dots-breathe{
+	0%,100%{ transform:scale(1);     opacity:.55; }
+	50%    { transform:scale(1.055); opacity:1; }
+}
+@media (prefers-reduced-motion:reduce){ #welcome::before{ animation:none; } }
 @supports (background: paint(something)){
 	#welcome::before{ display:none; }   /* Chromium draws the Houdini particles instead */
 }
