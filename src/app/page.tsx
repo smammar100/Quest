@@ -55,7 +55,7 @@ export default function Home() {
         <div className="quest-hero">
           <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></p>
           <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything. Hire a <span className="rn-mark">human</span>.</h2>
-          <p className="quest-hero__subtitle">Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can&apos;t do.</p>
+          <p className="quest-hero__subtitle">Hire trusted people for the real-world work AI can&apos;t do.</p>
 
           <div className="quest-prompt">
             <input className="quest-prompt__input" type="text" placeholder="Pick up a parcel in New York for $40" aria-label="Describe what you need" />
@@ -98,7 +98,7 @@ export default function Home() {
         <div className="bento-head">
           <div className="bento-head__text">
             <h2 className="bento-title">AI can write the plan.<br />Humans still show up.</h2>
-            <p className="bento-lede">Hire people for the physical, local, social, messy, urgent, and uniquely human work that AI cannot complete on its own.</p>
+            <p className="bento-lede">Hire people for the physical, local, urgent work AI can&apos;t finish.</p>
           </div>
           <div className="bento-arrows">
             <button type="button" className="bento-arrow" data-dir="prev" aria-label="Previous use case"><span className="material-symbols-outlined">arrow_back</span></button>
@@ -128,7 +128,7 @@ export default function Home() {
       <section id="video">
         <div className="video-head">
           <h2 className="video-title">Why humans still matter<br />in the age of AI.</h2>
-          <p className="video-sub">For 5 years, Quest called them Heroes. Today, we&apos;re saying what we&apos;ve always believed more clearly: real-world work still needs humans.</p>
+          <p className="video-sub">We called them Heroes. Real-world work still needs humans.</p>
           <a href="#" className="video-cta">Read the Manifesto <span className="material-symbols-outlined">arrow_forward</span></a>
         </div>
         <div className="video-frame">
@@ -155,7 +155,7 @@ export default function Home() {
         <div className="how-track">
           <article className="how-card is-active">
             <h3 className="how-card__title">Tell us what you need</h3>
-            <p className="how-card__desc">Describe the task, location, deadline, and budget in one sentence.</p>
+            <p className="how-card__desc">Tell us the task, location, deadline, and budget.</p>
             <span className="how-card__num">/ 01</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--post">
@@ -173,7 +173,7 @@ export default function Home() {
           </article>
           <article className="how-card">
             <h3 className="how-card__title">Get matched with humans</h3>
-            <p className="how-card__desc">Quest matches you with trusted humans who have the right skills, location, and track record.</p>
+            <p className="how-card__desc">We match you with trusted humans who have the right skills nearby.</p>
             <span className="how-card__num">/ 02</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--match">
@@ -191,7 +191,7 @@ export default function Home() {
           </article>
           <article className="how-card">
             <h3 className="how-card__title">Hire, pay, and get it done</h3>
-            <p className="how-card__desc">Hire the right person, track progress, and pay securely through Quest. Funds are held safely until the work is done.</p>
+            <p className="how-card__desc">Hire, track, and pay securely. Funds held safely.</p>
             <span className="how-card__num">/ 03</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--pay">

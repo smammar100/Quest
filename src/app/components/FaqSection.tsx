@@ -28,7 +28,7 @@ export default function FaqSection() {
     <section id="faq">
       <div className="faq-head">
         <h2 className="faq-title">Questions &amp; Answers</h2>
-        <p className="faq-lede">Everything you need to know about getting real-world work done through real people.</p>
+        <p className="faq-lede">Everything you need to know about working with real people.</p>
       </div>
 
       <div className="faq-list">
