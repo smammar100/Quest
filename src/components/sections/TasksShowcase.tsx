@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 
-// 30 distinct, verified portrait IDs — one per task so faces never repeat within a tab,
-// and the two marquee rows are offset (see `shift`) so they never share a face either.
 const AV = [
   'photo-1494790108377-be9c29b29330',
   'photo-1500648767791-00dcc994a43e',
@@ -111,7 +109,6 @@ function Card({ t, hidden, shift = 0 }: { t: Task; hidden?: boolean; shift?: num
 }
 
 function Row({ items, dir, shift = 0 }: { items: Task[]; dir: 'ltr' | 'rtl'; shift?: number }) {
-  // Render the set twice so the CSS marquee (translateX -50%) loops seamlessly.
   const loop = [...items, ...items];
   return (
     <div className={`tasks-row tasks-row--${dir}`}>

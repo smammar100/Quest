@@ -40,6 +40,23 @@ Structure code to follow an MVC pattern with clear boundaries between layers:
 - **View** — Next.js pages and components. Views should only handle rendering and user interaction; no business logic here
 - **Controller** — the layer that connects views to models. In Next.js this typically lives in Server Actions, Route Handlers, or custom hooks depending on the operation
 
+### Flutter → Next.js Concept Map
+
+If you know Flutter, use this table to orient yourself before writing code.
+
+| Flutter concept | Next.js / React equivalent | Where it lives in this project |
+|---|---|---|
+| `Navigator` + route guards | Route groups + `middleware.ts` | `src/app/(public)/`, `src/app/(protected)/`, `src/middleware.ts` |
+| `StreamProvider` / `onAuthStateChanged` listener | `AuthContext` + `useEffect` | `src/context/AuthContext.tsx` |
+| Controller / BLoC | Custom hook | `src/controllers/useAuth.ts`, etc. |
+| Service / Repository | Firebase helper module | `src/lib/firebase/auth.ts`, `firestore.ts` |
+| Model class | TypeScript type | `src/lib/models/user.ts`, `task.ts` |
+| Widget (stateless) | Server Component (default in App Router) | `src/components/` |
+| Widget (stateful) | Client Component (`'use client'`) | `src/components/` |
+| `BuildContext` | React context via `useContext` | `src/context/` |
+| `setState` | `useState` / `useReducer` | Inside Client Components |
+| `initState` / `dispose` | `useEffect(() => { … return cleanup }, [])` | Inside Client Components |
+
 ### State Management
 
 State changes should flow cleanly through the MVC layers:

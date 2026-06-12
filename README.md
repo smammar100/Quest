@@ -1,3 +1,46 @@
+# Quest Website
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── (public)/          # Unprotected routes (no auth required)
+│   ├── (protected)/       # Auth-guarded routes
+│   ├── layout.tsx         # Root layout
+│   └── globals.css
+├── components/
+│   ├── layout/            # SiteHeader, SiteFooter, Nav
+│   └── sections/          # Page-section components
+├── controllers/           # Custom hooks connecting views to models
+├── context/               # Global state providers (AuthContext, etc.)
+├── lib/
+│   ├── data/              # Static/seed data
+│   ├── firebase/          # Firebase init, auth helpers, Firestore helpers
+│   └── models/            # TypeScript types for domain objects
+├── middleware.ts           # Route protection (runs before page render)
+└── types/                 # Shared type re-exports
+```
+
+## Flutter → Next.js concept map
+
+For developers coming from a Flutter background:
+
+| Flutter concept | Next.js / React equivalent | Where it lives |
+|---|---|---|
+| `Navigator` + route guards | Route groups + `middleware.ts` | `src/app/(public)/`, `src/app/(protected)/`, `src/middleware.ts` |
+| `StreamProvider` / `onAuthStateChanged` | `AuthContext` + `useEffect` | `src/context/AuthContext.tsx` |
+| Controller / BLoC | Custom hook | `src/controllers/` |
+| Service / Repository | Firebase helper module | `src/lib/firebase/` |
+| Model class | TypeScript type | `src/lib/models/` |
+| Widget (stateless) | Server Component (default) | `src/components/` |
+| Widget (stateful) | Client Component (`'use client'`) | `src/components/` |
+| `BuildContext` | React context via `useContext` | `src/context/` |
+| `setState` | `useState` / `useReducer` | Inside Client Components |
+| `initState` / `dispose` | `useEffect(() => { … return cleanup }, [])` | Inside Client Components |
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -1,26 +1,13 @@
 import type { CSSProperties } from 'react';
-import PageScript from './components/PageScript';
-import ScrollFX from './components/ScrollFX';
-import TasksShowcase from './components/TasksShowcase';
-import AudiencesSection from './components/AudiencesSection';
-import SocialProof from './components/SocialProof';
-import FaqSection from './components/FaqSection';
-import CtaSection from './components/CtaSection';
-import SiteFooter from './components/SiteFooter';
-
-// #bento use-case tiles — colour-blocked across the full Quest palette.
-// `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
-// back to the card colour until generated; 3 reuse existing assets.
-const useCases = [
-  { key: 'errands',  color: 'coral',    title: 'Run errands',               desc: 'Groceries, returns, pickups, and the small jobs that eat your day.', img: '/images/cards/for-everyday-tasks.webp', fit: 'auto 115%' },
-  { key: 'events',   color: 'marigold', title: 'Staff events',              desc: 'Vetted hands for setup, hosting, and teardown, booked in minutes.', img: '/images/cards/for-onsite-crew.webp', fit: 'cover' },
-  { key: 'move',     color: 'electric', title: 'Move and set up',           desc: 'Lift, assemble, mount, and install, with muscle and know-how on tap.', img: '/images/cards/for-heavy-lifting.webp', fit: '110%' },
-  { key: 'deliver',  color: 'lime',     title: 'Deliver locally',           desc: 'Hand-delivered drop-offs across town by a real person nearby.', img: '/images/cards/for-same-day-delivery.webp', fit: 'auto 115%' },
-  { key: 'content',  color: 'violet',   title: 'Create real-world content', desc: 'Photo, video, and UGC shot where it actually happens.', img: '/images/cards/for-onlocation-ugc.webp', fit: 'auto 115%' },
-  { key: 'check',    color: 'sky',      title: 'Check places in person',    desc: 'Store audits, site visits, and mystery checks with photo proof.', img: '/images/cards/for-boots-on-grounds.webp', fit: '110%' },
-  { key: 'business', color: 'ink',      title: 'Help your business',        desc: 'Scale a flexible, on-demand crew for ops, field, and retail.', img: '/images/cards/for-teams.webp', fit: '110%' },
-  { key: 'anything', color: 'blush',    title: "Do anything AI can't",      desc: 'If it takes a human in the real world, someone here will do it.', img: '/images/cards/for-anything-else.webp', fit: 'cover' },
-];
+import { useCases } from '@/lib/data/useCases';
+import PageScript from '@/components/sections/PageScript';
+import ScrollFX from '@/components/sections/ScrollFX';
+import TasksShowcase from '@/components/sections/TasksShowcase';
+import AudiencesSection from '@/components/sections/AudiencesSection';
+import SocialProof from '@/components/sections/SocialProof';
+import FaqSection from '@/components/sections/FaqSection';
+import CtaSection from '@/components/sections/CtaSection';
+import SiteFooter from '@/components/layout/SiteFooter';
 
 export default function Home() {
   return (
@@ -212,17 +199,11 @@ export default function Home() {
       </section>
 
       <TasksShowcase />
-
       <AudiencesSection />
-
       <SocialProof />
-
       <FaqSection />
-
       <CtaSection />
-
       <SiteFooter />
-
       <PageScript />
       <ScrollFX />
     </>

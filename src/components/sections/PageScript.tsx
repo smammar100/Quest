@@ -45,7 +45,6 @@ export default function PageScript() {
       const startHeroMark = () => requestAnimationFrame(() => requestAnimationFrame(drawHeroMark));
       if (document.fonts?.ready) void document.fonts.ready.then(startHeroMark);
       else window.addEventListener('load', startHeroMark);
-      // Timer fallback: rAF can be throttled before the first paint, so guarantee one draw.
       setTimeout(drawHeroMark, 700);
       let heroResizeT: ReturnType<typeof setTimeout>;
       window.addEventListener('resize', () => { clearTimeout(heroResizeT); heroResizeT = setTimeout(drawHeroMark, 150); });
@@ -116,8 +115,6 @@ export default function PageScript() {
     }
 
     // "AI can write the plan": centre-focused, draggable carousel.
-    // Translate the track so the active card sits at the viewport centre; CSS
-    // scales it up. Pointer drag scrubs the strip and snaps to the nearest card.
     const bento = document.querySelector('#bento');
     if (bento) {
       const viewport = bento.querySelector<HTMLElement>('.bento-carousel');
@@ -129,8 +126,6 @@ export default function PageScript() {
         let active = Math.floor((cards.length - 1) / 2);
         let currentShift = 0;
 
-        // Clamp bounds: pin the first card to the content margin and the last to
-        // its mirror so the strip never reveals an empty gutter past the ends.
         const bounds = () => {
           const head = bento.querySelector<HTMLElement>('.bento-head');
           const pad = head ? head.getBoundingClientRect().left : 24;
@@ -172,7 +167,6 @@ export default function PageScript() {
           return best;
         };
 
-        // Pointer drag — scrub freely, live-feature the centred card, snap on release.
         let dragging = false;
         let moved = false;
         let startX = 0;
