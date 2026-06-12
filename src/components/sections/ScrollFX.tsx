@@ -7,29 +7,17 @@ import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-/**
- * ScrollFX — Lenis smooth scrolling + subtle GSAP entrance reveals.
- *
- * Coexists with (never overrides) the existing scroll effects:
- *   #proof sticky stack, #video bleed (view-timeline), #bento wave + drag,
- *   #tasks marquee, #cta animated gradient. Lenis runs on NATIVE scroll, so all
- *   of those keep working. Everything is gated on (prefers-reduced-motion:
- *   no-preference) via gsap.matchMedia, and nothing is CSS-hidden — so reduced
- *   motion / no-JS users get a fully-visible, native-scroll page.
- */
 export default function ScrollFX() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      // ── Lenis smooth scroll, driven by GSAP's ticker (one rAF loop) ──
       const lenis = new Lenis({ autoRaf: false, duration: 1.1 });
       lenis.on('scroll', ScrollTrigger.update);
       const tick = (time: number) => lenis.raf(time * 1000);
       gsap.ticker.add(tick);
       gsap.ticker.lagSmoothing(0);
 
-      // ── Smooth in-page anchor links (offset clears the fixed header) ──
       const onAnchorClick = (e: MouseEvent) => {
         const link = (e.target as HTMLElement | null)?.closest?.('a[href^="#"]') as HTMLAnchorElement | null;
         if (!link) return;
@@ -43,7 +31,6 @@ export default function ScrollFX() {
       };
       document.addEventListener('click', onAnchorClick);
 
-      // ── Reveal helper: fade + rise once, then hand styles back to CSS ──
       const revealUp = (selector: string) => {
         const els = gsap.utils.toArray<HTMLElement>(selector);
         if (!els.length) return;
@@ -64,9 +51,6 @@ export default function ScrollFX() {
         });
       };
 
-      // ── Hero load-in (above the fold → on mount, not scroll-triggered) ──
-      // The headline (.quest-hero__title) is intentionally NOT animated so the
-      // rough-notation highlight on .rn-mark keeps a stable box.
       const heroBits = gsap.utils.toArray<HTMLElement>(
         '.quest-hero__eyebrow, .quest-hero__subtitle, .quest-prompt, .quest-suggest'
       );
@@ -83,10 +67,6 @@ export default function ScrollFX() {
         });
       }
 
-      // ── Section entrance reveals ──
-      // Delicate sections (already self-animating) reveal their HEADS only;
-      // static sections reveal heads + item groups. Never the #proof cards,
-      // #video frame, #bento cards/track, or #tasks rows.
       [
         '.logos-label',
         '.logos-row li',
@@ -104,7 +84,6 @@ export default function ScrollFX() {
         '.ft-top, .ft-bottom',
       ].forEach(revealUp);
 
-      // Recalc positions after client sections / fonts / images settle.
       ScrollTrigger.refresh();
       requestAnimationFrame(() => ScrollTrigger.refresh());
       const onLoad = () => ScrollTrigger.refresh();

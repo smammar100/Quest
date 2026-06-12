@@ -1,5 +1,3 @@
-// #faq — light off-white accordion. Pure-CSS exclusive accordion via
-// <details name="faq"> (no JS): opening one row natively closes the others.
 const FAQS = [
   {
     q: 'What exactly is Quest?',

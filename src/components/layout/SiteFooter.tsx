@@ -1,4 +1,3 @@
-// White-background footer (the closing CTA is now a separate <CtaSection> above this).
 const COLUMNS = [
   {
     title: 'Product',

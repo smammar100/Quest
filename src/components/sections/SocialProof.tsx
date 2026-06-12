@@ -1,7 +1,5 @@
 import type { CSSProperties } from 'react';
 
-// #proof stat cards — a sticky stacked "numbers" deck (MindMarket-style):
-// big number, accent icon badge top-right, description at the bottom.
 const CARDS = [
   { key: 'people', tint: 'coral',    num: '750k+',  unit: 'humans',     icon: 'groups',     desc: 'From weekend helpers to seasoned pros, ready to work.' },
   { key: 'income', tint: 'teal',     num: '$2M+',   unit: 'earned',     icon: 'payments',   desc: 'Flexible income, earned by humans doing real-world work.' },
