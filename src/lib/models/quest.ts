@@ -6,6 +6,8 @@ export type QuestCategory =
   | 'photography'
   | 'other';
 
+// ── Form draft (manual post flow, kept for future use) ────────────────────────
+
 export type PostQuestDraft = {
   title: string;
   description: string;
@@ -14,6 +16,8 @@ export type PostQuestDraft = {
   currency: string;
   location: string;
 };
+
+// ── API payload (sent to the Node.js backend) ─────────────────────────────────
 
 export type PostQuestPayload = {
   posterId: string;
@@ -24,6 +28,24 @@ export type PostQuestPayload = {
   currency: string;
   location: string;
 };
+
+// ── Conversational agent types ────────────────────────────────────────────────
+
+export type ChatMessage = {
+  role: 'user' | 'agent';
+  content: string;
+};
+
+// Shape returned by the conversational agent API on each turn.
+// When readyToPost is true, the agent has elicited enough information and
+// questData contains the structured payload ready to send to the backend.
+export type AgentTurnResponse = {
+  message: string;
+  readyToPost: boolean;
+  questData?: PostQuestPayload;
+};
+
+// ── Serializer (manual flow) ──────────────────────────────────────────────────
 
 export function toPostQuestPayload(
   draft: PostQuestDraft,
