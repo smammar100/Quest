@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import PageScript from './components/PageScript';
+import SiteHeader from './components/SiteHeader';
 import ScrollFX from './components/ScrollFX';
 import TasksShowcase from './components/TasksShowcase';
 import AudiencesSection from './components/AudiencesSection';
@@ -25,31 +26,7 @@ const useCases = [
 export default function Home() {
   return (
     <>
-      <div className="header-wrapper">
-        <header>
-          <a href="#" className="quest-logo" aria-label="Quest">
-            <img className="quest-logo__img" src="/images/logos/Logo.svg" alt="Quest" width={80} height={30} />
-          </a>
-
-          <input className="menu-checkbox" type="checkbox" id="menu-checkbox" />
-          <label className="menu-button" htmlFor="menu-checkbox">
-            <span className="material-symbols-outlined not-sr-only" data-show-when="closed">dehaze</span>
-            <span className="material-symbols-outlined not-sr-only" data-show-when="open">close</span>
-            <span className="sr-only">Toggle Menu</span>
-          </label>
-
-          <nav>
-            <ul>
-              <li><a href="#bento"><span className="nav-rn">For business</span></a></li>
-              <li><a href="#tasks"><span className="nav-rn">For humans</span></a></li>
-              <li><a href="#audiences"><span className="nav-rn">For AI agents</span></a></li>
-            </ul>
-            <a href="#welcome" className="nav-cta">Hire a human</a>
-          </nav>
-
-          <button className="secondary"><span>Hire a human</span></button>
-        </header>
-      </div>
+      <SiteHeader />
 
       <section id="welcome" className="center">
         <h1><span className="sr-only">Quest. Hire trusted humans for real-world work AI can&apos;t do.</span></h1>
@@ -134,7 +111,7 @@ export default function Home() {
         </div>
         <div className="video-frame">
           <video className="video-el" preload="metadata" playsInline>
-            <source src="/videos/manifesto.mp4#t=0.5" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dxlcfrlkn/video/upload/v1781498253/Website_vid_2_bveee3.mp4" type="video/mp4" />
           </video>
           <button type="button" className="video-play" aria-label="Play video">
             <span className="material-symbols-outlined">play_arrow</span>

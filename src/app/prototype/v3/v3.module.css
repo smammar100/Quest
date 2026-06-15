@@ -1,0 +1,931 @@
+/* ============================================================================
+   v3 — "BENTO MOSAIC"
+   Dense, colorful dashboard of rounded palette tiles with varied spans.
+   Every <section>/<h2>/<h3>/<p> carries a module class to beat the global
+   element selectors in globals.css (section{min-height:100dvh}, h2{width:50%…},
+   p{color:…}). No hairline grey borders — separation comes from fills + size.
+   ============================================================================ */
+
+.page {
+  background: #ffffff;
+  font-family: var(--q-work);
+  color: var(--near-black);
+  --gap: 18px;
+  --pad: clamp(16px, 4vw, 56px);
+}
+
+/* ── shared section reset (kills global min-height:100dvh + adds rhythm) ── */
+.heroSection,
+.statSection,
+.whySection,
+.questsSection,
+.earnSection,
+.howSection,
+.heroesSection,
+.faqSection {
+  min-height: 0;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-inline: var(--pad);
+  box-sizing: border-box;
+}
+
+.heroSection {
+  padding-top: clamp(96px, 12vh, 160px);
+  padding-bottom: clamp(28px, 4vw, 48px);
+}
+.statSection { padding-block: clamp(8px, 1.5vw, 16px); }
+.whySection,
+.questsSection,
+.earnSection,
+.howSection,
+.heroesSection,
+.faqSection {
+  padding-block: clamp(40px, 6vw, 84px);
+}
+
+/* scroll anchor offset for the fixed header */
+.questsSection { scroll-margin-top: 110px; }
+
+/* ── BASE TILE ──────────────────────────────────────────────────────── */
+.tile {
+  position: relative;
+  border-radius: var(--q-radius-lg);
+  padding: clamp(20px, 2.4vw, 30px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: #f2ecdf;
+  color: var(--near-black);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease;
+  overflow: hidden;
+}
+.tile:hover {
+  transform: translateY(-4px);
+}
+
+/* palette fills + correct ink */
+.tileCoral    { background: var(--coral);     color: #fff; }
+.tileElectric { background: var(--electric);  color: #fff; }
+.tileViolet   { background: var(--violet);    color: #fff; }
+.tileBlack    { background: var(--near-black); color: #fff; }
+.tileLime     { background: var(--lime);      color: var(--near-black); }
+.tileMarigold { background: var(--marigold);  color: var(--near-black); }
+.tileBeige    { background: #f2ecdf;          color: var(--near-black); }
+.tileSky      { background: var(--sky);       color: var(--near-black); }
+
+/* material icon default sizing inside tiles */
+.tile .material-symbols-outlined { line-height: 1; }
+
+/* ============================================================================
+   HERO BENTO
+   ============================================================================ */
+.heroGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(0, auto);
+  gap: var(--gap);
+}
+
+/* large headline tile — 2 cols wide, spans 2 rows */
+.heroLead {
+  grid-column: span 2;
+  grid-row: span 2;
+  justify-content: center;
+  gap: 18px;
+  padding: clamp(26px, 3vw, 44px);
+  background: #f2ecdf;
+}
+.heroEarn   { grid-column: span 2; }
+.heroCat    { grid-column: span 1; }
+.heroMini   { grid-column: span 1; }
+.heroProof  { grid-column: span 2; }
+.heroRating { grid-column: span 1; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  background: var(--near-black);
+  color: #fff;
+}
+.eyebrow .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--lime);
+}
+
+.heroTitle {
+  width: auto;
+  max-width: 16ch;
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--near-black);
+}
+.heroSub {
+  width: auto;
+  max-width: 36ch;
+  margin: 0;
+  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  line-height: 1.5;
+  color: var(--mid-grey);
+}
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* ── buttons ── */
+.btnPrimary,
+.btnGhost,
+.btnInverse,
+.browseLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 13px 24px;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+  cursor: pointer;
+}
+.btnPrimary {
+  background: var(--coral);
+  color: #fff;
+}
+.btnPrimary:hover { transform: translateY(-2px); background: #ff4733; }
+.btnPrimary .material-symbols-outlined { font-size: 20px; }
+
+.btnGhost {
+  background: transparent;
+  color: var(--near-black);
+  border: 1.5px solid var(--near-black);
+}
+.btnGhost:hover { background: rgba(20, 16, 31, 0.06); }
+
+.btnInverse {
+  background: #fff;
+  color: var(--near-black);
+}
+.btnInverse:hover { transform: translateY(-2px); }
+.btnInverse .material-symbols-outlined { font-size: 20px; }
+
+/* ── hero earnings (coral) ── */
+.heroEarn {
+  justify-content: center;
+  gap: 2px;
+}
+.earnLabel {
+  font-weight: 600;
+  font-size: 0.92rem;
+  opacity: 0.92;
+}
+.earnAmount {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(2.6rem, 5vw, 3.8rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-top: 6px;
+}
+.earnPeriod {
+  font-weight: 600;
+  font-size: 1rem;
+  opacity: 0.92;
+}
+.earnCadence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 16px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.earnCadence .material-symbols-outlined { font-size: 17px; }
+
+/* ── category badge (near-black) ── */
+.heroCat {
+  justify-content: space-between;
+  gap: 4px;
+}
+.heroCatIcon {
+  font-size: 32px;
+  color: var(--lime);
+}
+.heroCatCount {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: 14px;
+}
+.heroCatLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── mini quest card (beige) ── */
+.heroMini {
+  justify-content: space-between;
+  gap: 12px;
+}
+.miniTag {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.miniTitle {
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 0.98rem;
+  line-height: 1.2;
+  color: var(--near-black);
+}
+.miniFoot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.miniPay {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--coral);
+}
+.miniMeta {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--mid-grey);
+}
+
+/* ── big social proof (lime) ── */
+.heroProof {
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  justify-content: flex-start;
+}
+.proofNumber {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(2.8rem, 6vw, 4.4rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+}
+.proofLabel {
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  line-height: 1.25;
+  max-width: 12ch;
+}
+
+/* ── rating (violet) ── */
+.heroRating {
+  justify-content: center;
+  gap: 6px;
+}
+.ratingStars {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  line-height: 1;
+}
+.ratingStars .material-symbols-outlined {
+  font-size: 30px;
+  color: var(--marigold);
+  font-variation-settings: 'FILL' 1;
+}
+.ratingLabel {
+  font-weight: 600;
+  font-size: 0.9rem;
+  opacity: 0.88;
+}
+
+/* ============================================================================
+   STAT ROW
+   ============================================================================ */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+.statTile {
+  gap: 6px;
+  padding: clamp(22px, 2.6vw, 32px);
+}
+.statTile .material-symbols-outlined {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+.statNum {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+.statText {
+  font-weight: 600;
+  font-size: 0.98rem;
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   SECTION HEADERS (shared)
+   ============================================================================ */
+.sectionHead {
+  margin-bottom: clamp(24px, 3vw, 40px);
+  max-width: 720px;
+}
+.sectionTitle {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 3.6vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--near-black);
+}
+.sectionLede {
+  width: auto;
+  max-width: 52ch;
+  margin: 14px 0 0;
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: 1.5;
+  color: var(--mid-grey);
+}
+
+/* ============================================================================
+   WHY JOIN
+   ============================================================================ */
+.whyGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+}
+.whyTile {
+  gap: 12px;
+  min-height: 240px;
+  justify-content: flex-start;
+}
+.whyIcon {
+  font-size: 34px;
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--near-black);
+  color: var(--lime);
+  margin-bottom: 6px;
+}
+.whyTitle {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--near-black);
+}
+.whyBody {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: rgba(20, 16, 31, 0.7);
+}
+
+/* ============================================================================
+   OPEN QUESTS
+   ============================================================================ */
+.questGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+.questTile {
+  text-decoration: none;
+  color: var(--near-black);
+  gap: 12px;
+  background: #f2ecdf;
+  min-height: 280px;
+}
+.questTile:hover { transform: translateY(-4px); }
+.questTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.questPay {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--coral);
+}
+.questLevel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--near-black);
+  color: #fff;
+}
+.questTitle {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 1.12rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--near-black);
+}
+.questTeaser {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(20, 16, 31, 0.66);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.questTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+.questTag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(20, 16, 31, 0.07);
+  color: var(--near-black);
+}
+.questFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+}
+.questMeta {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--mid-grey);
+}
+.questTime {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--near-black);
+}
+.questTime .material-symbols-outlined { font-size: 16px; }
+
+.questsBrowse {
+  margin-top: clamp(20px, 2.5vw, 32px);
+  display: flex;
+  justify-content: center;
+}
+.browseLink {
+  background: var(--near-black);
+  color: #fff;
+}
+.browseLink:hover { transform: translateY(-2px); }
+.browseLink .material-symbols-outlined { font-size: 20px; }
+
+/* ============================================================================
+   EARNINGS
+   ============================================================================ */
+.earnGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: var(--gap);
+}
+.earnCopy {
+  justify-content: center;
+  gap: 16px;
+  padding: clamp(28px, 3vw, 44px);
+}
+.earnHeadline {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.7rem, 2.8vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+.earnText {
+  width: auto;
+  max-width: 42ch;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+}
+.earnRange {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 4px 0 6px;
+}
+.earnRangeNum {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--lime);
+}
+.earnRangeText {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+.earnCopy .btnPrimary { align-self: flex-start; }
+
+/* ── bar / bell-curve viz (lime tile) ── */
+.earnViz {
+  gap: 16px;
+  justify-content: space-between;
+  min-height: 320px;
+}
+.vizLabel {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+.vizBars {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(4px, 0.8vw, 10px);
+  min-height: 180px;
+}
+.vizCol {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+}
+.vizBar {
+  width: 100%;
+  border-radius: 8px 8px 4px 4px;
+  background: rgba(20, 16, 31, 0.32);
+  position: relative;
+  transition: background 0.2s ease;
+}
+.earnViz:hover .vizBar { background: rgba(20, 16, 31, 0.42); }
+.vizBarMedian {
+  background: var(--near-black);
+}
+.earnViz:hover .vizBarMedian { background: var(--near-black); }
+.vizMedianTag {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--coral);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.vizAxis {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(20, 16, 31, 0.6);
+  text-align: center;
+}
+
+/* ============================================================================
+   HOW TO EARN
+   ============================================================================ */
+.howGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+.howTile {
+  gap: 12px;
+  min-height: 260px;
+  justify-content: flex-start;
+}
+.howNum {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: 2.4rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  opacity: 0.55;
+}
+.howIcon {
+  font-size: 34px;
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--near-black);
+  margin-top: 4px;
+}
+/* lime tile uses dark ink already, give icon chip a dark fill for contrast pop */
+.tileLime .howIcon {
+  background: var(--near-black);
+  color: var(--lime);
+}
+.howTitle {
+  width: auto;
+  max-width: none;
+  margin: 6px 0 0;
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+.howBody {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+.tileElectric .howBody,
+.tileViolet .howBody { color: rgba(255, 255, 255, 0.82); }
+.tileMarigold .howBody,
+.tileLime .howBody { color: rgba(20, 16, 31, 0.72); }
+
+/* ============================================================================
+   TOP HEROES
+   ============================================================================ */
+.heroesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+.heroProfileTile {
+  gap: 16px;
+  justify-content: flex-start;
+}
+.profileHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.profileAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+.profileWho {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.profileName {
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.1;
+  color: var(--near-black);
+}
+.profileLoc {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--mid-grey);
+}
+.profileQuote {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(20, 16, 31, 0.82);
+  font-weight: 500;
+}
+.profileStats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+.profileStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--near-black);
+}
+.profileStat .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--marigold);
+  font-variation-settings: 'FILL' 1;
+}
+.profileStatMeta {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--mid-grey);
+}
+
+.heroesCta {
+  margin-top: var(--gap);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: clamp(24px, 3vw, 36px) clamp(24px, 3.5vw, 44px);
+}
+.heroesCtaText {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+/* ============================================================================
+   FAQ
+   ============================================================================ */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.faqItem {
+  background: #f2ecdf;
+  border-radius: var(--q-radius);
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+.faqItem[open] { background: var(--near-black); }
+.faqSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  list-style: none;
+  padding: clamp(18px, 2vw, 24px) clamp(20px, 2.4vw, 28px);
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--near-black);
+}
+.faqItem[open] .faqSummary { color: #fff; }
+.faqSummary::-webkit-details-marker { display: none; }
+.faqChevron {
+  flex: none;
+  font-size: 26px;
+  color: var(--coral);
+  transition: transform 0.25s ease;
+}
+.faqItem[open] .faqChevron {
+  transform: rotate(180deg);
+  color: var(--lime);
+}
+.faqAnswer {
+  width: auto;
+  max-width: 64ch;
+  margin: 0;
+  padding: 0 clamp(20px, 2.4vw, 28px) clamp(20px, 2.2vw, 26px);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+@media (max-width: 1080px) {
+  .whyGrid { grid-template-columns: repeat(2, 1fr); }
+  .questGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 880px) {
+  .page { --gap: 14px; }
+
+  /* hero collapses to a simple 2-col mosaic that stacks gracefully */
+  .heroGrid { grid-template-columns: repeat(2, 1fr); }
+  .heroLead { grid-column: span 2; grid-row: auto; }
+  .heroEarn { grid-column: span 2; }
+  .heroCat { grid-column: span 1; }
+  .heroMini { grid-column: span 1; }
+  .heroProof { grid-column: span 2; }
+  .heroRating { grid-column: span 2; }
+
+  .statGrid { grid-template-columns: 1fr; }
+  .howGrid { grid-template-columns: 1fr; }
+  .heroesGrid { grid-template-columns: 1fr; }
+  .earnGrid { grid-template-columns: 1fr; }
+  .earnViz { min-height: 280px; }
+}
+
+@media (max-width: 600px) {
+  .whyGrid { grid-template-columns: 1fr; }
+  .questGrid { grid-template-columns: 1fr; }
+  .whyTile { min-height: 0; }
+  .questTile { min-height: 0; }
+}
+
+@media (max-width: 480px) {
+  .heroGrid { grid-template-columns: 1fr; }
+  .heroLead,
+  .heroEarn,
+  .heroCat,
+  .heroMini,
+  .heroProof,
+  .heroRating { grid-column: span 1; }
+  .heroProof { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .heroProof .proofLabel { max-width: none; }
+  .heroesCta { flex-direction: column; align-items: flex-start; }
+  .heroesCta .btnInverse { align-self: stretch; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .btnPrimary,
+  .btnGhost,
+  .btnInverse,
+  .browseLink,
+  .faqChevron {
+    transition: none;
+  }
+  .tile:hover,
+  .questTile:hover { transform: none; }
+}

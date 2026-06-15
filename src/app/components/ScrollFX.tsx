@@ -31,9 +31,14 @@ export default function ScrollFX() {
 
       // ── Smooth in-page anchor links (offset clears the fixed header) ──
       const onAnchorClick = (e: MouseEvent) => {
-        const link = (e.target as HTMLElement | null)?.closest?.('a[href^="#"]') as HTMLAnchorElement | null;
+        const link = (e.target as HTMLElement | null)?.closest?.('a[href^="#"], a[href^="/#"]') as HTMLAnchorElement | null;
         if (!link) return;
-        const href = link.getAttribute('href');
+        let href = link.getAttribute('href');
+        // "/#section" links (shared header) smooth-scroll when already on the homepage
+        if (href?.startsWith('/#')) {
+          if (window.location.pathname !== '/') return;
+          href = href.slice(1);
+        }
         if (!href || href === '#') return;
         const target = document.querySelector(href);
         if (!target) return;
@@ -102,6 +107,13 @@ export default function ScrollFX() {
         '.faq-item',
         '.ft-cta',
         '.ft-top, .ft-bottom',
+        // /quests pages (selectors no-op on the homepage)
+        '.qp-hero__title, .qp-hero__proof, .qp-hero__cta',
+        '.qp-sample-head',
+        '.qp-earn',
+        '.qp-seo__intro, .qp-seo__block',
+        '.qp-related__col',
+        '.qx-card',
       ].forEach(revealUp);
 
       // Recalc positions after client sections / fonts / images settle.
