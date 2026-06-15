@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SiteHeader from "../../../components/sections/SiteHeader";
-import SiteFooter from "../../../components/sections/SiteFooter";
+import SiteHeader from "../../../components/layout/SiteHeader";
+import SiteFooter from "../../../components/layout/SiteFooter";
 import ScrollFX from "../../../components/sections/ScrollFX";
-import { QUEST_CATEGORIES } from "../../../app/lib/quests-data";
+import { QUEST_CATEGORIES } from "@/lib/data/quests-data";
 
 export const metadata: Metadata = {
   title: 'Browse quests — real-world work for real humans | Quest',

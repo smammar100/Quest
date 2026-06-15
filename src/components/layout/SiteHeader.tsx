@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { TASK_TYPES } from "../../app/lib/quests-data";
+import { TASK_TYPES } from "@/lib/data/quests-data";
 
 // Shared fixed header (home + /quests pages). Section links are absolute
 // ("/#bento") so they work from any route; ScrollFX smooth-scrolls them when

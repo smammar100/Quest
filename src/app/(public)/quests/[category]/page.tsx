@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import SiteHeader from '@/components/sections/SiteHeader';
-import SiteFooter from '@/components/sections/SiteFooter';
+import SiteHeader from '@/components/layout/SiteHeader';
+import SiteFooter from '@/components/layout/SiteFooter';
 import CtaSection from '@/components/sections/CtaSection';
 import ScrollFX from '@/components/sections/ScrollFX';
-import { QUEST_CATEGORIES, getCategory, monthlyEstimate } from '@/app/lib/quests-data';
-import { HERO_REASONS, HOW_STEPS, TOP_HEROES, HERO_FAQS, EARN_CURVE } from '@/app/lib/hero-page-data';
+import { QUEST_CATEGORIES, getCategory, monthlyEstimate } from '@/lib/data/quests-data';
+import { HERO_REASONS, HOW_STEPS, TOP_HEROES, HERO_FAQS, EARN_CURVE } from '@/lib/data/hero-page-data';
 
 // Hero category landing template (the "As a Hero" page). Structure adapts the
 // Airtasker individual-category page into Quest's design system:

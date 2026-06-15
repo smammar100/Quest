@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SiteHeader from '../../../src/components/sections/SiteHeader';
-import SiteFooter from '../../../src/components/sections/SiteFooter';
+import SiteHeader from '@/components/layout/SiteHeader';
+import SiteFooter from '@/components/layout/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Hero page prototypes — pick a winner | Quest',
