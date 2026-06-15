@@ -1,33 +1,62 @@
-export type QuestCategory =
-  | 'delivery'
-  | 'errands'
-  | 'cleaning'
-  | 'assembly'
-  | 'photography'
-  | 'other';
+// ── Location ──────────────────────────────────────────────────────────────────
 
-// ── Form draft (manual post flow, kept for future use) ────────────────────────
-
-export type PostQuestDraft = {
-  title: string;
-  description: string;
-  category: QuestCategory | '';
-  budget: number;
-  currency: string;
-  location: string;
+export type LocationData = {
+  primaryText: string;   // first component of the human-readable name (Google Maps)
+  secondaryText: string; // second component of the human-readable name (Google Maps)
+  lat: number;
+  lng: number;
 };
 
-// ── API payload (sent to the Node.js backend) ─────────────────────────────────
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
+export type DueDateType = 'range' | 'before' | 'exact';
+export type PaymentRecurrence = 'one time payment' | 'per hour';
+export type ScopeOfReach = 'local' | 'global';
+
+// ── API payload (POST /quest) ─────────────────────────────────────────────────
 
 export type PostQuestPayload = {
-  posterId: string;
+  // Client-generated — never provided by the agent; added by the controller.
+  questID: string;
+  citizenID: string;
+
+  // Required
   title: string;
-  description: string;
-  category: QuestCategory;
-  budget: number;
-  currency: string;
-  location: string;
+  desc: string;
+  numOffers: number;
+  scopeOfReach: ScopeOfReach;
+  startingCountry: string;
+  startingLocation: LocationData;
+  dueDate: string;             // ISO 8601 timestamp
+  dueDateType: DueDateType;
+  timeRange: string;
+  numberOfHours: number;
+  paymentRecurrence: PaymentRecurrence;
+  price: number;
+  minimumBudget: number;
+  averageBudget: number;
+  countryCode: string;
+
+  // Optional
+  genre?: string;
+  subCategory?: string;
+  requirements?: string;
+  screeningQuestions?: string[];
+  jobImgURL?: string[];
+  endingCountry?: string;
+  endingLocation?: LocationData;
+  dateRangeEnd?: string;       // ISO 8601; only when dueDateType === 'range'
+  urgent?: boolean;
+  additionalPurchasePrice?: number;
+  priceNegotiable?: boolean;
+  portfolioLinkRequired?: boolean;
+  paidFeatures?: string;
+  discountCode?: string;
+  dynamicLink?: string;
 };
+
+// What the agent returns — all fields except the two the controller generates.
+export type AgentQuestData = Omit<PostQuestPayload, 'questID' | 'citizenID'>;
 
 // ── Conversational agent types ────────────────────────────────────────────────
 
@@ -36,30 +65,14 @@ export type ChatMessage = {
   content: string;
 };
 
-// Shape returned by the conversational agent API on each turn.
-// When readyToPost is true, the agent has elicited enough information and
-// questData contains the structured payload ready to send to the backend.
+// Shape returned by the conversational agent on each turn.
+// partialData carries whichever fields were just elicited — the controller
+// merges these additively into questDraft on every turn.
+// When readyToPost is true, questData is the complete elicited payload;
+// the controller adds questID and citizenID before calling POST /quest.
 export type AgentTurnResponse = {
   message: string;
   readyToPost: boolean;
-  questData?: PostQuestPayload;
+  partialData?: Partial<AgentQuestData>;
+  questData?: AgentQuestData;
 };
-
-// ── Serializer (manual flow) ──────────────────────────────────────────────────
-
-export function toPostQuestPayload(
-  draft: PostQuestDraft,
-  posterId: string,
-): PostQuestPayload {
-  if (!draft.category) throw new Error('Category is required');
-
-  return {
-    posterId,
-    title: draft.title.trim(),
-    description: draft.description.trim(),
-    category: draft.category,
-    budget: draft.budget,
-    currency: draft.currency,
-    location: draft.location.trim(),
-  };
-}
