@@ -1,42 +1,32 @@
 import type { CSSProperties } from 'react';
-import { useCases } from '@/lib/data/useCases';
-import PageScript from '@/components/sections/PageScript';
-import ScrollFX from '@/components/sections/ScrollFX';
-import TasksShowcase from '@/components/sections/TasksShowcase';
-import AudiencesSection from '@/components/sections/AudiencesSection';
-import SocialProof from '@/components/sections/SocialProof';
-import FaqSection from '@/components/sections/FaqSection';
-import CtaSection from '@/components/sections/CtaSection';
-import SiteFooter from '@/components/layout/SiteFooter';
+import PageScript from '../../components/sections/PageScript';
+import SiteHeader from '../../components/sections/SiteHeader';
+import ScrollFX from '../../components/sections/ScrollFX';
+import TasksShowcase from '../../components/sections/TasksShowcase';
+import AudiencesSection from '../../components/sections/AudiencesSection';
+import SocialProof from '../../components/sections/SocialProof';
+import FaqSection from '../../components/sections/FaqSection';
+import CtaSection from '../../components/sections/CtaSection';
+import SiteFooter from '../../components/sections/SiteFooter';
+
+// #bento use-case tiles — colour-blocked across the full Quest palette.
+// `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
+// back to the card colour until generated; 3 reuse existing assets.
+const useCases = [
+  { key: 'errands',  color: 'coral',    title: 'Run errands',               desc: 'Groceries, returns, pickups, and the small jobs that eat your day.', img: '/images/cards/for-everyday-tasks.webp', fit: 'auto 115%' },
+  { key: 'events',   color: 'marigold', title: 'Staff events',              desc: 'Vetted hands for setup, hosting, and teardown, booked in minutes.', img: '/images/cards/for-onsite-crew.webp', fit: 'cover' },
+  { key: 'move',     color: 'electric', title: 'Move and set up',           desc: 'Lift, assemble, mount, and install, with muscle and know-how on tap.', img: '/images/cards/for-heavy-lifting.webp', fit: '110%' },
+  { key: 'deliver',  color: 'lime',     title: 'Deliver locally',           desc: 'Hand-delivered drop-offs across town by a real person nearby.', img: '/images/cards/for-same-day-delivery.webp', fit: 'auto 115%' },
+  { key: 'content',  color: 'violet',   title: 'Create real-world content', desc: 'Photo, video, and UGC shot where it actually happens.', img: '/images/cards/for-onlocation-ugc.webp', fit: 'auto 115%' },
+  { key: 'check',    color: 'sky',      title: 'Check places in person',    desc: 'Store audits, site visits, and mystery checks with photo proof.', img: '/images/cards/for-boots-on-grounds.webp', fit: '110%' },
+  { key: 'business', color: 'ink',      title: 'Help your business',        desc: 'Scale a flexible, on-demand crew for ops, field, and retail.', img: '/images/cards/for-teams.webp', fit: '110%' },
+  { key: 'anything', color: 'blush',    title: "Do anything AI can't",      desc: 'If it takes a human in the real world, someone here will do it.', img: '/images/cards/for-anything-else.webp', fit: 'cover' },
+];
 
 export default function Home() {
   return (
     <>
-      <div className="header-wrapper">
-        <header>
-          <a href="#" className="quest-logo" aria-label="Quest">
-            <img className="quest-logo__img" src="/images/logos/Logo.svg" alt="Quest" width={80} height={30} />
-          </a>
-
-          <input className="menu-checkbox" type="checkbox" id="menu-checkbox" />
-          <label className="menu-button" htmlFor="menu-checkbox">
-            <span className="material-symbols-outlined not-sr-only" data-show-when="closed">dehaze</span>
-            <span className="material-symbols-outlined not-sr-only" data-show-when="open">close</span>
-            <span className="sr-only">Toggle Menu</span>
-          </label>
-
-          <nav>
-            <ul>
-              <li><a href="#bento"><span className="nav-rn">For business</span></a></li>
-              <li><a href="#tasks"><span className="nav-rn">For humans</span></a></li>
-              <li><a href="#audiences"><span className="nav-rn">For AI agents</span></a></li>
-            </ul>
-            <a href="#welcome" className="nav-cta">Hire a human</a>
-          </nav>
-
-          <button className="secondary"><span>Hire a human</span></button>
-        </header>
-      </div>
+      <SiteHeader />
 
       <section id="welcome" className="center">
         <h1><span className="sr-only">Quest. Hire trusted humans for real-world work AI can&apos;t do.</span></h1>
@@ -121,7 +111,7 @@ export default function Home() {
         </div>
         <div className="video-frame">
           <video className="video-el" preload="metadata" playsInline>
-            <source src="/videos/manifesto.mp4#t=0.5" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dxlcfrlkn/video/upload/v1781498253/Website_vid_2_bveee3.mp4" type="video/mp4" />
           </video>
           <button type="button" className="video-play" aria-label="Play video">
             <span className="material-symbols-outlined">play_arrow</span>
@@ -199,11 +189,17 @@ export default function Home() {
       </section>
 
       <TasksShowcase />
+
       <AudiencesSection />
+
       <SocialProof />
+
       <FaqSection />
+
       <CtaSection />
+
       <SiteFooter />
+
       <PageScript />
       <ScrollFX />
     </>
