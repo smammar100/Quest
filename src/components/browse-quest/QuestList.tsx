@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { QuestCategory } from '../../app/lib/quests-data';
-import { INITIAL_VISIBLE } from '../../app/lib/quests-data';
+import type { QuestCategory } from '@/lib/data/quests-data';
+import { INITIAL_VISIBLE } from '@/lib/data/quests-data';
 
 // Upwork-style sample list: subcategory filter chips, 2-col card grid showing
 // the first 12 listings, and a "Load more" that appends the rest client-side

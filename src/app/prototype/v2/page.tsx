@@ -1,5 +1,5 @@
-import SiteHeader from '../../../components/sections/SiteHeader'
-import SiteFooter from '../../../components/sections/SiteFooter'
+import SiteHeader from '../../../components/layout/SiteHeader'
+import SiteFooter from '../../../components/layout/SiteFooter'
 import { getCategory } from '../../lib/quests-data';
 import {
   HERO_COPY,

@@ -1,13 +1,13 @@
 import type { CSSProperties } from 'react';
 import PageScript from '../../components/sections/PageScript';
-import SiteHeader from '../../components/sections/SiteHeader';
+import SiteHeader from '../../components/layout/SiteHeader';
 import ScrollFX from '../../components/sections/ScrollFX';
 import TasksShowcase from '../../components/sections/TasksShowcase';
 import AudiencesSection from '../../components/sections/AudiencesSection';
 import SocialProof from '../../components/sections/SocialProof';
 import FaqSection from '../../components/sections/FaqSection';
 import CtaSection from '../../components/sections/CtaSection';
-import SiteFooter from '../../components/sections/SiteFooter';
+import SiteFooter from '../../components/layout/SiteFooter';
 
 // #bento use-case tiles — colour-blocked across the full Quest palette.
 // `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
