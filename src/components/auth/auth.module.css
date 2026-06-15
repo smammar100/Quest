@@ -1,0 +1,437 @@
+/* ------------------------------------------------------------------ *
+ *  Quest auth prototypes — shared styles for the 3 Clerk-inspired
+ *  layouts (centered · split · social-first), both login + signup.
+ *  Quest design system: coral / Bricolage / beige, white base.
+ *  Every class is module-scoped, so the global element bleed rules
+ *  (section{min-height:100dvh}, h1{...}, nav{...}) never apply.
+ * ------------------------------------------------------------------ */
+
+.page {
+  --ink: var(--near-black);
+  --beige: #f2ecdf;
+  --paper: #ffffff;
+  --line: rgba(20, 16, 31, 0.12);
+  min-height: 100dvh;
+  font-family: var(--q-work);
+  color: var(--ink);
+  position: relative;
+  isolation: isolate;
+}
+
+/* ---------- backgrounds ---------- */
+.pageCentered,
+.pageSocial {
+  display: grid;
+  place-items: center;
+  grid-template-rows: 1fr auto;
+  padding: clamp(32px, 6vw, 72px) var(--page-pad) 28px;
+  background: var(--offwhite);
+}
+.pageSocial {
+  background: var(--paper);
+}
+
+/* soft coral dot-field behind the centered card (Quest hero motif, calmer) */
+.field0 {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(
+    rgba(255, 90, 71, 0.16) 1.4px,
+    transparent 1.6px
+  );
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 42%,
+    #000 0%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 42%,
+    #000 0%,
+    transparent 72%
+  );
+}
+.pageSocial .field0 {
+  background-image: radial-gradient(
+    rgba(20, 16, 31, 0.07) 1.4px,
+    transparent 1.6px
+  );
+}
+
+/* ---------- card ---------- */
+.card {
+  min-height: 0; /* kill global section{min-height:100dvh} bleed */
+  width: 100%;
+  max-width: 420px;
+  background: var(--paper);
+  border-radius: var(--q-radius-lg);
+  padding: clamp(28px, 3.4vw, 40px);
+  box-shadow: 0 1px 0 rgba(20, 16, 31, 0.04),
+    0 18px 50px -22px rgba(20, 16, 31, 0.28);
+  display: flex;
+  flex-direction: column;
+}
+.cardSocial {
+  max-width: 400px;
+  box-shadow: none;
+  background: transparent;
+  text-align: center;
+  align-items: stretch;
+}
+
+.brand {
+  display: inline-flex;
+  margin-bottom: 22px;
+}
+.cardSocial .brand,
+.cardCentered .brand {
+  align-self: center;
+}
+.brand img {
+  height: 32px;
+  width: auto;
+}
+
+.eyebrow {
+  font-family: var(--q-work);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin: 0 0 8px;
+}
+.title {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.7rem, 2.4vw, 2.15rem);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  margin: 0 0 8px;
+  width: auto;
+}
+.sub {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--mid-grey);
+  margin: 0 0 24px;
+  width: auto;
+}
+
+/* ---------- form ---------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.socialRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.socialStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.12s ease;
+}
+.social:hover {
+  background: rgba(20, 16, 31, 0.04);
+  border-color: rgba(20, 16, 31, 0.22);
+  transform: translateY(-1px);
+}
+.glyph {
+  width: 19px;
+  height: 19px;
+  flex: none;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--mid-grey);
+  font-size: 0.8rem;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  min-width: 0; /* allow shrink inside the two-column name row */
+}
+.fieldLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.input {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  font-family: var(--q-work);
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input::placeholder {
+  color: rgba(20, 16, 31, 0.34);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 4px rgba(255, 90, 71, 0.15);
+}
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 50px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-family: var(--q-work);
+  font-weight: 700;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.submit:hover {
+  background: #f0402c;
+  transform: translateY(-1px);
+}
+.submit .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.emailToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 50px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.emailToggle:hover {
+  background: rgba(20, 16, 31, 0.04);
+  border-color: rgba(20, 16, 31, 0.22);
+}
+.emailToggle .material-symbols-outlined {
+  font-size: 19px;
+}
+
+.switch {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--mid-grey);
+  width: auto;
+}
+.switchLink {
+  color: var(--coral);
+  font-weight: 600;
+  text-decoration: none;
+}
+.switchLink:hover {
+  text-decoration: underline;
+}
+
+.secured {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--mid-grey);
+  width: auto;
+}
+
+/* ================================================================== *
+   *  Split layout — coral brand panel + white form panel
+   * ================================================================== */
+.pageSplit {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--paper);
+}
+
+.brandPanel {
+  background: var(--coral);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: clamp(40px, 5vw, 80px);
+  position: relative;
+  overflow: hidden;
+}
+.brandPanel::after {
+  content: "";
+  position: absolute;
+  right: -120px;
+  bottom: -140px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+.brandPanelInner {
+  position: relative;
+  z-index: 1;
+  max-width: 460px;
+}
+.brandPanel .brand img {
+  height: 34px;
+  filter: brightness(0) invert(1);
+}
+.brandHeadline {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 2.8vw, 2.7rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 28px 0 36px;
+  width: auto;
+}
+.benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.benefit {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.benefitIcon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.18);
+}
+.benefitIcon .material-symbols-outlined {
+  font-size: 22px;
+  line-height: 1;
+}
+.benefitTitle {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+.benefitBody {
+  display: block;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.82);
+}
+.brandFoot {
+  margin: 40px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.78);
+  width: auto;
+}
+
+.formPanel {
+  display: grid;
+  place-items: center;
+  grid-template-rows: 1fr auto;
+  padding: clamp(40px, 5vw, 72px) clamp(28px, 5vw, 80px) 28px;
+}
+.formPanel .card {
+  box-shadow: none;
+  padding: 0;
+  max-width: 400px;
+}
+
+/* ================================================================== *
+   *  Responsive
+   * ================================================================== */
+@media (max-width: 860px) {
+  .pageSplit {
+    grid-template-columns: 1fr;
+  }
+  .brandPanel {
+    padding: 40px var(--page-pad);
+  }
+  .brandPanel::after {
+    display: none;
+  }
+  .brandHeadline {
+    margin: 20px 0 24px;
+  }
+  .benefits {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pageCentered,
+  .pageSocial,
+  .formPanel {
+    padding-left: var(--page-pad);
+    padding-right: var(--page-pad);
+  }
+  .card {
+    padding: 26px 20px;
+    box-shadow: 0 14px 40px -20px rgba(20, 16, 31, 0.3);
+  }
+  .row2,
+  .socialRow {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 1.55rem;
+  }
+}
