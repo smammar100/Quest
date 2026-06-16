@@ -8,6 +8,8 @@ import CtaSection from '@/components/sections/CtaSection';
 import ScrollFX from '@/components/sections/ScrollFX';
 import { QUEST_CATEGORIES, getCategory, monthlyEstimate } from '@/lib/data/quests-data';
 import { HERO_REASONS, HOW_STEPS, TOP_HEROES, HERO_FAQS, EARN_CURVE } from '@/lib/data/hero-page-data';
+import { getSanityCategory } from '@/sanity/queries';
+import { urlForImage } from '@/sanity/image';
 
 // Hero category landing template (the "As a Hero" page). Structure adapts the
 // Airtasker individual-category page into Quest's design system:
@@ -32,19 +34,50 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function CategoryPage({ params }: { params: Params }) {
-  const cat = getCategory((await params).category);
+  const slug = (await params).category;
+  const cat = getCategory(slug);
   if (!cat) notFound();
   const low = cat.label.toLowerCase();
 
-  const quests = cat.listings.slice(0, 9);
+  // CMS content (Sanity) overrides local data where authored; otherwise the
+  // page falls back to lib/data so it always renders.
+  const sc = await getSanityCategory(slug);
 
-  const FAQS = [
+  // Listing grid — CMS-driven when authored, else local data.
+  const quests = (sc?.quests?.length ? sc.quests : cat.listings).slice(0, 9);
+
+  // ── Hero (CMS-driven: H1, subtext, image) ──
+  const heroHeading = sc?.heroHeading ?? `${cat.label} quests near you.`;
+  const heroSubtext =
+    sc?.heroSubtext ?? `Browse over ${cat.count} open ${low} quests near you.`;
+  const heroImage = sc?.heroImage?.asset
+    ? urlForImage(sc.heroImage.asset).width(1600).quality(80).url()
+    : cat.image;
+
+  // ── Numbers / earnings (CMS-driven) ──
+  const earn = sc?.earnings;
+  const bandMin = earn?.bandMin ?? cat.earn.min;
+  const bandMax = earn?.bandMax ?? cat.earn.max;
+  const earnEyebrow = earn?.eyebrow ?? 'The numbers';
+  const earnHeading = earn?.heading ?? `What ${low} Heroes earn.`;
+  const earnBars = earn?.bars?.length ? earn.bars : EARN_CURVE.bars;
+  const earnMedian = earn?.medianIndex ?? EARN_CURVE.medianIndex;
+  const earnAxis = earn?.axisLabel ?? EARN_CURVE.axisLabel;
+
+  // ── FAQ (CMS-driven, falls back to the generated set) ──
+  const FALLBACK_FAQS = [
     {
       q: `What kind of ${low} quests can I take on?`,
       a: `${cat.seo.intro} Most quests fall under ${cat.subcategories.slice(0, 3).map((s) => s.label.toLowerCase()).join(', ')} and more — pick whatever fits your skills and your week.`,
     },
     ...HERO_FAQS,
   ];
+  const FAQS = sc?.faqs?.length
+    ? sc.faqs.map((f) => ({ q: f.question, a: f.answer }))
+    : FALLBACK_FAQS;
+
+  // ── Sub-categories (CMS-driven) — section hidden for now; restore the
+  // `subcats` mapping + the "Browse by type" <section> below together.
 
   const monthly = monthlyEstimate(cat.earn);
 
@@ -54,7 +87,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
 
       {/* ── Hero ── */}
       <section className="qh">
-        <div className="qh__banner" style={{ '--qh-img': `url(${cat.image})` } as CSSProperties}>
+        <div className="qh__banner" style={{ '--qh-img': `url(${heroImage})` } as CSSProperties}>
           <div className="qh__main">
           <div className="qh__content">
             <div className="qh__crumbs">
@@ -62,8 +95,8 @@ export default async function CategoryPage({ params }: { params: Params }) {
               <span aria-hidden="true">/</span>
               <span aria-current="page">{cat.label}</span>
             </div>
-            <h1 className="qh__title">{cat.label} quests near you.</h1>
-            <p className="qh__sub">Browse over {cat.count} open {low} quests near you.</p>
+            <h1 className="qh__title">{heroHeading}</h1>
+            <p className="qh__sub">{heroSubtext}</p>
           </div>
 
           <aside className="qh__earn" aria-label="Estimated earnings">
@@ -86,6 +119,28 @@ export default async function CategoryPage({ params }: { params: Params }) {
           </div>
         </div>
       </section>
+
+      {/* ── Browse by type (sub-categories) — hidden for now, restore later
+      <section className="hc-subs">
+        <p className="hc-eyebrow">Browse by type</p>
+        <h2 className="hc-h2">Every kind of {low} quest.</h2>
+        <div className="hc-subs__grid">
+          {subcats.map((s) => (
+            <Link
+              key={s.slug || s.label}
+              href={`/quests/${cat.slug}${s.slug ? `?sub=${s.slug}` : ""}`}
+              className="hc-sub"
+            >
+              <span className="hc-sub__title">{s.label}</span>
+              {s.blurb && <span className="hc-sub__blurb">{s.blurb}</span>}
+              <span className="hc-sub__go" aria-hidden="true">
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+      */}
 
       {/* ── Why Heroes choose Quest ── */}
       <section className="hc-why">
@@ -114,8 +169,8 @@ export default async function CategoryPage({ params }: { params: Params }) {
           {quests.map((q) => (
             <article className="hc-card" key={q.title}>
               <div className="hc-card__top">
-                <span className="hc-card__pay">{q.pay}</span>
-                <span className="hc-card__meta">{q.payType} · {q.posted}</span>
+                <span className="hc-card__pay">{q.pay?.replace("/hr", "")}</span>
+                <span className="hc-card__meta">{q.posted}</span>
               </div>
               <h3 className="hc-card__title">{q.title}</h3>
               <p className="hc-card__teaser">{q.teaser}</p>
@@ -138,31 +193,35 @@ export default async function CategoryPage({ params }: { params: Params }) {
       <section className="hc-earn">
         <div className="hc-earn__inner">
           <div className="hc-earn__copy">
-            <p className="hc-eyebrow hc-eyebrow--gold">The numbers</p>
-            <h2 className="hc-h2 hc-h2--light">What {low} Heroes earn.</h2>
+            <p className="hc-eyebrow hc-eyebrow--gold">{earnEyebrow}</p>
+            <h2 className="hc-h2 hc-h2--light">{earnHeading}</h2>
             <p className="hc-earn__text">
-              Most {low} Heroes settle in the <strong>${cat.earn.min}–${cat.earn.max}/hr</strong> band.
-              Take on recurring quests and the curve shifts right — fast.
+              {earn?.description ?? (
+                <>
+                  Most {low} Heroes settle in the <strong>${bandMin}–${bandMax}/hr</strong> band.
+                  Take on recurring quests and the curve shifts right — fast.
+                </>
+              )}
             </p>
             <a href="/#cta" className="hc-btn hc-btn--white">Become a Hero<span className="material-symbols-outlined">arrow_forward</span></a>
           </div>
 
           <figure className="hc-chart" aria-label={`Distribution of ${low} Hero hourly rates`}>
             <div className="hc-chart__bars">
-              {EARN_CURVE.bars.map((v, i) => (
+              {earnBars.map((v, i) => (
                 <span
                   key={i}
-                  className={`hc-bar${i === EARN_CURVE.medianIndex ? ' is-median' : ''}`}
+                  className={`hc-bar${i === earnMedian ? ' is-median' : ''}`}
                   style={{ '--h': `${v}%`, '--i': i } as CSSProperties}
                 >
-                  {i === EARN_CURVE.medianIndex && <span className="hc-bar__flag">Median</span>}
+                  {i === earnMedian && <span className="hc-bar__flag">Median</span>}
                 </span>
               ))}
             </div>
             <figcaption className="hc-chart__axis">
-              <span>${cat.earn.min}/hr</span>
-              <span className="hc-chart__axis-label">{EARN_CURVE.axisLabel}</span>
-              <span>${cat.earn.max}+/hr</span>
+              <span>${bandMin}/hr</span>
+              <span className="hc-chart__axis-label">{earnAxis}</span>
+              <span>${bandMax}+/hr</span>
             </figcaption>
           </figure>
         </div>
@@ -243,7 +302,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
         </div>
       </section>
 
-      {/* ── Meet the heroes ── */}
+      {/* ── Meet the heroes — temporarily hidden, restore later
       <section className="hc-heroes">
         <div className="hc-heroes__head">
           <div>
@@ -273,6 +332,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
           ))}
         </div>
       </section>
+      */}
 
       {/* ── Category FAQ ── */}
       <section className="hc-faq">

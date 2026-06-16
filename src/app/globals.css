@@ -2,6 +2,41 @@
 /* See https://brm.us/antigravity for details */
 @layer reset, tokens, base, components, layout, moderncss, util;
 
+/* ============================================================
+   Tailwind v4 + ShadCN (added for /prototype/bounties).
+   Declared AFTER the native layers above, so Tailwind's
+   `utilities` layer wins over the native cascade, while
+   preflight lands in the early `base` layer and stays
+   overridden by the existing site styles. Quest design
+   tokens are exposed as Tailwind theme colors/fonts below.
+   ============================================================ */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-coral: #ff5a47;
+  --color-coral-tint: #ffd9d2;
+  --color-coral-dark: #f0402c;
+  /* WCAG-AA CTA fill: white text on this clears 4.5:1 (verified in-browser) */
+  --color-coral-cta: #d6391f;
+  --color-coral-cta-hover: #b92f18;
+  --color-marigold: #ffb627;
+  --color-electric: #2e5bff;
+  --color-violet: #7b5cff;
+  --color-lime: #c6f23c;
+  --color-sky: #9fd2ff;
+  --color-ink: #14101f;
+  --color-offwhite: #f7f4ed;
+  --color-midgrey: #7c7787;
+  --color-line: rgba(20, 16, 31, 0.1);
+
+  --font-display: "Bricolage Grotesque", serif;
+  --font-sans: "Inter Tight", system-ui, sans-serif;
+
+  --radius-quest: 18px;
+  --radius-quest-lg: 26px;
+}
+
 @layer moderncss {
   @layer misc {
     :root {
@@ -1166,6 +1201,70 @@
     overflow: visible;
     clip: auto;
     white-space: normal;
+  }
+
+  /* ============================================================
+     Bounties/Quests prototype reset (scoped to `.q-bounties`).
+     Placed in `util` so it BEATS the native `components` button
+     rule (coral bg / pill / padding) and the `base` section/h2/p
+     rules, but still LOSES to Tailwind's `utilities` layer (added
+     after `util`) — so explicit Tailwind classes keep working and
+     untouched elements fall back to neutral, not brand coral.
+     Does not affect the main site (selector is scoped).
+     ============================================================ */
+  .q-bounties button {
+    background: transparent;
+    color: inherit;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    font-size: inherit;
+    gap: 0;
+  }
+  .q-bounties section {
+    min-height: 0;
+  }
+  .q-bounties :is(h1, h2, h3, h4, h5, h6) {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+  .q-bounties p {
+    color: inherit;
+    margin: 0;
+  }
+}
+
+/* Neutralize the marketing site's native `header` rule (display:flex;
+   padding-inline:3rem; gap:2rem) for the app top bar. UNLAYERED on purpose so
+   it beats the native layered `header` rule regardless of cascade-layer order —
+   otherwise the inner container collapses and the nav clusters in the centre.
+   Safe: the app top bar sets no display/padding utilities on <header> itself. */
+.q-bounties header {
+  display: block;
+  padding: 0;
+  gap: 0;
+}
+
+/* Earners ticker — seamless horizontal marquee (track holds two copies of
+   the list, translates by -50% for a loop). Pauses on hover. */
+@keyframes q-ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.q-ticker-track {
+  animation: q-ticker 45s linear infinite;
+}
+.q-ticker:hover .q-ticker-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-ticker-track {
+    animation: none;
   }
 }
 
@@ -4478,7 +4577,7 @@ nav a {
 
   .nav-mega__inner {
     display: grid;
-    grid-template-columns: minmax(320px, 32%) 1fr;
+    grid-template-columns: 1fr; /* intent column temporarily hidden — panel spans full width */
     padding: clamp(24px, 2.6vw, 40px) 3rem; /* full width; gutter matches the navbar */
     gap: clamp(28px, 3vw, 56px);
   }
@@ -5590,6 +5689,82 @@ nav a {
   font-size: 0.95rem;
   line-height: 1.5;
   color: var(--mid-grey);
+}
+
+/* ── Browse by type (sub-categories) ── */
+.hc-subs {
+  grid-column: main;
+  min-height: 0;
+  padding-block: var(--section-pad-y) 0;
+}
+.hc-subs__grid {
+  margin-top: clamp(32px, 4vw, 52px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 1.4vw, 20px);
+}
+.hc-sub {
+  position: relative;
+  background: #f2ecdf;
+  border-radius: var(--q-radius-lg);
+  padding: clamp(20px, 1.8vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.hc-sub:hover {
+  background: #ece4d3;
+  transform: translateY(-2px);
+}
+.hc-sub__title {
+  padding-right: 34px;
+  font-family: var(--q-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: 1.1rem;
+  line-height: 1.2;
+  color: var(--near-black);
+}
+.hc-sub__blurb {
+  font-family: var(--q-work);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--mid-grey);
+  max-width: 36ch;
+}
+.hc-sub__go {
+  position: absolute;
+  top: clamp(20px, 1.8vw, 26px);
+  right: clamp(20px, 1.8vw, 26px);
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--near-black);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.hc-sub:hover .hc-sub__go {
+  opacity: 1;
+  transform: none;
+}
+.hc-sub__go .material-symbols-outlined {
+  font-size: 18px;
+}
+@media (width < 760px) {
+  .hc-subs__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (width < 480px) {
+  .hc-subs__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── Open quests (3×3) ── */
