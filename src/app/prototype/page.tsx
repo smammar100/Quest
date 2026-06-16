@@ -46,6 +46,31 @@ export default function PrototypeIndex() {
           ))}
         </div>
 
+        {/* ── Bounties board redesign ── */}
+        <a
+          href="/prototype/bounties"
+          className="mt-12 flex flex-col gap-3 rounded-3xl border border-ink/10 bg-gradient-to-br from-coral/10 to-marigold/10 p-7 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-ink/5 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-coral">
+              New · Tailwind + ShadCN
+            </p>
+            <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink">
+              Bounties board redesign — 3 layouts
+            </h2>
+            <p className="mt-1 max-w-xl text-ink/60">
+              A reworked logged-in <code>/bounties</code> page: refined feed,
+              marketplace grid, and split board. Built on the Quest design system.
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full bg-ink px-5 py-2.5 font-semibold text-white sm:self-auto">
+            Open
+            <span className="material-symbols-outlined text-[18px]">
+              arrow_forward
+            </span>
+          </span>
+        </a>
+
         {/* ── Auth prototypes ── */}
         <div className="proto-sub">
           <p className="proto-hub__eyebrow">Auth screens · login &amp; signup</p>
