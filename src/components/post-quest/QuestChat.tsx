@@ -26,6 +26,17 @@ export default function QuestChat({ messages, agentTyping, onSend }: Props) {
     onSend(trimmed);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const trimmed = input.trim();
+      if (trimmed && !agentTyping) {
+        setInput('');
+        onSend(trimmed);
+      }
+    }
+  }
+
   return (
     <div className="pq-chat">
       <ul className="pq-chat__messages">
@@ -47,14 +58,15 @@ export default function QuestChat({ messages, agentTyping, onSend }: Props) {
       </ul>
 
       <form className="pq-chat__input-row" onSubmit={handleSubmit}>
-        <input
+        <textarea
           className="pq-chat__input"
-          type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Reply…"
           disabled={agentTyping}
           autoFocus
+          rows={1}
         />
         <button
           type="submit"

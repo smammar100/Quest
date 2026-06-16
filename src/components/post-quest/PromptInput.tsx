@@ -18,27 +18,32 @@ export default function PromptInput({ onSubmit }: Props) {
     onSubmit(trimmed);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const trimmed = value.trim();
+      if (trimmed) onSubmit(trimmed);
+    }
+  }
+
   return (
     <form className="quest-prompt" onSubmit={handleSubmit}>
-      <input
+      <textarea
         className="quest-prompt__input"
-        type="text"
         value={value}
         onChange={e => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="What do you need a human to do?"
         autoFocus
+        rows={1}
       />
-      <div className="quest-prompt__toolbar">
-        <div className="quest-prompt__actions">
-          <button
-            type="submit"
-            className="quest-prompt__submit"
-            disabled={!value.trim()}
-          >
-            Post a quest
-          </button>
-        </div>
-      </div>
+      <button
+        type="submit"
+        className="quest-prompt__submit"
+        disabled={!value.trim()}
+      >
+        Post a quest
+      </button>
     </form>
   );
 }
