@@ -77,3 +77,34 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Sanity CMS
+
+Content for the `/quests/[category]` pages (hero copy, earnings data, FAQs, quest listings) is managed in Sanity.
+
+- **Project ID:** `2pg6mq7a`
+- **Dataset:** `production`
+- **Studio:** `/studio` (embedded in the Next.js app — requires auth)
+- **Hosted Studio:** [quest-inc.sanity.studio](https://quest-inc.sanity.studio)
+
+### Environment variables
+
+Create a `.env.local` at the project root:
+
+```env
+NEXT_PUBLIC_SANITY_PROJECT_ID=2pg6mq7a
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2025-06-16
+```
+
+### Schema
+
+The `category` document type lives in `schemaTypes/category.ts`. After editing the schema, deploy it:
+
+```bash
+npx sanity schema deploy
+```
+
+### Accessing the Studio
+
+Navigate to `/studio` in the running dev server and sign in with the `hello@quest-inc.co` Google account. Each category page (`field-data`, `errands`, `content`, `events`, `home`) has a document in the Studio where you can edit all CMS-driven content.
