@@ -11,8 +11,8 @@ export default defineConfig({
   // router reads the "studio" URL segment as a tool ("Tool not found: studio").
   basePath: '/studio',
 
-  projectId: '2pg6mq7a',
-  dataset: 'production',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
 
   plugins: [structureTool(), visionTool()],
 
