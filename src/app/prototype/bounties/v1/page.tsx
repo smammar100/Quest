@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import BountyTopBar from "@/components/bounties/BountyTopBar";
-import { MetaItem, PriceTag, initials } from "@/components/bounties/parts";
+import BountyTopBar from "@/components/browse/BountyTopBar";
+import { MetaItem, PriceTag, initials } from "@/components/browse/parts";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { BOUNTIES, BOUNTY_CATEGORIES } from "@/lib/data/bounties-data";

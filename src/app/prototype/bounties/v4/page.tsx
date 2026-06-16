@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import BountyTopBar from "@/components/bounties/BountyTopBar";
-import { CategoryPill } from "@/components/bounties/parts";
+import BountyTopBar from "@/components/browse/BountyTopBar";
+import { CategoryPill } from "@/components/browse/parts";
 import { Button } from "@/components/ui/button";
 import { BOUNTIES, BOUNTY_CATEGORIES } from "@/lib/data/bounties-data";
 

@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import BountyTopBar from "@/components/bounties/BountyTopBar";
+import BountyTopBar from "@/components/browse/BountyTopBar";
 import {
   CategoryPill,
   MetaItem,
   PriceTag,
   SecuredBadge,
   initials,
-} from "@/components/bounties/parts";
+} from "@/components/browse/parts";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {

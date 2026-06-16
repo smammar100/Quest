@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import BountyTopBar from "@/components/bounties/BountyTopBar";
+import BountyTopBar from "@/components/browse/BountyTopBar";
 import {
   CategoryPill,
   MetaItem,
   SecuredBadge,
   initials,
-} from "@/components/bounties/parts";
+} from "@/components/browse/parts";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
