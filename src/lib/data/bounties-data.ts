@@ -1,3 +1,5 @@
+import type { BrowseQuest, BrowseQuestResponse } from '@/lib/models/browse-quest';
+
 // Mock dataset for the /prototype/bounties quest-board redesigns.
 // Quest voice: posters post "quests", "Heroes" apply and do real-world
 // work AI can't. Categories mirror the live site (Field data / Errands /
@@ -407,3 +409,54 @@ export const RECENT_EARNERS = [
 ];
 
 export const SORT_TABS = ["newest", "top pay", "ending soon"] as const;
+
+// ---------------------------------------------------------------------------
+// BrowseQuest adapter — maps Bounty (prototype mock) → BrowseQuest (API model)
+// ---------------------------------------------------------------------------
+
+function parsePostedAgo(ago: string): string | undefined {
+  const m = ago.match(/^(\d+)(h|d) ago$/);
+  if (!m) return undefined;
+  const ms = Number(m[1]) * (m[2] === 'h' ? 3_600_000 : 86_400_000);
+  return new Date(Date.now() - ms).toISOString();
+}
+
+function parseDue(due: string): string | undefined {
+  if (due.startsWith('Today')) return new Date().toISOString();
+  const m = due.match(/\w+,\s+(\w+)\s+(\d+)/);
+  if (!m) return undefined;
+  const MONTHS: Record<string, number> = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+  };
+  const mo = MONTHS[m[1]];
+  return mo !== undefined
+    ? new Date(new Date().getFullYear(), mo, Number(m[2])).toISOString()
+    : undefined;
+}
+
+export function bountyToBrowseQuest(b: Bounty): BrowseQuest {
+  const nameParts = b.poster.name.trim().split(' ');
+  return {
+    idQuests: b.id,
+    title: b.title,
+    price: String(b.price),
+    // "fixed" = negotiate a flat price; "hr" = non-negotiable rate
+    price_negotiable: b.rate === 'fixed',
+    proposalsCount: b.applied,
+    scope_of_reach: 'global',
+    starting_country: b.remote ? 'online' : undefined,
+    address: b.remote ? undefined : b.location,
+    datePosted: parsePostedAgo(b.postedAgo),
+    dueDate: b.due ? parseDue(b.due) : undefined,
+    dueDateType: b.due ? 'exact' : undefined,
+    firstName: nameParts[0],
+    lastName: nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined,
+    paid_features: b.featured ? 'highlight' : '',
+  };
+}
+
+export function mockBrowseQuestResponse(): BrowseQuestResponse {
+  const quests = BOUNTIES.map(bountyToBrowseQuest);
+  return { quests, resultCount: quests.length };
+}

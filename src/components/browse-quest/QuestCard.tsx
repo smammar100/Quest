@@ -79,6 +79,9 @@ const getLocationLabel = (quest: BrowseQuest, userCountryCode: string) => {
   return quest.starting_location?.primaryText ?? quest.address ?? 'No location';
 };
 
+const initials = (name: string) =>
+  name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
+
 const getTruncatedName = (firstName?: string, lastName?: string) => {
   const baseFirst = firstName?.trim() || 'Quest';
   let cleaned = `${baseFirst.charAt(0).toUpperCase()}${baseFirst.slice(1).toLowerCase()}`;
@@ -202,7 +205,7 @@ export default function QuestCard({ quest, userCountryCode }: Props) {
             <img className={s.avatar} src={quest.image} alt="Quest poster avatar" />
           ) : (
             <div className={s.avatarFallback} aria-hidden="true">
-              {name.charAt(0)}
+              {initials(name)}
             </div>
           )}
 
