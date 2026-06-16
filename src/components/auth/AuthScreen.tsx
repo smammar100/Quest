@@ -124,10 +124,12 @@ function AuthForm({
   mode,
   layout,
   switchHref,
+  onSwitch,
 }: {
   mode: AuthMode;
   layout: AuthLayout;
   switchHref: string;
+  onSwitch?: () => void;
 }) {
   const c = COPY[mode];
   const [showEmail, setShowEmail] = useState(layout !== "social");
@@ -196,6 +198,16 @@ function AuthForm({
     </>
   );
 
+  const switchEl = onSwitch ? (
+    <button type="button" className={s.switchLink} onClick={onSwitch}>
+      {c.switchCta}
+    </button>
+  ) : (
+    <Link href={switchHref} className={s.switchLink}>
+      {c.switchCta}
+    </Link>
+  );
+
   return (
     <form className={s.form} onSubmit={(e) => e.preventDefault()}>
       {social}
@@ -215,10 +227,7 @@ function AuthForm({
         emailBlock
       )}
       <p className={s.switch}>
-        {c.switchText}{" "}
-        <Link href={switchHref} className={s.switchLink}>
-          {c.switchCta}
-        </Link>
+        {c.switchText} {switchEl}
       </p>
     </form>
   );
@@ -236,10 +245,12 @@ export default function AuthScreen({
   mode,
   layout,
   switchHref: switchHrefProp,
+  onSwitch,
 }: {
   mode: AuthMode;
   layout: AuthLayout;
   switchHref?: string;
+  onSwitch?: () => void;
 }) {
   const c = COPY[mode];
   const other: AuthMode = mode === "login" ? "signup" : "login";
@@ -282,7 +293,7 @@ export default function AuthScreen({
           <div className={s.card}>
             <h1 className={s.title}>{c.title}</h1>
             <p className={s.sub}>{c.sub}</p>
-            <AuthForm mode={mode} layout={layout} switchHref={switchHref} />
+            <AuthForm mode={mode} layout={layout} switchHref={switchHref} onSwitch={onSwitch} />
           </div>
         </section>
       </main>
@@ -300,7 +311,7 @@ export default function AuthScreen({
         <Brandmark />
         <h1 className={s.title}>{c.title}</h1>
         <p className={s.sub}>{c.sub}</p>
-        <AuthForm mode={mode} layout={layout} switchHref={switchHref} />
+        <AuthForm mode={mode} layout={layout} switchHref={switchHref} onSwitch={onSwitch} />
       </section>
     </main>
   );

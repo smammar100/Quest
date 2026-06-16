@@ -1,48 +1,77 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/controllers/useAuth';
-import { toPostQuestPayload, type PostQuestDraft } from '@/lib/models/quest';
-import { postQuest } from '@/lib/api/quests';
+import type { ChatMessage } from '@/lib/models/quest';
+import { createAgentSession, sendAgentMessage } from '@/lib/api/agent';
+import type { SessionState } from '@/lib/api/agent';
 
-const EMPTY_DRAFT: PostQuestDraft = {
-  title: '',
-  description: '',
-  category: '',
-  budget: 0,
-  currency: 'USD',
-  location: '',
-};
+export type PostQuestPhase =
+  | 'prompt'   // initial input
+  | 'chat'     // full-screen agent conversation
+  | 'done'     // agent posted the quest successfully
+  | 'error';
 
-export type SubmitStatus = 'idle' | 'submitting' | 'success' | 'error';
+type SessionRef = { userId: string; sessionId: string };
 
 export function usePostQuest() {
-  const { user, isAuthenticated } = useAuth();
-  const [draft, setDraft] = useState<PostQuestDraft>(EMPTY_DRAFT);
-  const [status, setStatus] = useState<SubmitStatus>('idle');
+  const { user } = useAuth();
+  const [phase, setPhase] = useState<PostQuestPhase>('prompt');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [agentTyping, setAgentTyping] = useState(false);
 
-  function updateField<K extends keyof PostQuestDraft>(key: K, value: PostQuestDraft[K]) {
-    setDraft(prev => ({ ...prev, [key]: value }));
+  const sessionRef = useRef<SessionRef | null>(null);
+
+  function submitInitialPrompt(prompt: string) {
+    setMessages([{ role: 'user', content: prompt }]);
+    setPhase('chat');
+    void runAgentTurn(prompt);
   }
 
-  async function submit() {
-    if (!isAuthenticated || !user) return;
+  async function sendMessage(content: string) {
+    setMessages(prev => [...prev, { role: 'user', content }]);
+    await runAgentTurn(content);
+  }
 
-    setStatus('submitting');
+  async function ensureSession(): Promise<SessionRef> {
+    if (sessionRef.current) return sessionRef.current;
+
+    // TODO: replace with real Firebase uid + idToken once auth is wired.
+    const userId = user?.uid ?? 'cit-42';
+    const sessionId = crypto.randomUUID();
+
+    const state: SessionState = {
+      citizen_id: userId,
+      country_code: 'SG',
+      timezone: 'Asia/Singapore',
+      country_name: 'Singapore',
+    };
+
+    await createAgentSession(userId, sessionId, state, '');
+    sessionRef.current = { userId, sessionId };
+    return sessionRef.current;
+  }
+
+  async function runAgentTurn(text: string) {
+    setAgentTyping(true);
     try {
-      const payload = toPostQuestPayload(draft, user.uid);
+      const { userId, sessionId } = await ensureSession();
+      // TODO: replace '' with real Firebase ID token once auth is wired.
+      const response = await sendAgentMessage(userId, sessionId, text, '');
 
-      // TODO: replace '' with the Firebase ID token once auth is wired up.
-      // The token is obtained via: const idToken = await firebaseUser.getIdToken();
-      // Expose getIdToken from useAuth once the Firebase user object is available.
-      await postQuest(payload, '');
+      setMessages(prev => [...prev, { role: 'agent', content: response.message }]);
 
-      setStatus('success');
-      setDraft(EMPTY_DRAFT);
+      // The agent posts the quest to the backend itself — when it signals done
+      // we advance to 'done' without any additional frontend POST.
+      if (response.readyToPost) {
+        setPhase('done');
+      }
     } catch {
-      setStatus('error');
+      setPhase('error');
+    } finally {
+      setAgentTyping(false);
     }
   }
 
-  return { draft, updateField, submit, status, isAuthenticated };
+  return { phase, messages, agentTyping, submitInitialPrompt, sendMessage };
 }

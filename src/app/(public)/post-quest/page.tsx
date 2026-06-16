@@ -1,16 +1,6 @@
-import PostQuestForm from '@/components/post-quest/PostQuestForm';
+import '@/styles/post-quest.css';
+import PostQuestPageContent from '@/components/post-quest/PostQuestPageContent';
 
 export default function PostQuestPage() {
-  return (
-    <>
-      <section>
-        <h1>Post a quest</h1>
-        <p>Tell us what you need. A trusted human will take it from there.</p>
-      </section>
-
-      <section>
-        <PostQuestForm />
-      </section>
-    </>
-  );
+  return <PostQuestPageContent />;
 }
