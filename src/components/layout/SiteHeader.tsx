@@ -105,7 +105,7 @@ export default function SiteHeader() {
 
               <div id="browse-dropdown" className="nav-mega" hidden={!menuOpen}>
                 <div className="nav-mega__inner">
-                  {/* left intent column */}
+                  {/* left intent column — temporarily hidden, restore later
                   <div className="nav-mega__intent">
                     <p className="nav-mega__intent-title">
                       What are you looking for?
@@ -154,6 +154,7 @@ export default function SiteHeader() {
                       </button>
                     </div>
                   </div>
+                  */}
 
                   {/* right dense task-type list */}
                   <div
@@ -184,6 +185,7 @@ export default function SiteHeader() {
                           </Link>
                         </li>
                       ))}
+                      {/* "View all" link — temporarily hidden, restore later
                       <li>
                         <Link
                           href="/quests"
@@ -193,6 +195,7 @@ export default function SiteHeader() {
                           View all
                         </Link>
                       </li>
+                      */}
                     </ul>
                   </div>
                 </div>
