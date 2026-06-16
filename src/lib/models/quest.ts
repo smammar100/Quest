@@ -66,13 +66,9 @@ export type ChatMessage = {
 };
 
 // Shape returned by the conversational agent on each turn.
-// partialData carries whichever fields were just elicited — the controller
-// merges these additively into questDraft on every turn.
-// When readyToPost is true, questData is the complete elicited payload;
-// the controller adds questID and citizenID before calling POST /quest.
+// The agent now posts the quest to the backend itself — when readyToPost is
+// true the frontend just advances to 'done'; no quest data is forwarded.
 export type AgentTurnResponse = {
   message: string;
   readyToPost: boolean;
-  partialData?: Partial<AgentQuestData>;
-  questData?: AgentQuestData;
 };

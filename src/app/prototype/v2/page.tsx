@@ -1,6 +1,6 @@
 import SiteHeader from '../../../components/layout/SiteHeader'
 import SiteFooter from '../../../components/layout/SiteFooter'
-import { getCategory } from '../../lib/quests-data';
+import { getCategory } from "../../../lib/data/quests-data";
 import {
   HERO_COPY,
   HERO_REASONS,
@@ -8,7 +8,7 @@ import {
   TOP_HEROES,
   HERO_FAQS,
   EARN_CURVE,
-} from '../../lib/hero-page-data';
+} from '../../../lib/data/hero-page-data';
 import s from './v2.module.css';
 
 export const metadata = {

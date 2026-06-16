@@ -1,75 +1,70 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/controllers/useAuth';
-import type { ChatMessage, PostQuestPayload, AgentQuestData } from '@/lib/models/quest';
-import { sendAgentMessage } from '@/lib/api/agent';
-import { postQuest } from '@/lib/api/quests';
+import type { ChatMessage } from '@/lib/models/quest';
+import { createAgentSession, sendAgentMessage } from '@/lib/api/agent';
+import type { SessionState } from '@/lib/api/agent';
 
 export type PostQuestPhase =
-  | 'prompt'   // initial input, public
-  | 'auth'     // sign-in gate, triggered after first message
-  | 'chat'     // full-screen agent conversation, authenticated
-  | 'posting'  // agent signalled done, submitting to backend
-  | 'done'     // quest posted successfully
+  | 'prompt'   // initial input
+  | 'chat'     // full-screen agent conversation
+  | 'done'     // agent posted the quest successfully
   | 'error';
 
+type SessionRef = { userId: string; sessionId: string };
+
 export function usePostQuest() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [phase, setPhase] = useState<PostQuestPhase>('prompt');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [agentTyping, setAgentTyping] = useState(false);
-  // Accumulates quest fields additively as the agent elicits them turn by turn.
-  const [questDraft, setQuestDraft] = useState<Partial<AgentQuestData>>({});
 
-  const messagesRef = useRef(messages);
-  messagesRef.current = messages;
-
-  // Auto-advance from auth gate to chat once the user signs in.
-  useEffect(() => {
-    if (phase !== 'auth' || !isAuthenticated) return;
-    setPhase('chat');
-    void runAgentTurn(messagesRef.current);
-    // runAgentTurn is intentionally omitted from deps — it is stable across
-    // renders and including it would cause spurious re-runs.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, isAuthenticated]);
+  const sessionRef = useRef<SessionRef | null>(null);
 
   function submitInitialPrompt(prompt: string) {
-    const initial: ChatMessage[] = [{ role: 'user', content: prompt }];
-    setMessages(initial);
-
-    if (!isAuthenticated) {
-      setPhase('auth');
-      return;
-    }
-
+    setMessages([{ role: 'user', content: prompt }]);
     setPhase('chat');
-    void runAgentTurn(initial);
+    void runAgentTurn(prompt);
   }
 
   async function sendMessage(content: string) {
-    const next: ChatMessage[] = [...messages, { role: 'user', content }];
-    setMessages(next);
-    await runAgentTurn(next);
+    setMessages(prev => [...prev, { role: 'user', content }]);
+    await runAgentTurn(content);
   }
 
-  async function runAgentTurn(history: ChatMessage[]) {
+  async function ensureSession(): Promise<SessionRef> {
+    if (sessionRef.current) return sessionRef.current;
+
+    // TODO: replace with real Firebase uid + idToken once auth is wired.
+    const userId = user?.uid ?? 'cit-42';
+    const sessionId = crypto.randomUUID();
+
+    const state: SessionState = {
+      citizen_id: userId,
+      country_code: 'SG',
+      timezone: 'Asia/Singapore',
+      country_name: 'Singapore',
+    };
+
+    await createAgentSession(userId, sessionId, state, '');
+    sessionRef.current = { userId, sessionId };
+    return sessionRef.current;
+  }
+
+  async function runAgentTurn(text: string) {
     setAgentTyping(true);
     try {
-      // TODO: replace '' with the real Firebase ID token once auth is wired up.
-      // Obtain via: const idToken = await firebaseUser.getIdToken();
-      const response = await sendAgentMessage(history, '');
+      const { userId, sessionId } = await ensureSession();
+      // TODO: replace '' with real Firebase ID token once auth is wired.
+      const response = await sendAgentMessage(userId, sessionId, text, '');
 
-      setMessages([...history, { role: 'agent', content: response.message }]);
+      setMessages(prev => [...prev, { role: 'agent', content: response.message }]);
 
-      // Merge whichever fields the agent just elicited into the running draft.
-      if (response.partialData) {
-        setQuestDraft(prev => ({ ...prev, ...response.partialData }));
-      }
-
-      if (response.readyToPost && response.questData) {
-        await submitQuest(response.questData);
+      // The agent posts the quest to the backend itself — when it signals done
+      // we advance to 'done' without any additional frontend POST.
+      if (response.readyToPost) {
+        setPhase('done');
       }
     } catch {
       setPhase('error');
@@ -78,23 +73,5 @@ export function usePostQuest() {
     }
   }
 
-  async function submitQuest(agentData: AgentQuestData) {
-    if (!user) return;
-    setPhase('posting');
-    try {
-      const payload: PostQuestPayload = {
-        ...agentData,
-        questID: crypto.randomUUID(),
-        citizenID: user.uid,
-        // TODO: generate and attach dynamicLink once deep linking is wired up.
-      };
-      // TODO: replace '' with the real Firebase ID token once auth is wired up.
-      await postQuest(payload, '');
-      setPhase('done');
-    } catch {
-      setPhase('error');
-    }
-  }
-
-  return { phase, messages, agentTyping, questDraft, submitInitialPrompt, sendMessage };
+  return { phase, messages, agentTyping, submitInitialPrompt, sendMessage };
 }
