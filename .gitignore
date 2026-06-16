@@ -42,3 +42,6 @@ next-env.d.ts
 
 # lock files — committed per-project at the repo root, not in worktrees
 package-lock.json
+
+# local prototype pages — not for shared branches
+src/app/prototype/
