@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import UserMenu from "@/components/browsequest/UserMenu";
+import UserMenu from "@/components/browse-quest/UserMenu";
 
 // Quest dashboard top bar — logo left, account on the right (plus an optional
 // "Post a quest" CTA). Brand coral is reserved for the CTA.
