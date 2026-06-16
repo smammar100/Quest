@@ -5,7 +5,7 @@ import Studio from "./Studio";
 // (@sanity/ui uses React context at module scope and can't render in a
 // Server Component). This file stays a Server Component so it can export
 // the Studio's metadata/viewport.
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export { metadata, viewport } from "next-sanity/studio";
 
