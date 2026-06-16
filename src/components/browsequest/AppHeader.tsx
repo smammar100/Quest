@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import AccountMenu from "@/components/browsequest/AccountMenu";
+import UserMenu from "@/components/browsequest/UserMenu";
 
 // Quest dashboard top bar — logo left, account on the right (plus an optional
 // "Post a quest" CTA). Brand coral is reserved for the CTA.
-export default function BountyTopBar({
+export default function AppHeader({
   showPost = true,
 }: {
   active?: string;
@@ -35,7 +35,7 @@ export default function BountyTopBar({
               <span className="hidden sm:inline">Post a quest</span>
             </Button>
           )}
-          <AccountMenu />
+          <UserMenu />
         </div>
       </div>
     </header>
