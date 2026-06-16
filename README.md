@@ -87,16 +87,6 @@ Content for the `/quests/[category]` pages (hero copy, earnings data, FAQs, ques
 - **Studio:** `/studio` (embedded in the Next.js app — requires auth)
 - **Hosted Studio:** [quest-inc.sanity.studio](https://quest-inc.sanity.studio)
 
-### Environment variables
-
-Create a `.env.local` at the project root:
-
-```env
-NEXT_PUBLIC_SANITY_PROJECT_ID=2pg6mq7a
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2025-06-16
-```
-
 ### Schema
 
 The `category` document type lives in `schemaTypes/category.ts`. After editing the schema, deploy it:
