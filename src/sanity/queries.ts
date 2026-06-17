@@ -1,4 +1,4 @@
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import type { SanityImageSource } from "@sanity/image-url";
 import { sanityClient } from "./client";
 
 // Shape returned by the category-by-slug query. All sections are optional
