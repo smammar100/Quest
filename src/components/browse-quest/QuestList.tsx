@@ -1,104 +1,261 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import type { QuestCategory } from '@/lib/data/quests-data';
-import { INITIAL_VISIBLE } from '@/lib/data/quests-data';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuthContext } from '@/context/AuthContext';
+import {
+  BROWSE_CATEGORIES,
+  type BrowseCategory,
+  type BrowseQuest,
+  type BrowseQuestResponse,
+} from '@/lib/models/browse-quest';
+import QuestCard from './QuestCard';
+import s from './QuestList.module.css';
 
-// Upwork-style sample list: subcategory filter chips, 2-col card grid showing
-// the first 12 listings, and a "Load more" that appends the rest client-side
-// and then unmounts (mirrors upwork.com/freelance-jobs/* exactly).
-export default function QuestList({
+const DEFAULT_COUNTRY_CODE = process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG';
+const DEFAULT_USER_ID = process.env.NEXT_PUBLIC_QUEST_BROWSE_USER_ID ?? 'web_guest';
+
+type FetchMode = 'replace' | 'append';
+
+const formatCount = (value?: string | number) => {
+  if (value == null) return '0';
+  const count = Number(value);
+  if (Number.isNaN(count)) return String(value);
+  return new Intl.NumberFormat('en-US').format(count);
+};
+
+const dedupeById = (items: BrowseQuest[]) => {
+  const seen = new Set<string>();
+  const result: BrowseQuest[] = [];
+
+  for (const item of items) {
+    const id = item.idQuests ?? `${item.title ?? 'untitled'}-${item.datePosted ?? ''}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    result.push(item);
+  }
+
+  return result;
+};
+
+const requestQuests = async ({
   category,
-  initialSub,
+  currentPage,
+  offset,
+  userID,
+  countryCode,
 }: {
-  category: QuestCategory;
-  initialSub?: string;
-}) {
-  const validSub = category.subcategories.some((s) => s.slug === initialSub) ? initialSub : undefined;
-  const [sub, setSub] = useState<string | undefined>(validSub);
-  const [visible, setVisible] = useState(INITIAL_VISIBLE);
+  category: BrowseCategory;
+  currentPage: number;
+  offset: number;
+  userID: string;
+  countryCode: string;
+}) => {
+  const params = new URLSearchParams({
+    category,
+    currentPage: String(currentPage),
+    offset: String(offset),
+    userID,
+    countryCode,
+  });
 
-  const listings = useMemo(
-    () => (sub ? category.listings.filter((l) => l.sub === sub) : category.listings),
-    [category, sub]
+  const fetchPromise = fetch(`/api/browse-quests?${params.toString()}`, {
+    cache: 'no-store',
+  });
+
+  const settled = await fetchPromise;
+
+  if (!settled.ok) {
+    throw new Error('Could not load quests right now.');
+  }
+
+  return (await settled.json()) as BrowseQuestResponse;
+};
+
+export default function QuestList() {
+  const { user, userProfile } = useAuthContext();
+  const [category, setCategory] = useState<BrowseCategory>('All');
+  const [quests, setQuests] = useState<BrowseQuest[]>([]);
+  const [resultCount, setResultCount] = useState<string | number>('0');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const countryCode =
+    userProfile?.countryCode?.trim().toUpperCase() || DEFAULT_COUNTRY_CODE;
+  const userID = user?.uid ?? DEFAULT_USER_ID;
+
+  const fetchQuests = useCallback(
+    async (nextPage: number, nextOffset: number, mode: FetchMode) => {
+      if (mode === 'append') {
+        setLoadingMore(true);
+      }
+
+      try {
+        const payload = await requestQuests({
+          category,
+          currentPage: nextPage,
+          offset: nextOffset,
+          userID,
+          countryCode,
+        });
+        const incoming = payload.quests ?? [];
+
+        setQuests((prev) =>
+          mode === 'append' ? dedupeById([...prev, ...incoming]) : dedupeById(incoming)
+        );
+        setResultCount(payload.resultCount ?? '0');
+        setCurrentPage(nextPage);
+        setOffset(nextOffset + incoming.length);
+        setHasMore(incoming.length > 2);
+      } catch (err) {
+        if (mode === 'replace') {
+          setQuests([]);
+          setResultCount('0');
+          setCurrentPage(0);
+          setOffset(0);
+          setHasMore(false);
+        }
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [category, countryCode, userID]
   );
-  const shown = listings.slice(0, visible);
-  const hasMore = listings.length > visible;
 
-  const pickSub = (next?: string) => {
-    setSub(next);
-    setVisible(INITIAL_VISIBLE);
-    const url = next ? `?sub=${next}` : window.location.pathname;
-    window.history.replaceState(null, '', url);
-  };
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const payload = await requestQuests({
+          category,
+          currentPage: 0,
+          offset: 0,
+          userID,
+          countryCode,
+        });
+        if (cancelled) return;
+
+        const incoming = payload.quests ?? [];
+        setQuests(dedupeById(incoming));
+        setResultCount(payload.resultCount ?? '0');
+        setCurrentPage(0);
+        setOffset(incoming.length);
+        setHasMore(incoming.length > 2);
+        setError(null);
+      } catch {
+        if (cancelled) return;
+        setQuests([]);
+        setResultCount('0');
+        setCurrentPage(0);
+        setOffset(0);
+        setHasMore(false);
+        setError('Could not load live quests right now.');
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [category, countryCode, userID]);
+
+  const subtitle = useMemo(() => {
+    const activeLabel = category === 'All' ? 'all categories' : category;
+    return `${formatCount(resultCount)} quests in ${activeLabel}`;
+  }, [category, resultCount]);
 
   return (
-    <div className="qp-list">
-      <div className="qp-chips" role="group" aria-label="Filter by subcategory">
-        <button
-          type="button"
-          className={`qp-chip${!sub ? ' is-active' : ''}`}
-          onClick={() => pickSub(undefined)}
-        >
-          All {category.label.toLowerCase()}
-        </button>
-        {category.subcategories.map((s) => (
-          <button
-            key={s.slug}
-            type="button"
-            className={`qp-chip${sub === s.slug ? ' is-active' : ''}`}
-            onClick={() => pickSub(s.slug)}
-          >
-            {s.label}
-          </button>
-        ))}
+    <section className={s.pageWrap}>
+      <div className={s.hero}>
+        <p className={s.eyebrow}>Browse Quest Marketplace</p>
+        <h1 className={s.title}>Find quests that match your skills.</h1>
+        <p className={s.sub}>{subtitle}</p>
       </div>
 
-      <div className="qp-grid">
-        {shown.map((l) => (
-          <article className="qp-card" key={l.title}>
-            <h2 className="qp-card__title">{l.title}</h2>
-            <p className="qp-card__meta">
-              {l.payType} ‐ Posted {l.posted}
-            </p>
-            <div className="qp-card__attrs">
-              <div className="qp-attr">
-                <span className="qp-attr__value">{l.pay}</span>
-                <span className="qp-attr__label">Payout</span>
-              </div>
-              <div className="qp-attr">
-                <span className="qp-attr__value">{l.time}</span>
-                <span className="qp-attr__label">Time needed</span>
-              </div>
-              <div className="qp-attr">
-                <span className="qp-attr__value">{l.commitment}</span>
-                <span className="qp-attr__label">Commitment</span>
-              </div>
-              <div className="qp-attr">
-                <span className="qp-attr__value">{l.level}</span>
-                <span className="qp-attr__label">Hero level</span>
-              </div>
-            </div>
-            <p className="qp-card__teaser">{l.teaser}</p>
-            <div className="qp-card__foot">
-              <div className="qp-card__tags">
-                {l.tags.map((t) => (
-                  <span className="qp-tag" key={t}>{t}</span>
-                ))}
-              </div>
-              <a href="/#welcome" className="qp-card__more">See more</a>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {hasMore && (
-        <div className="qp-loadmore">
-          <button type="button" className="qp-loadmore__btn" onClick={() => setVisible(listings.length)}>
-            Load more quests
-          </button>
+      <div className={s.toolbar}>
+        <div className={s.searchBox}>
+          <span className="material-symbols-outlined" aria-hidden="true">
+            search
+          </span>
+          <input
+            type="text"
+            placeholder="Search quests, locations, or keywords"
+            aria-label="Search quests"
+          />
         </div>
+        <p className={s.searchHint}>Search coming soon</p>
+      </div>
+
+      <div className={s.categoryRail} role="tablist" aria-label="Quest categories">
+        {BROWSE_CATEGORIES.map((item) => {
+          const selected = item === category;
+          return (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              className={`${s.categoryChip}${selected ? ` ${s.active}` : ''}`}
+              onClick={() => {
+                if (item === category) return;
+                setLoading(true);
+                setError(null);
+                setCategory(item);
+                setQuests([]);
+                setResultCount('0');
+                setCurrentPage(0);
+                setOffset(0);
+                setHasMore(true);
+              }}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </div>
+
+      {loading && <p className={s.stateLine}>Loading quests...</p>}
+      {error && <p className={s.errorLine}>{error}</p>}
+
+      {!loading && !error && quests.length === 0 && (
+        <p className={s.stateLine}>No quests found for this category yet.</p>
       )}
-    </div>
+
+      {!loading && quests.length > 0 && (
+        <>
+          <div className={s.grid}>
+            {quests.map((quest, index) => (
+              <QuestCard
+                key={quest.idQuests ?? `${quest.title}-${quest.datePosted}-${index}`}
+                quest={quest}
+                userCountryCode={countryCode}
+              />
+            ))}
+          </div>
+
+          <div className={s.paginationWrap}>
+            <p className={s.pageInfo}>Page {currentPage + 1}</p>
+            <button
+              type="button"
+              className={s.moreBtn}
+              onClick={() => void fetchQuests(currentPage + 1, offset, 'append')}
+              disabled={!hasMore || loadingMore}
+            >
+              {loadingMore ? 'Loading...' : hasMore ? 'Load more quests' : 'No more quests'}
+            </button>
+          </div>
+        </>
+      )}
+    </section>
   );
 }

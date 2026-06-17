@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/controllers/useAuth";
 import { TASK_TYPES } from "@/lib/data/quests-data";
 
 // Shared fixed header (home + /quests pages). Section links are absolute
@@ -11,8 +13,13 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 type Intent = "hero" | "poster";
 
 export default function SiteHeader() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [intent, setIntent] = useState<Intent>("hero");
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  const { isAuthenticated, signOut } = useAuth();
   const megaRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
@@ -30,6 +37,34 @@ export default function SiteHeader() {
       document.removeEventListener("keydown", onKey);
     };
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (!showLogoutDialog) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !signingOut) {
+        setShowLogoutDialog(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [showLogoutDialog, signingOut]);
+
+  async function handleConfirmLogout() {
+    setSignOutError(null);
+
+    try {
+      setSigningOut(true);
+      await signOut();
+      setShowLogoutDialog(false);
+      router.push("/");
+    } catch {
+      setSignOutError("Could not log out right now. Please try again.");
+    } finally {
+      setSigningOut(false);
+    }
+  }
 
   return (
     <div className={`header-wrapper${menuOpen ? " has-mega-open" : ""}`}>
@@ -105,12 +140,12 @@ export default function SiteHeader() {
 
               <div id="browse-dropdown" className="nav-mega" hidden={!menuOpen}>
                 <div className="nav-mega__inner">
-                  {/* left intent column — temporarily hidden, restore later
+                  {/* left intent column */}
                   <div className="nav-mega__intent">
                     <p className="nav-mega__intent-title">
                       What are you looking for?
                     </p>
-                    <p className="nav-mega__intent-sub">Pick a type of task.</p>
+                    <p className="nav-mega__intent-sub">Pick a type of quest.</p>
                     <div
                       className="nav-mega__tabs"
                       role="tablist"
@@ -146,7 +181,7 @@ export default function SiteHeader() {
                         onMouseEnter={() => setIntent("poster")}
                       >
                         <span className="nav-mega__tab-eyebrow">
-                          As a poster
+                          As a citizen
                         </span>
                         <span className="nav-mega__tab-desc">
                           I’m looking to hire someone
@@ -154,7 +189,6 @@ export default function SiteHeader() {
                       </button>
                     </div>
                   </div>
-                  */}
 
                   {/* right dense task-type list */}
                   <div
@@ -171,13 +205,13 @@ export default function SiteHeader() {
                       {TASK_TYPES.map((t) => (
                         <li key={t.label}>
                           <Link
-                            href={`/quests/${t.category}${
+                            href={
                               intent === "poster"
-                                ? ""
-                                : t.sub
-                                ? `?sub=${t.sub}`
-                                : ""
-                            }`}
+                                ? `/quests/${t.category}/hire`
+                                : `/quests/${t.category}${
+                                    t.sub ? `?sub=${t.sub}` : ""
+                                  }`
+                            }
                             className="nav-mega__link"
                             onClick={() => setMenuOpen(false)}
                           >
@@ -202,20 +236,85 @@ export default function SiteHeader() {
               </div>
             </li>
           </ul>
-          <a href="/#welcome" className="nav-cta">
+          <a href="/signup" className="nav-cta">
             Hire a human
           </a>
         </nav>
 
         <div className="nav-actions">
-          <a href="/login" className="nav-login">
-            <span className="nav-rn">Log in</span>
-          </a>
-          <button className="primary">
+          {!isAuthenticated ? (
+            <Link href="/login" className="nav-login">
+              <span className="nav-rn">Log in</span>
+            </Link>
+          ) : null}
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className="nav-login nav-login-btn"
+              onClick={() => {
+                setSignOutError(null);
+                setShowLogoutDialog(true);
+              }}
+            >
+              <span className="nav-rn">Log out</span>
+            </button>
+          ) : null}
+          <button className="primary" onClick={() => router.push("/signup")}>
             <span>Hire a human</span>
           </button>
         </div>
       </header>
+
+      {showLogoutDialog ? (
+        <div
+          className="quest-dialog-backdrop"
+          role="presentation"
+          onClick={() => {
+            if (!signingOut) {
+              setShowLogoutDialog(false);
+            }
+          }}
+        >
+          <div
+            className="quest-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-title"
+            aria-describedby="logout-description"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="logout-title" className="quest-dialog__title">
+              Log out of Quest?
+            </h3>
+            <p id="logout-description" className="quest-dialog__desc">
+              You will need to sign in again to post, manage, and browse personalized quests.
+            </p>
+            {signOutError ? (
+              <p className="quest-dialog__error" role="alert" aria-live="polite">
+                {signOutError}
+              </p>
+            ) : null}
+            <div className="quest-dialog__actions">
+              <button
+                type="button"
+                className="quest-dialog__cancel"
+                onClick={() => setShowLogoutDialog(false)}
+                disabled={signingOut}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="quest-dialog__confirm"
+                onClick={() => void handleConfirmLogout()}
+                disabled={signingOut}
+              >
+                {signingOut ? "Logging out..." : "Log out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

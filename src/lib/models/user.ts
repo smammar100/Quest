@@ -5,6 +5,7 @@ export type UserProfile = {
   email: string;
   displayName: string;
   photoURL?: string;
+  countryCode?: string;
   role: UserRole;
   createdAt: Date;
 };
