@@ -20,7 +20,6 @@ export default function SiteHeader() {
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const { isAuthenticated, signOut } = useAuth();
-  const router = useRouter();
   const megaRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
