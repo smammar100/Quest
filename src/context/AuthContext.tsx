@@ -1,6 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { auth } from '@/lib/firebase/auth';
 
 export type AuthUser = {
   uid: string;
@@ -16,17 +18,25 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue>({ user: null, loading: true });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user] = useState<AuthUser>(null);
-  const [loading] = useState(false);
+  const [user, setUser] = useState<AuthUser>(null);
+  const [loading, setLoading] = useState(true);
 
-  // TODO: replace the stubs above with real Firebase listener:
-  // useEffect(() => {
-  //   const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-  //     setUser(firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName } : null);
-  //     setLoading(false);
-  //   });
-  //   return unsub;
-  // }, []);
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(
+        firebaseUser
+          ? {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+            }
+          : null
+      );
+      setLoading(false);
+    });
+
+    return unsub;
+  }, []);
 
   return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
 }

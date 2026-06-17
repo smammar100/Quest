@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/controllers/useAuth";
 import s from "./auth.module.css";
 
 // Quest auth prototype screens. Three Clerk-inspired layouts (centered card,
@@ -94,12 +96,14 @@ function Divider({ label = "or" }: { label?: string }) {
 
 function Field({
   id,
+  name,
   label,
   type = "text",
   placeholder,
   autoComplete,
 }: {
   id: string;
+  name?: string;
   label: string;
   type?: string;
   placeholder?: string;
@@ -110,6 +114,7 @@ function Field({
       <span className={s.fieldLabel}>{label}</span>
       <input
         id={id}
+        name={name ?? id}
         className={s.input}
         type={type}
         placeholder={placeholder}
@@ -125,11 +130,19 @@ function AuthForm({
   layout,
   switchHref,
   onSwitch,
+  onSubmit,
+  onGoogleSignIn,
+  errorMessage,
+  busy,
 }: {
   mode: AuthMode;
   layout: AuthLayout;
   switchHref: string;
   onSwitch?: () => void;
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onGoogleSignIn?: () => void;
+  errorMessage?: string | null;
+  busy?: boolean;
 }) {
   const c = COPY[mode];
   const [showEmail, setShowEmail] = useState(layout !== "social");
@@ -137,11 +150,16 @@ function AuthForm({
 
   const social = (
     <div className={stacked ? s.socialStack : s.socialRow}>
-      <button type="button" className={s.social}>
+      <button
+        type="button"
+        className={s.social}
+        onClick={onGoogleSignIn}
+        disabled={busy}
+      >
         <GoogleIcon />
         <span>{stacked ? "Continue with Google" : "Google"}</span>
       </button>
-      <button type="button" className={s.social}>
+      <button type="button" className={s.social} disabled={busy}>
         <AppleIcon />
         <span>{stacked ? "Continue with Apple" : "Apple"}</span>
       </button>
@@ -189,7 +207,7 @@ function AuthForm({
           autoComplete="new-password"
         />
       )}
-      <button type="submit" className={s.submit}>
+      <button type="submit" className={s.submit} disabled={busy}>
         {c.submit}
         <span className="material-symbols-outlined" aria-hidden="true">
           arrow_forward
@@ -209,7 +227,7 @@ function AuthForm({
   );
 
   return (
-    <form className={s.form} onSubmit={(e) => e.preventDefault()}>
+    <form className={s.form} onSubmit={onSubmit ?? ((e) => e.preventDefault())}>
       {social}
       <Divider />
       {stacked && !showEmail ? (
@@ -226,6 +244,11 @@ function AuthForm({
       ) : (
         emailBlock
       )}
+      {errorMessage ? (
+        <p className={s.error} role="alert" aria-live="polite">
+          {errorMessage}
+        </p>
+      ) : null}
       <p className={s.switch}>
         {c.switchText} {switchEl}
       </p>
@@ -253,10 +276,85 @@ export default function AuthScreen({
   onSwitch?: () => void;
 }) {
   const c = COPY[mode];
+  const router = useRouter();
+  const { signIn, signInWithGoogle } = useAuth();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const other: AuthMode = mode === "login" ? "signup" : "login";
   // default switch link stays within the prototype set; real /login + /signup
   // routes pass an explicit switchHref to point at each other.
   const switchHref = switchHrefProp ?? `/prototype/auth/${other}-${layout}`;
+
+  function mapAuthError(error: unknown) {
+    if (!error || typeof error !== "object" || !("code" in error)) {
+      return "Could not log in right now. Please try again.";
+    }
+
+    const code = String((error as { code?: unknown }).code ?? "");
+    if (
+      code === "auth/invalid-credential" ||
+      code === "auth/user-not-found" ||
+      code === "auth/wrong-password"
+    ) {
+      return "Incorrect email or password.";
+    }
+    if (code === "auth/too-many-requests") {
+      return "Too many attempts. Please try again in a bit.";
+    }
+    if (code === "auth/popup-closed-by-user") {
+      return "Google sign-in was cancelled.";
+    }
+
+    return "Could not log in right now. Please try again.";
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (mode !== "login") {
+      return;
+    }
+
+    setErrorMessage(null);
+
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    if (!email || !password) {
+      setErrorMessage("Please enter both email and password.");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      await signIn(email, password);
+
+      router.push("/browse-quest/list");
+    } catch (error) {
+      setErrorMessage(mapAuthError(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    if (mode !== "login") {
+      return;
+    }
+
+    setErrorMessage(null);
+
+    try {
+      setBusy(true);
+      await signInWithGoogle();
+      router.push("/browse-quest/list");
+    } catch (error) {
+      setErrorMessage(mapAuthError(error));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   // ── Split: coral brand panel + white form card ──
   if (layout === "split") {
@@ -293,7 +391,16 @@ export default function AuthScreen({
           <div className={s.card}>
             <h1 className={s.title}>{c.title}</h1>
             <p className={s.sub}>{c.sub}</p>
-            <AuthForm mode={mode} layout={layout} switchHref={switchHref} onSwitch={onSwitch} />
+            <AuthForm
+              mode={mode}
+              layout={layout}
+              switchHref={switchHref}
+              onSwitch={onSwitch}
+              onSubmit={handleSubmit}
+              onGoogleSignIn={handleGoogleSignIn}
+              errorMessage={errorMessage}
+              busy={busy}
+            />
           </div>
         </section>
       </main>
@@ -311,7 +418,16 @@ export default function AuthScreen({
         <Brandmark />
         <h1 className={s.title}>{c.title}</h1>
         <p className={s.sub}>{c.sub}</p>
-        <AuthForm mode={mode} layout={layout} switchHref={switchHref} onSwitch={onSwitch} />
+        <AuthForm
+          mode={mode}
+          layout={layout}
+          switchHref={switchHref}
+          onSwitch={onSwitch}
+          onSubmit={handleSubmit}
+          onGoogleSignIn={handleGoogleSignIn}
+          errorMessage={errorMessage}
+          busy={busy}
+        />
       </section>
     </main>
   );
