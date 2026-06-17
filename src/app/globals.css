@@ -3028,6 +3028,10 @@ nav a {
   text-decoration: none;
   background: transparent;
 }
+.nav-login-btn {
+  border: 0;
+  cursor: pointer;
+}
 .nav-actions > button.primary {
   background: var(--near-black);
   color: #fff;
@@ -3070,6 +3074,96 @@ nav a {
   height: clamp(26px, 2.4vw, 32px);
   width: auto;
   display: block;
+}
+
+.quest-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(20, 16, 31, 0.42);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.quest-dialog {
+  width: min(92vw, 460px);
+  border-radius: 22px;
+  border: 1px solid rgba(20, 16, 31, 0.12);
+  background: #fff;
+  color: var(--near-black);
+  padding: 24px;
+  box-shadow: 0 24px 64px -26px rgba(20, 16, 31, 0.5);
+}
+
+.quest-dialog__title {
+  margin: 0;
+  font-family: var(--q-display);
+  font-size: clamp(1.26rem, 2.2vw, 1.45rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+.quest-dialog__desc {
+  margin: 10px 0 0;
+  color: var(--mid-grey);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.quest-dialog__error {
+  margin: 10px 0 0;
+  color: #b02216;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.quest-dialog__actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.quest-dialog__cancel,
+.quest-dialog__confirm {
+  min-width: 110px;
+  height: 42px;
+  border-radius: 999px;
+  padding: 0 18px;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.quest-dialog__cancel {
+  border: 1.5px solid rgba(20, 16, 31, 0.2);
+  background: #fff;
+  color: var(--near-black);
+}
+
+.quest-dialog__cancel:hover,
+.quest-dialog__cancel:focus-visible {
+  background: rgba(20, 16, 31, 0.05);
+}
+
+.quest-dialog__confirm {
+  border: 1.5px solid var(--near-black);
+  background: var(--near-black);
+  color: #fff;
+}
+
+.quest-dialog__confirm:hover,
+.quest-dialog__confirm:focus-visible {
+  background: #000;
+}
+
+.quest-dialog__cancel:disabled,
+.quest-dialog__confirm:disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
 }
 
 #bento {

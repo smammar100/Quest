@@ -267,6 +267,13 @@
 .emailToggle .material-symbols-outlined {
   font-size: 19px;
 }
+.social:disabled,
+.submit:disabled,
+.emailToggle:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+}
 
 .switch {
   margin: 6px 0 0;
@@ -274,6 +281,13 @@
   font-size: 0.9rem;
   color: var(--mid-grey);
   width: auto;
+}
+.error {
+  margin: 0;
+  text-align: center;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #b02216;
 }
 .switchLink {
   color: var(--coral);

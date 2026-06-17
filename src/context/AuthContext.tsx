@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import type { UserProfile } from '@/lib/models/user';
+import { auth } from '@/lib/firebase/auth';
+import { getUserProfileByUid } from '@/lib/firebase/firestore';
+
+const DEFAULT_COUNTRY_CODE = process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG';
 
 export type AuthUser = {
   uid: string;
@@ -10,25 +16,73 @@ export type AuthUser = {
 
 type AuthContextValue = {
   user: AuthUser;
+  userProfile: UserProfile | null;
   loading: boolean;
 };
 
-const AuthContext = createContext<AuthContextValue>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextValue>({
+  user: null,
+  userProfile: null,
+  loading: true,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user] = useState<AuthUser>(null);
-  const [loading] = useState(false);
+  const [user, setUser] = useState<AuthUser>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // TODO: replace the stubs above with real Firebase listener:
-  // useEffect(() => {
-  //   const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-  //     setUser(firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName } : null);
-  //     setLoading(false);
-  //   });
-  //   return unsub;
-  // }, []);
+  useEffect(() => {
+    let mounted = true;
 
-  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!mounted) return;
+
+      if (!firebaseUser) {
+        setUser(null);
+        setUserProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      setUser({
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+      });
+      setUserProfile({
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        displayName: firebaseUser.displayName ?? '',
+        photoURL: firebaseUser.photoURL ?? undefined,
+        role: 'poster',
+        countryCode: DEFAULT_COUNTRY_CODE,
+        createdAt: new Date(),
+      });
+      setLoading(false);
+
+      try {
+        const profile = await getUserProfileByUid(firebaseUser.uid);
+        if (!mounted) return;
+
+        if (profile) {
+          setUserProfile(profile);
+        }
+      } catch {
+        if (!mounted) return;
+      }
+    });
+
+    return () => {
+      mounted = false;
+      unsub();
+    };
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, userProfile, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export const useAuthContext = () => useContext(AuthContext);
