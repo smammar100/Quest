@@ -4,7 +4,7 @@ import { useAuth } from '@/controllers/useAuth';
 import { useRouter } from 'next/navigation';
 import PostQuestFlow from '@/components/post-quest/PostQuestFlow';
 import SiteHeader from '@/components/layout/SiteHeader';
-import PostQuestPrompt from '@/components/post-quest/PostQuestPrompt';
+import PromptInput from '@/components/post-quest/PromptInput';
 
 // Auth users go straight to the agent chat flow.
 // Unauth users see a public landing; submitting the prompt redirects to signup
@@ -26,7 +26,7 @@ export default function PostQuestPageContent() {
   return (
     <>
       <SiteHeader />
-      <PostQuestPrompt onSubmit={handlePublicSubmit} authNote />
+      <PromptInput onSubmit={handlePublicSubmit} authNote />
     </>
   );
 }

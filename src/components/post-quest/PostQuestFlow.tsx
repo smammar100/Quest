@@ -1,8 +1,8 @@
 'use client';
 
 import { usePostQuest } from '@/controllers/usePostQuest';
-import PostQuestPrompt from '@/components/post-quest/PostQuestPrompt';
-import PostQuestChat from '@/components/post-quest/PostQuestChat';
+import PromptInput from '@/components/post-quest/PromptInput';
+import QuestChat from '@/components/post-quest/QuestChat';
 
 // Rendered only for authenticated users — PostQuestPageContent handles the gate.
 export default function PostQuestFlow() {
@@ -11,7 +11,7 @@ export default function PostQuestFlow() {
   if (phase === 'chat') {
     return (
       <div className="post-quest-fullscreen">
-        <PostQuestChat
+        <QuestChat
           messages={messages}
           agentTyping={agentTyping}
           onSend={sendMessage}
@@ -51,5 +51,5 @@ export default function PostQuestFlow() {
   }
 
   // 'prompt' phase — auth user lands here first, types their quest, then chat begins.
-  return <PostQuestPrompt onSubmit={submitInitialPrompt} />;
+  return <PromptInput onSubmit={submitInitialPrompt} />;
 }

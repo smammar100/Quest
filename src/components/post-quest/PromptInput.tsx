@@ -19,7 +19,7 @@ const SUGGESTIONS = [
 // Post-quest landing hero — mirrors the homepage #welcome hero: the same chat
 // box (global .quest-prompt) and the antigravity ring-particles field. Used by
 // both the authed flow (start chat) and the unauth public landing (→ signup).
-export default function PostQuestPrompt({ onSubmit, authNote }: Props) {
+export default function PromptInput({ onSubmit, authNote }: Props) {
   const [value, setValue] = useState('');
 
   function submit(text: string) {

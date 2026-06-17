@@ -11,7 +11,7 @@ type Props = {
   onSend: (content: string) => void;
 };
 
-export default function PostQuestChat({ messages, agentTyping, onSend }: Props) {
+export default function QuestChat({ messages, agentTyping, onSend }: Props) {
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
