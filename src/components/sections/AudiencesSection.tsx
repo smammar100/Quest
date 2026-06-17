@@ -108,7 +108,7 @@ export default function AudiencesSection() {
 
         <div className="aud-aside">
           <p className="aud-aside__text">{a.asideText}</p>
-          <a href="#welcome" className="aud-aside__link">
+          <a href="/signup" className="aud-aside__link">
             {a.link}
           </a>
         </div>

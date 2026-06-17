@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { TASK_TYPES } from "@/lib/data/quests-data";
 
 // Shared fixed header (home + /quests pages). Section links are absolute
@@ -11,6 +12,7 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 type Intent = "hero" | "poster";
 
 export default function SiteHeader() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [intent, setIntent] = useState<Intent>("hero");
   const megaRef = useRef<HTMLLIElement>(null);
@@ -202,7 +204,7 @@ export default function SiteHeader() {
               </div>
             </li>
           </ul>
-          <a href="/#welcome" className="nav-cta">
+          <a href="/signup" className="nav-cta">
             Hire a human
           </a>
         </nav>
@@ -211,7 +213,7 @@ export default function SiteHeader() {
           <a href="/login" className="nav-login">
             <span className="nav-rn">Log in</span>
           </a>
-          <button className="primary">
+          <button className="primary" onClick={() => router.push("/signup")}>
             <span>Hire a human</span>
           </button>
         </div>

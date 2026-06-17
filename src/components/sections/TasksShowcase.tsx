@@ -128,7 +128,7 @@ export default function TasksShowcase() {
     <section id="tasks">
       <div className="tasks-head">
         <h2 className="tasks-title">Real tasks. Real humans.<br />Real work done.</h2>
-        <a href="#welcome" className="tasks-post">Describe a task, free</a>
+        <a href="/signup" className="tasks-post">Describe a task, free</a>
       </div>
       <div className="tasks-tabs">
         {TABS.map((tab) => (
