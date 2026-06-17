@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '@/controllers/useAuth';
 import type { ChatMessage } from '@/lib/models/quest';
-import { createAgentSession, sendAgentMessage } from '@/lib/api/agent';
+import { createAgentSession, sendAgentMessage, getAgentSession } from '@/lib/api/agent';
 import type { SessionState } from '@/lib/api/agent';
 
 export type PostQuestPhase =
@@ -46,8 +46,8 @@ export function usePostQuest() {
   async function ensureSession(): Promise<SessionRef> {
     if (sessionRef.current) return sessionRef.current;
 
+    // TODO: replace '' with real Firebase ID token once auth is wired.
     const userId = user?.uid ?? 'cit-42';
-    const sessionId = crypto.randomUUID();
     const countryCode = userProfile?.countryCode?.trim().toUpperCase() || 'SG';
 
     const state: SessionState = {
@@ -57,8 +57,8 @@ export function usePostQuest() {
       country_name: countryCode,
     };
 
-    await createAgentSession(userId, sessionId, state, '');
-    sessionRef.current = { userId, sessionId };
+    const session = await createAgentSession(userId, state, '');
+    sessionRef.current = { userId, sessionId: session.id };
     return sessionRef.current;
   }
 
@@ -71,10 +71,9 @@ export function usePostQuest() {
 
       setMessages(prev => [...prev, { role: 'agent', content: response.message }]);
 
-      // The agent posts the quest to the backend itself — when it signals done
-      // we advance to 'done' without any additional frontend POST.
       if (response.readyToPost) {
-        setPhase('done');
+        const result = await getAgentSession(userId, sessionId, '');
+        setPhase(result?.status === 'success' ? 'done' : 'error');
       }
     } catch {
       setPhase('error');
