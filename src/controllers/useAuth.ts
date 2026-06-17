@@ -7,12 +7,13 @@ import { logOut, signInEmail, signInGoogle, signUpEmail } from '@/lib/firebase/a
 // Add signIn / signOut / signUp here as wrappers over lib/firebase/auth —
 // never call Firebase directly from a component.
 export function useAuth() {
-  const { user, loading } = useAuthContext();
+  const { user, userProfile, loading } = useAuthContext();
 
   return {
     user,
+    userProfile,
     loading,
-    isAuthenticated: !loading && user !== null,
+    isAuthenticated: user !== null,
     signIn: signInEmail,
     signUp: signUpEmail,
     signInWithGoogle: signInGoogle,

@@ -72,7 +72,7 @@ const requestQuests = async ({
 };
 
 export default function QuestList() {
-  const { user } = useAuthContext();
+  const { user, userProfile } = useAuthContext();
   const [category, setCategory] = useState<BrowseCategory>('All');
   const [quests, setQuests] = useState<BrowseQuest[]>([]);
   const [resultCount, setResultCount] = useState<string | number>('0');
@@ -83,7 +83,8 @@ export default function QuestList() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const countryCode = DEFAULT_COUNTRY_CODE;
+  const countryCode =
+    userProfile?.countryCode?.trim().toUpperCase() || DEFAULT_COUNTRY_CODE;
   const userID = user?.uid ?? DEFAULT_USER_ID;
 
   const fetchQuests = useCallback(

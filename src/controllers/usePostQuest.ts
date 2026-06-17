@@ -15,7 +15,7 @@ export type PostQuestPhase =
 type SessionRef = { userId: string; sessionId: string };
 
 export function usePostQuest() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [phase, setPhase] = useState<PostQuestPhase>('prompt');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [agentTyping, setAgentTyping] = useState(false);
@@ -36,15 +36,15 @@ export function usePostQuest() {
   async function ensureSession(): Promise<SessionRef> {
     if (sessionRef.current) return sessionRef.current;
 
-    // TODO: replace with real Firebase uid + idToken once auth is wired.
     const userId = user?.uid ?? 'cit-42';
     const sessionId = crypto.randomUUID();
+    const countryCode = userProfile?.countryCode?.trim().toUpperCase() || 'SG';
 
     const state: SessionState = {
       citizen_id: userId,
-      country_code: 'SG',
+      country_code: countryCode,
       timezone: 'Asia/Singapore',
-      country_name: 'Singapore',
+      country_name: countryCode,
     };
 
     await createAgentSession(userId, sessionId, state, '');
