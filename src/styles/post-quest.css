@@ -3,120 +3,56 @@
    Uses design tokens defined in globals.css.
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Landing page --------------------------------------------------------------- */
-.pq-landing {
+/* Landing hero --------------------------------------------------------------
+   Mirrors the homepage #welcome hero: the chat box (global .quest-prompt) and
+   the antigravity ring-particles field all come from the global #welcome /
+   .quest-hero / .quest-prompt rules in globals.css. We only add the few
+   post-quest-specific tweaks below. */
+#welcome.post-quest-welcome {
+  /* Fill the viewport and vertically centre the hero — the global #welcome is
+     content-height because the homepage stacks more sections beneath it, but
+     this page is just the hero. .center handles the actual centring. */
   min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem var(--page-pad);
 }
 
-.pq-landing__hero {
-  /* override global section { min-height: 100dvh } */
-  min-height: unset;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  max-width: 680px;
+/* No +/tune/mic controls here — only the submit button, pushed to the right
+   (the global toolbar uses space-between for the homepage's left + button). */
+.post-quest-welcome .quest-prompt__toolbar {
+  justify-content: flex-end;
 }
 
-.pq-landing__title {
-  font-family: var(--q-display);
-  font-weight: 800;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
-  color: var(--near-black);
-  margin: 0;
-  text-align: center;
-}
-
-.pq-landing__subtitle {
-  color: var(--mid-grey);
-  font-family: var(--q-work);
-  font-size: 1.05rem;
-  text-align: center;
-  margin: 0;
-}
-
-/* Prompt input — chat-box container ------------------------------------------ */
-.quest-prompt {
-  width: 100%;
-  margin-top: 1.25rem;
+/* Beige card fill (--offwhite) instead of the homepage hero's grey box. */
+.post-quest-welcome .quest-prompt {
   background: var(--offwhite);
-  border: 1.5px solid rgba(20, 16, 31, 0.14);
-  border-radius: 18px;
-  padding: 12px 12px 12px 18px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 10px;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-}
-.quest-prompt:focus-within {
-  border-color: rgba(20, 16, 31, 0.36);
-  box-shadow: 0 0 0 3px rgba(20, 16, 31, 0.06);
 }
 
-.quest-prompt__input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  outline: none;
+.post-quest-welcome__auth-note {
+  margin: 22px auto 0;
   font-family: var(--q-work);
-  font-size: 1rem;
-  color: var(--near-black);
-  line-height: 1.5;
-  resize: none;
-  min-height: 1.5rem;
-  max-height: 160px;
-  overflow-y: auto;
-  field-sizing: content;
-  padding: 2px 0;
-}
-.quest-prompt__input::placeholder {
+  font-size: var(--type-label, 0.875rem);
   color: var(--mid-grey);
 }
-
-.quest-prompt__submit {
-  flex: none;
-  align-self: flex-end;
-  background: var(--coral);
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 8px 20px;
-  font-family: var(--q-work);
+.post-quest-welcome__auth-link {
+  color: var(--coral);
   font-weight: 600;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: background 0.18s ease;
-  white-space: nowrap;
+  text-decoration: none;
 }
-.quest-prompt__submit:hover:not(:disabled) {
-  background: #f0402c;
-}
-.quest-prompt__submit:disabled {
-  opacity: 0.38;
-  cursor: not-allowed;
+.post-quest-welcome__auth-link:hover {
+  text-decoration: underline;
 }
 
-/* Full-screen chat phase ------------------------------------------------------ */
-.pq-fullscreen {
+/* Full-screen chat phase — modern centered conversation ---------------------- */
+.post-quest-fullscreen {
   /* Fixed overlay removes this element from the body grid, so the grid row
      never grows to content height and body-level scroll never appears. */
   position: fixed;
   inset: 0;
   display: flex;
   flex-direction: column;
+  background: #fff;
 }
 
-.pq-chat {
+.post-quest-chat {
   flex: 1;
   min-height: 0; /* allows flex child to shrink below its content size */
   display: flex;
@@ -124,117 +60,189 @@
   overflow: hidden;
 }
 
-.pq-chat__messages {
+/* Scroll region holds the centered thread column */
+.post-quest-chat__scroll {
   flex: 1;
-  min-height: 0; /* same — without this, overflow-y: auto has nothing to clip */
+  min-height: 0; /* without this, overflow-y has nothing to clip */
   overflow-y: auto;
-  padding: 28px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 8px;
-  list-style: none;
-  margin: 0;
 }
 
-/* Chat bubbles */
-@keyframes pq-bubble-in {
-  from { opacity: 0; transform: translateY(10px); }
+.post-quest-chat__thread {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Message rows --------------------------------------------------------------- */
+@keyframes post-quest-row-in {
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  @keyframes pq-bubble-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes post-quest-row-in { from { opacity: 0; } to { opacity: 1; } }
 }
 
-.pq-chat__message {
-  max-width: 75%;
-  padding: 8px 12px;
-  border-radius: 15px;
-  background: #e5e5e5;
-  color: #000;
+.post-quest-chat__row {
+  display: flex;
+  animation: post-quest-row-in 0.28s ease-out both;
+}
+
+/* User: soft right-aligned pill */
+.post-quest-chat__row--user {
+  justify-content: flex-end;
+}
+
+.post-quest-chat__bubble {
+  max-width: 80%;
+  padding: 11px 16px;
+  border-radius: 18px 18px 4px 18px;
+  background: rgba(20, 16, 31, 0.05);
+  color: var(--near-black);
   font-family: var(--q-work);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.55;
   word-break: break-word;
-  animation: pq-bubble-in 0.22s ease-out both;
 }
 
-.pq-chat__message--user {
-  align-self: flex-end;
+/* Agent: clean left-aligned text fronted by the Quest spark (no bubble) */
+.post-quest-chat__row--agent {
+  gap: 12px;
+  align-items: flex-start;
 }
 
-.pq-chat__message--agent {
-  align-self: flex-start;
+.post-quest-chat__avatar {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  color: var(--coral);
 }
 
-/* Typing indicator */
-.pq-chat__message--typing {
+.post-quest-chat__text {
+  flex: 1;
+  min-width: 0;
+  color: var(--near-black);
+  font-family: var(--q-work);
+  font-size: 1rem;
+  line-height: 1.62;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* Thinking state — pulsing spark + shimmering label -------------------------- */
+.post-quest-thinking {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 12px 14px;
+  gap: 12px;
+  animation: post-quest-row-in 0.28s ease-out both;
 }
 
-.pq-chat__typing-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--mid-grey);
-  animation: pq-typing-bounce 1.2s ease-in-out infinite;
+.post-quest-thinking__spark {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  color: var(--coral);
+  transform-origin: center;
+  animation: post-quest-spark-pulse 1.4s ease-in-out infinite;
 }
-.pq-chat__typing-dot:nth-child(2) { animation-delay: 0.18s; }
-.pq-chat__typing-dot:nth-child(3) { animation-delay: 0.36s; }
 
-@keyframes pq-typing-bounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30%            { transform: translateY(-5px); opacity: 1; }
+@keyframes post-quest-spark-pulse {
+  0%, 100% { transform: scale(0.8) rotate(0deg);  opacity: 0.5; }
+  50%      { transform: scale(1.12) rotate(90deg); opacity: 1; }
 }
+
+.post-quest-thinking__label {
+  font-family: var(--q-work);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  /* Sweeping shimmer across the text (Claude/DeepSeek-style) */
+  background: linear-gradient(
+    100deg,
+    rgba(20, 16, 31, 0.3) 32%,
+    var(--near-black) 50%,
+    rgba(20, 16, 31, 0.3) 68%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: post-quest-shimmer 1.7s linear infinite;
+}
+
+@keyframes post-quest-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pq-chat__typing-dot { animation: none; opacity: 0.6; }
+  .post-quest-thinking__spark { animation: none; opacity: 0.85; }
+  .post-quest-thinking__label {
+    animation: none;
+    color: var(--mid-grey);
+    -webkit-text-fill-color: currentColor;
+  }
 }
 
-/* Chat reply input row ------------------------------------------------------- */
-.pq-chat__input-row {
+/* Composer — sticky centered input ------------------------------------------- */
+.post-quest-chat__composer {
+  flex: none;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 20px 18px;
+}
+
+.post-quest-chat__field {
   display: flex;
   align-items: flex-end;
-  gap: 10px;
-  padding: 12px 16px;
-  border-top: 1px solid rgba(20, 16, 31, 0.08);
-  background: #fff;
-}
-
-.pq-chat__input {
-  flex: 1;
+  gap: 8px;
   background: var(--offwhite);
   border: 1.5px solid rgba(20, 16, 31, 0.12);
-  border-radius: 18px;
-  padding: 10px 16px;
-  font-family: var(--q-work);
-  font-size: 0.95rem;
-  color: var(--near-black);
+  border-radius: 22px;
+  padding: 8px 8px 8px 18px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.post-quest-chat__field:focus-within {
+  border-color: rgba(20, 16, 31, 0.32);
+  box-shadow: 0 0 0 3px rgba(20, 16, 31, 0.05);
+}
+
+.post-quest-chat__input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
   outline: none;
   resize: none;
+  font-family: var(--q-work);
+  font-size: 1rem;
+  color: var(--near-black);
   line-height: 1.5;
-  min-height: 1.5rem;
-  max-height: 120px;
+  min-height: 24px;
+  max-height: 140px;
   overflow-y: auto;
   field-sizing: content;
-  transition: border-color 0.18s ease;
+  padding: 6px 0;
 }
-.pq-chat__input:focus {
-  border-color: rgba(20, 16, 31, 0.35);
-}
-.pq-chat__input::placeholder {
+.post-quest-chat__input::placeholder {
   color: var(--mid-grey);
 }
-.pq-chat__input:disabled {
+.post-quest-chat__input:disabled {
   opacity: 0.5;
 }
 
-.pq-chat__send {
+.post-quest-chat__send {
   flex: none;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
+  padding: 0; /* zero the global button padding so it stays a perfect circle */
+  aspect-ratio: 1;
   border-radius: 50%;
   background: var(--coral);
   color: #fff;
@@ -242,21 +250,30 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: background 0.18s ease;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
-.pq-chat__send:hover:not(:disabled) {
+.post-quest-chat__send:hover:not(:disabled) {
   background: #f0402c;
+  transform: translateY(-1px);
 }
-.pq-chat__send:disabled {
-  opacity: 0.38;
+.post-quest-chat__send:disabled {
+  opacity: 0.34;
   cursor: not-allowed;
 }
-.pq-chat__send .material-symbols-outlined {
+.post-quest-chat__send .material-symbols-outlined {
   font-size: 20px;
 }
 
+.post-quest-chat__disclaimer {
+  margin: 10px 0 0;
+  text-align: center;
+  font-family: var(--q-work);
+  font-size: 0.75rem;
+  color: var(--mid-grey);
+}
+
 /* Outcome screens (done / error) --------------------------------------------- */
-.pq-outcome {
+.post-quest-outcome {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -267,15 +284,15 @@
   text-align: center;
 }
 
-.pq-outcome__icon {
+.post-quest-outcome__icon {
   font-size: 56px !important;
   color: var(--coral);
 }
-.pq-outcome--error .pq-outcome__icon {
+.post-quest-outcome--error .post-quest-outcome__icon {
   color: #e53935;
 }
 
-.pq-outcome__title {
+.post-quest-outcome__title {
   font-family: var(--q-display);
   font-weight: 800;
   font-size: 2rem;
@@ -283,12 +300,28 @@
   margin: 0;
 }
 
-.pq-outcome__body {
+.post-quest-outcome__body {
   color: var(--mid-grey);
   font-size: 1rem;
   margin: 0;
+  max-width: 420px;
 }
 
-.pq-outcome__retry {
-  margin-top: 8px;
+.post-quest-outcome__btn {
+  margin-top: 12px;
+  height: 44px;
+  padding: 0 24px;
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.post-quest-outcome__btn:hover {
+  background: #f0402c;
+  transform: translateY(-1px);
 }

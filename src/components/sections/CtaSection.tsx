@@ -19,8 +19,8 @@ export default function CtaSection() {
             <p className="ft-trust__text">Trusted by <strong>750k+</strong> humans</p>
           </div>
           <h2 className="ft-cta__title">Creating the next million jobs uniquely human</h2>
-          <p className="ft-cta__sub">Describe a task in a sentence. A trusted human gets it done.</p>
-          <a href="#welcome" className="ft-cta-btn ft-cta-btn--primary">Hire a human</a>
+          <p className="ft-cta__sub">Describe a quest in a sentence. A trusted human gets it done.</p>
+          <a href="/signup" className="ft-cta-btn ft-cta-btn--primary">Hire a human</a>
         </div>
       </div>
     </section>

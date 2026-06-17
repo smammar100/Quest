@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { TASK_TYPES } from "@/lib/data/quests-data";
 
 // Shared fixed header (home + /quests pages). Section links are absolute
@@ -11,6 +12,7 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 type Intent = "hero" | "poster";
 
 export default function SiteHeader() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [intent, setIntent] = useState<Intent>("hero");
   const megaRef = useRef<HTMLLIElement>(null);
@@ -105,12 +107,12 @@ export default function SiteHeader() {
 
               <div id="browse-dropdown" className="nav-mega" hidden={!menuOpen}>
                 <div className="nav-mega__inner">
-                  {/* left intent column — temporarily hidden, restore later
+                  {/* left intent column */}
                   <div className="nav-mega__intent">
                     <p className="nav-mega__intent-title">
                       What are you looking for?
                     </p>
-                    <p className="nav-mega__intent-sub">Pick a type of task.</p>
+                    <p className="nav-mega__intent-sub">Pick a type of quest.</p>
                     <div
                       className="nav-mega__tabs"
                       role="tablist"
@@ -146,7 +148,7 @@ export default function SiteHeader() {
                         onMouseEnter={() => setIntent("poster")}
                       >
                         <span className="nav-mega__tab-eyebrow">
-                          As a poster
+                          As a citizen
                         </span>
                         <span className="nav-mega__tab-desc">
                           I’m looking to hire someone
@@ -154,7 +156,6 @@ export default function SiteHeader() {
                       </button>
                     </div>
                   </div>
-                  */}
 
                   {/* right dense task-type list */}
                   <div
@@ -171,13 +172,13 @@ export default function SiteHeader() {
                       {TASK_TYPES.map((t) => (
                         <li key={t.label}>
                           <Link
-                            href={`/quests/${t.category}${
+                            href={
                               intent === "poster"
-                                ? ""
-                                : t.sub
-                                ? `?sub=${t.sub}`
-                                : ""
-                            }`}
+                                ? `/quests/${t.category}/hire`
+                                : `/quests/${t.category}${
+                                    t.sub ? `?sub=${t.sub}` : ""
+                                  }`
+                            }
                             className="nav-mega__link"
                             onClick={() => setMenuOpen(false)}
                           >
@@ -202,7 +203,7 @@ export default function SiteHeader() {
               </div>
             </li>
           </ul>
-          <a href="/#welcome" className="nav-cta">
+          <a href="/signup" className="nav-cta">
             Hire a human
           </a>
         </nav>
@@ -211,7 +212,7 @@ export default function SiteHeader() {
           <a href="/login" className="nav-login">
             <span className="nav-rn">Log in</span>
           </a>
-          <button className="primary">
+          <button className="primary" onClick={() => router.push("/signup")}>
             <span>Hire a human</span>
           </button>
         </div>

@@ -1644,6 +1644,17 @@ button.secondary:focus-visible {
   min-height: 0;
   padding-block: var(--section-pad-y);
 }
+/* Standalone use (e.g. the citizen /hire page) — no marketing section above to
+   supply the top gap, so restore the section's own top padding. id+class beats
+   the `#how{padding-top:0}` reset below. */
+#how.how--standalone {
+  padding-top: var(--section-pad-y);
+}
+/* Same for the Audiences section reused on the citizen /hire page (it shares
+   the `padding-top:0` reset below). id+class beats the reset. */
+#audiences.section--standalone {
+  padding-top: var(--section-pad-y);
+}
 #how > *:not(.how-track) {
   grid-column: main;
 }
@@ -2369,7 +2380,9 @@ button.secondary:focus-visible {
   color: var(--near-black);
   text-align: center;
   margin: 0;
-  max-width: 18ch;
+  width: auto; /* escape the base `h2{width:50%}` rule that forced a 3rd line */
+  max-width: 22ch; /* wraps the title to two balanced lines */
+  text-wrap: balance;
 }
 .aud-content {
   display: grid;
@@ -3554,6 +3567,10 @@ nav a {
 .quest-prompt .quest-prompt__submit {
   height: 36px;
   padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   background: var(--near-black);
   color: #ffffff;
   border: 0;
@@ -3602,6 +3619,7 @@ nav a {
   padding: 0 18px;
   display: inline-flex;
   align-items: center;
+  text-decoration: none;
   background: #ffffff;
   border: 1px solid rgba(20, 16, 31, 0.14);
   border-radius: 999px;
@@ -4606,12 +4624,16 @@ nav a {
     font-size: 0.92rem;
     color: var(--mid-grey);
   }
+  /* Two equal-width tabs side by side (Hero / Citizen lead to different page
+     structures, so they read as a real tab switch). */
   .nav-mega__tabs {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    gap: 10px;
   }
   .nav-mega__tab {
+    flex: 1 1 0; /* equal width */
+    min-width: 0;
     position: relative;
     text-align: left;
     cursor: pointer;
@@ -4619,21 +4641,20 @@ nav a {
     flex-direction: column;
     align-items: flex-start;
     gap: 3px;
-    width: 100%;
     margin: 0; /* override header `button{margin-left:auto}` + base `align-items:center` */
     background: transparent;
     border: 0;
-    border-radius: 12px;
-    padding: 12px 14px 12px 18px;
+    border-radius: 14px;
+    padding: 14px 18px 16px;
     transition: background 0.15s ease;
   }
   .nav-mega__tab::before {
-    /* coral active indicator bar (a meaningful marker, not a decorative stroke) */
+    /* coral active marker on the left edge (a meaningful marker, not a decorative stroke) */
     content: "";
     position: absolute;
     left: 6px;
-    top: 14px;
-    bottom: 14px;
+    top: 12px;
+    bottom: 12px;
     width: 3px;
     border-radius: 3px;
     background: var(--coral);
@@ -4888,6 +4909,228 @@ nav a {
   font-size: clamp(1.05rem, 1.5vw, 1.3rem);
   line-height: 1.4;
 }
+/* Citizen hero CTA (the demand-side "Post a quest" button on the full-bleed hero) */
+.qh__cta {
+  margin-top: clamp(20px, 2.4vw, 32px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.qh__cta:hover {
+  background: #f0402c;
+  transform: translateY(-1px);
+}
+.qh__cta .material-symbols-outlined {
+  font-size: 20px;
+}
+/* step number on the Citizen "How it works" cards */
+.hc-reason__n {
+  color: var(--coral);
+  font-weight: 800;
+}
+
+/* Citizen "Trust & safety" — simple centered three-up */
+.cz-trust {
+  grid-column: main;
+  min-height: 0;
+  padding-block: var(--section-pad-y);
+  text-align: center;
+}
+.cz-trust__title {
+  margin: 0 auto;
+  width: auto; /* escape base h2{width:50%} */
+  max-width: 16ch;
+  font-family: var(--q-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+  line-height: 1.04;
+  text-wrap: balance;
+  color: var(--near-black);
+}
+.cz-trust__grid {
+  margin-top: clamp(40px, 5vw, 72px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+}
+.cz-trust__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 320px;
+  margin-inline: auto;
+}
+.cz-trust__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(20, 16, 31, 0.06);
+  color: var(--near-black);
+  margin-bottom: 4px;
+}
+.cz-trust__icon .material-symbols-outlined {
+  font-size: 26px;
+}
+.cz-trust__item-title {
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: 1.2rem;
+  color: var(--near-black);
+}
+.cz-trust__item-body {
+  margin: 0;
+  font-family: var(--q-work);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--mid-grey);
+}
+@media (max-width: 760px) {
+  .cz-trust__grid {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 7vw, 40px);
+  }
+}
+
+/* Citizen "What you can hire for" — image cards (Airtasker-style) */
+.cz-services {
+  margin-top: clamp(32px, 4vw, 52px); /* gap below the section heading */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 1.6vw, 24px);
+}
+.cz-service {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-decoration: none;
+}
+.cz-service__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--offwhite);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.cz-service:hover .cz-service__img {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 44px -26px rgba(12, 9, 18, 0.5);
+}
+.cz-service__label {
+  font-family: var(--q-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: 1.15rem;
+  color: var(--near-black);
+}
+@media (max-width: 860px) {
+  .cz-services {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 520px) {
+  .cz-services {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Citizen hero action card — Airtasker-style checklist + CTA, pinned right */
+.qh-card {
+  align-self: start;
+  justify-self: end;
+  z-index: 2;
+  width: clamp(320px, 32vw, 420px);
+  background: #fff;
+  border-radius: 24px;
+  padding: clamp(24px, 2vw, 32px);
+  box-shadow: 0 30px 60px -28px rgba(12, 9, 18, 0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.qh-card__title {
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.3rem, 1.7vw, 1.6rem);
+  line-height: 1.14;
+  text-wrap: balance; /* keep the heading to ~two balanced lines */
+  color: var(--near-black);
+}
+.qh-card__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.qh-card__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--q-work);
+  font-size: 1.02rem;
+  color: var(--near-black);
+}
+.qh-card__check {
+  flex: none;
+  color: var(--coral);
+  font-size: 22px;
+}
+.qh-card__item--more {
+  color: var(--mid-grey);
+  padding-left: 34px; /* align under the labels (check 22px + 12px gap) */
+}
+.qh-card__cta {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #fff;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.qh-card__cta:hover {
+  background: #f0402c;
+  transform: translateY(-1px);
+}
+.qh-card__cta .material-symbols-outlined {
+  font-size: 20px;
+}
+.qh-card__fine {
+  margin: 0;
+  text-align: center;
+  font-family: var(--q-work);
+  font-size: 0.85rem;
+  color: var(--mid-grey);
+}
 
 /* white earnings widget — pinned to the right, vertically centered */
 .qh__earn {
@@ -5003,7 +5246,8 @@ nav a {
   .qh__content {
     max-width: none;
   }
-  .qh__earn {
+  .qh__earn,
+  .qh-card {
     justify-self: stretch;
     width: 100%;
     box-shadow: 0 18px 40px -26px rgba(12, 9, 18, 0.4);
@@ -6579,21 +6823,6 @@ nav a {
 
 .app-header__avatar-btn:hover {
   background: #e0e0e0;
-}
-
-/* ── Post-quest public landing: auth note ────────────────────────────────────── */
-
-.pq-landing__auth-note {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #666;
-  text-align: center;
-}
-
-.pq-landing__auth-link {
-  color: #000;
-  font-weight: 500;
-  text-decoration: underline;
 }
 
 /* Post-quest flow → src/styles/post-quest.css (imported from post-quest page.tsx) */
