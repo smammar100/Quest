@@ -19,9 +19,9 @@ export default function AppHeader() {
         </Link>
 
         <nav className="app-header__nav">
-          <Link href="/quests" className="app-header__link">Browse</Link>
+          <Link href="/browse-quest" className="app-header__link">Browse</Link>
           <Link href="/post-quest" className="app-header__link app-header__link--cta">
-            Post a quest
+            Hire a human
           </Link>
         </nav>
 

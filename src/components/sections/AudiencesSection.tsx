@@ -37,7 +37,7 @@ const AUDS: Aud[] = [
     tint: '#E7E0FF',
     card: { label: 'Quests dispatched', value: '128', badge: 'live' },
     chip: { icon: 'sync', text: 'Auto-coordinated' },
-    asideText: 'It only pays once the work is verified done — built for trust.',
+    asideText: 'It only pays once the work is verified done, built for trust.',
     link: 'Connect via MCP',
   },
   {

@@ -100,7 +100,7 @@ export const BOUNTIES: Bounty[] = [
     id: "mystery-shop-phone-store",
     title: "Mystery shop a phone store and rate the pitch",
     description:
-      "Walk into a city-centre phone store as a regular customer, ask about upgrading your plan, then fill in a short scorecard on the pitch, upsell, and service. Discreet — no recording needed.",
+      "Walk into a city-centre phone store as a regular customer, ask about upgrading your plan, then fill in a short scorecard on the pitch, upsell, and service. Discreet, no recording needed.",
     category: "field-data",
     categoryLabel: "Mystery shopping",
     categoryIcon: "pin_drop",
@@ -158,7 +158,7 @@ export const BOUNTIES: Bounty[] = [
     id: "grocery-run-grandmother",
     title: "Weekly grocery run for my grandmother",
     description:
-      "Pick up a pre-paid grocery order and deliver it to my grandmother in North Austin every Saturday morning. Carry the bags in, say hello — she loves a chat. Lovely recurring quest.",
+      "Pick up a pre-paid grocery order and deliver it to my grandmother in North Austin every Saturday morning. Carry the bags in, say hello, she loves a chat. Lovely recurring quest.",
     category: "errands",
     categoryLabel: "Grocery run",
     categoryIcon: "bolt",
@@ -198,7 +198,7 @@ export const BOUNTIES: Bounty[] = [
     id: "queue-sneaker-drop",
     title: "Queue for a limited-edition sneaker drop",
     description:
-      "Line up at the flagship store on release morning and buy one pair in my size with funds I send ahead. Bring a power bank and patience — this one tends to sell out fast.",
+      "Line up at the flagship store on release morning and buy one pair in my size with funds I send ahead. Bring a power bank and patience, this one tends to sell out fast.",
     category: "errands",
     categoryLabel: "Queueing & waiting",
     categoryIcon: "bolt",
@@ -256,7 +256,7 @@ export const BOUNTIES: Bounty[] = [
     id: "plan-social-content",
     title: "Plan a month of social content for a bakery",
     description:
-      "Map out 20 posts for our neighbourhood bakery — captions, hooks, and a simple shot list we can film ourselves. Remote-friendly; one optional call to swap ideas.",
+      "Map out 20 posts for our neighbourhood bakery, captions, hooks, and a simple shot list we can film ourselves. Remote-friendly; one optional call to swap ideas.",
     category: "content",
     categoryLabel: "Social content",
     categoryIcon: "videocam",
@@ -275,7 +275,7 @@ export const BOUNTIES: Bounty[] = [
     id: "waiters-dinner-party",
     title: "Two waiters for a 40-guest dinner party",
     description:
-      "Hosting a milestone birthday and need two friendly servers for the evening — pour drinks, clear plates, keep the night flowing. Smart-casual dress. Dinner included, of course.",
+      "Hosting a milestone birthday and need two friendly servers for the evening, pour drinks, clear plates, keep the night flowing. Smart-casual dress. Dinner included, of course.",
     category: "events",
     categoryLabel: "Event staffing",
     categoryIcon: "celebration",
@@ -314,7 +314,7 @@ export const BOUNTIES: Bounty[] = [
     id: "end-of-lease-clean",
     title: "End-of-lease clean for a 2-bed flat",
     description:
-      "Bond clean for a 2-bed, 1-bath flat — kitchen, oven, bathroom, floors, windows inside. Moving out Friday so it needs to be spotless for the inspection. Supplies can be provided.",
+      "Bond clean for a 2-bed, 1-bath flat, kitchen, oven, bathroom, floors, windows inside. Moving out Friday so it needs to be spotless for the inspection. Supplies can be provided.",
     category: "home",
     categoryLabel: "Cleaning",
     categoryIcon: "home",

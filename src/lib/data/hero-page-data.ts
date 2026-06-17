@@ -25,14 +25,14 @@ export const HERO_COPY = {
     { icon: 'event_available', title: 'All on your terms', body: 'Pick the quests that fit your week. Work when you want, where you want, for what you want.' },
     { icon: 'rocket_launch', title: 'Get going for free', body: 'No joining fee, no subscription. Set up a profile and start earning the same day.' },
     { icon: 'verified_user', title: 'Secure payments', body: 'Funds are held safely the moment a quest is posted, and released the moment your work is accepted.' },
-    { icon: 'workspace_premium', title: 'Skills that pay', body: 'Turn what you’re already good at into real-world income — no degree, no gatekeepers.' },
+    { icon: 'workspace_premium', title: 'Skills that pay', body: 'Turn what you’re already good at into real-world income, no degree, no gatekeepers.' },
   ];
   
   export type HowStep = { n: string; icon: string; title: string; body: string; accent: 'electric' | 'marigold' | 'lime' | 'violet' };
   export const HOW_STEPS: HowStep[] = [
     { n: '01', icon: 'notifications_active', title: 'Quests find you', body: 'Get matched to nearby quests that fit your skills. New ones land in your feed every day.', accent: 'electric' },
-    { n: '02', icon: 'sell', title: 'Set your price', body: 'Make an offer or take a fixed payout — you decide what your time is worth.', accent: 'marigold' },
-    { n: '03', icon: 'bolt', title: 'Work. Get paid. Fast.', body: 'Finish the quest, upload your proof, and get paid — usually within 24 hours.', accent: 'lime' },
+    { n: '02', icon: 'sell', title: 'Set your price', body: 'Make an offer or take a fixed payout, you decide what your time is worth.', accent: 'marigold' },
+    { n: '03', icon: 'bolt', title: 'Work. Get paid. Fast.', body: 'Finish the quest, upload your proof, and get paid, usually within 24 hours.', accent: 'lime' },
   ];
   
   export type TopHero = {
@@ -54,11 +54,11 @@ export const HERO_COPY = {
   
   export type HeroFaq = { q: string; a: string };
   export const HERO_FAQS: HeroFaq[] = [
-    { q: 'How do I get paid?', a: 'Every quest shows its payout up front. Quest holds the funds when the poster posts the quest and releases them to you — usually within 24 hours of your proof being accepted.' },
+    { q: 'How do I get paid?', a: 'Every quest shows its payout up front. Quest holds the funds when the poster posts the quest and releases them to you, usually within 24 hours of your proof being accepted.' },
     { q: 'Do I need experience?', a: 'Most quests are open to all. Build a five-star streak on simple quests and higher-paying, recurring work unlocks fast.' },
-    { q: 'How much can I earn?', a: 'It depends on the category and how much you take on — Heroes typically earn between $15 and $60/hr. Recurring quests add steady weekly income.' },
+    { q: 'How much can I earn?', a: 'It depends on the category and how much you take on, Heroes typically earn between $15 and $60/hr. Recurring quests add steady weekly income.' },
     { q: 'Is it safe?', a: 'Every poster and payment is verified, funds are held in escrow, and you choose every quest you take. You only ever travel to vetted or confirmed locations.' },
-    { q: 'What does it cost to join?', a: 'Nothing. Creating a profile and browsing quests is free — Quest only takes a small service fee from completed quests.' },
+    { q: 'What does it cost to join?', a: 'Nothing. Creating a profile and browsing quests is free, Quest only takes a small service fee from completed quests.' },
   ];
   
   // A simple distribution for the "what Heroes earn" bell-curve viz. Each value is

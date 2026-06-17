@@ -68,7 +68,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
   const FALLBACK_FAQS = [
     {
       q: `What kind of ${low} quests can I take on?`,
-      a: `${cat.seo.intro} Most quests fall under ${cat.subcategories.slice(0, 3).map((s) => s.label.toLowerCase()).join(', ')} and more — pick whatever fits your skills and your week.`,
+      a: `${cat.seo.intro} Most quests fall under ${cat.subcategories.slice(0, 3).map((s) => s.label.toLowerCase()).join(', ')} and more, pick whatever fits your skills and your week.`,
     },
     ...HERO_FAQS,
   ];
@@ -91,7 +91,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
           <div className="qh__main">
           <div className="qh__content">
             <div className="qh__crumbs">
-              <Link href="/quests">Browse</Link>
+              <Link href="/browse-quest">Browse</Link>
               <span aria-hidden="true">/</span>
               <span aria-current="page">{cat.label}</span>
             </div>
@@ -184,7 +184,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
           ))}
         </div>
 
-        <a href="/quests" className="hc-btn hc-btn--primary hc-quests__cta">
+        <a href="/browse-quest" className="hc-btn hc-btn--primary hc-quests__cta">
           Browse all {cat.label} quests<span className="material-symbols-outlined">arrow_forward</span>
         </a>
       </section>
@@ -199,7 +199,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
               {earn?.description ?? (
                 <>
                   Most {low} Heroes settle in the <strong>${bandMin}–${bandMax}/hr</strong> band.
-                  Take on recurring quests and the curve shifts right — fast.
+                  Take on recurring quests and the curve shifts right, fast.
                 </>
               )}
             </p>
