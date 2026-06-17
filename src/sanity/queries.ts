@@ -71,3 +71,71 @@ export async function getSanityCategory(
     return null;
   }
 }
+
+// ── Citizen (demand-side /quests/[slug]/hire page) ──────────────────────────
+
+// Shape returned by the citizen-by-slug query. All sections optional so the
+// /hire template falls back to local data where a field isn't authored yet.
+export type SanityCitizen = {
+  title: string;
+  slug: string;
+  icon?: string;
+  heroHeading?: string;
+  heroSubtext?: string;
+  heroImage?: { asset?: SanityImageSource; alt?: string } | null;
+  capabilitiesEyebrow?: string;
+  capabilitiesHeading?: string;
+  capabilities?:
+    | {
+        title: string;
+        blurb?: string;
+        image?: { asset?: SanityImageSource; alt?: string } | null;
+      }[]
+    | null;
+  questsEyebrow?: string;
+  questsHeading?: string;
+  questsSubtext?: string;
+  quests?:
+    | { title: string; pay?: string; posted?: string; time?: string; teaser?: string }[]
+    | null;
+  faqHeading?: string;
+  faqSubtext?: string;
+  faqs?: { question: string; answer: string }[] | null;
+};
+
+const CITIZEN_BY_SLUG = /* groq */ `
+*[_type == "citizen" && slug.current == $slug][0]{
+  title,
+  "slug": slug.current,
+  icon,
+  heroHeading,
+  heroSubtext,
+  heroImage{asset, alt},
+  capabilitiesEyebrow,
+  capabilitiesHeading,
+  capabilities[]{title, blurb, image{asset, alt}},
+  questsEyebrow,
+  questsHeading,
+  questsSubtext,
+  quests[]{title, pay, posted, time, teaser},
+  faqHeading,
+  faqSubtext,
+  faqs[]{question, answer}
+}`;
+
+// Fetch a single citizen page's CMS content by slug. Returns null if no
+// document exists yet (the /hire page then renders entirely from local data).
+export async function getSanityCitizen(
+  slug: string
+): Promise<SanityCitizen | null> {
+  try {
+    return await sanityClient.fetch(
+      CITIZEN_BY_SLUG,
+      { slug },
+      { cache: "no-store" }
+    );
+  } catch (err) {
+    console.error(`[sanity] getSanityCitizen("${slug}") failed:`, err);
+    return null;
+  }
+}
