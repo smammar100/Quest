@@ -11,11 +11,13 @@ import {
 } from "@/lib/data/dial-codes";
 import s from "./auth.module.css";
 
-// Quest auth prototype screens. Three Clerk-inspired layouts (centered card,
-// split-branding, social-first) rendered in Quest's design system — coral +
-// Bricolage + beige, never Clerk purple. Each works for both login and signup
-// via the `mode` prop; the only auth method copy is email · Google · Apple.
-// Purely visual: no real authentication is wired.
+type CountryDetectionResponse = {
+  countryCode: string;
+  source: "header" | "ipapi" | "ipinfo" | "country.is" | "fallback";
+  detected: boolean;
+  supported: boolean;
+  message: string | null;
+};
 
 export type AuthMode = "login" | "signup";
 export type AuthLayout = "centered" | "split" | "social";
@@ -222,6 +224,9 @@ function AuthForm({
   onGoogleSignIn,
   errorMessage,
   busy,
+  dialIso,
+  onDialChange,
+  signupRestrictionMessage,
 }: {
   mode: AuthMode;
   layout: AuthLayout;
@@ -231,28 +236,15 @@ function AuthForm({
   onGoogleSignIn?: () => void;
   errorMessage?: string | null;
   busy?: boolean;
+  dialIso: string;
+  onDialChange: (iso: string) => void;
+  signupRestrictionMessage?: string | null;
 }) {
   const c = COPY[mode];
   const [showEmail, setShowEmail] = useState(layout !== "social");
-  const [dialIso, setDialIso] = useState(DEFAULT_DIAL_ISO);
   const [agreed, setAgreed] = useState(false);
   const stacked = layout === "social";
   const isSignup = mode === "signup";
-
-  // Best-effort country detection from the visitor's IP to pre-select the
-  // dial code. Silent fallback to the default on any failure/offline.
-  useEffect(() => {
-    if (!isSignup) return;
-    const ctrl = new AbortController();
-    fetch("https://ipapi.co/json/", { signal: ctrl.signal })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        const iso = data?.country_code as string | undefined;
-        if (iso && DIAL_CODES.some((c) => c.iso === iso)) setDialIso(iso);
-      })
-      .catch(() => {});
-    return () => ctrl.abort();
-  }, [isSignup]);
 
   const social = (
     <div className={stacked ? s.socialStack : s.socialRow}>
@@ -344,7 +336,7 @@ function AuthForm({
               ))}
             </Select>
           </div>
-          <PhoneField dialIso={dialIso} onDialChange={setDialIso} />
+          <PhoneField dialIso={dialIso} onDialChange={onDialChange} />
           <label className={s.agree} htmlFor="agree">
             <input
               id="agree"
@@ -374,13 +366,18 @@ function AuthForm({
       <button
         type="submit"
         className={s.submit}
-        disabled={busy || (isSignup && !agreed)}
+        disabled={busy || (isSignup && (!agreed || Boolean(signupRestrictionMessage)))}
       >
         {c.submit}
         <span className="material-symbols-outlined" aria-hidden="true">
           arrow_forward
         </span>
       </button>
+      {isSignup && signupRestrictionMessage ? (
+        <p className={s.warning} role="alert" aria-live="polite">
+          {signupRestrictionMessage}
+        </p>
+      ) : null}
     </>
   );
 
@@ -445,15 +442,30 @@ export default function AuthScreen({
 }) {
   const c = COPY[mode];
   const router = useRouter();
-  const { signIn, signInWithGoogle } = useAuth();
+  const {
+    completeSignupProfile,
+    deleteCurrentUser,
+    getCurrentUser,
+    refreshVerificationStatus,
+    sendVerificationEmail,
+    signIn,
+    signInWithGoogle,
+    signOut,
+    signUp,
+  } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [dialIso, setDialIso] = useState(DEFAULT_DIAL_ISO);
+  const [signupRestrictionMessage, setSignupRestrictionMessage] = useState<string | null>(null);
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const other: AuthMode = mode === "login" ? "signup" : "login";
   // default switch link stays within the prototype set; real /login + /signup
   // routes pass an explicit switchHref to point at each other.
   const switchHref = switchHrefProp ?? `/prototype/auth/${other}-${layout}`;
 
-  function mapAuthError(error: unknown) {
+  function mapLoginError(error: unknown) {
     if (!error || typeof error !== "object" || !("code" in error)) {
       return "Could not log in right now. Please try again.";
     }
@@ -476,12 +488,173 @@ export default function AuthScreen({
     return "Could not log in right now. Please try again.";
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function mapSignupError(error: unknown) {
+    if (!error || typeof error !== "object" || !("code" in error)) {
+      return "Could not create your account right now. Please try again.";
+    }
 
-    if (mode !== "login") {
+    const code = String((error as { code?: unknown }).code ?? "");
+    if (code === "auth/email-already-in-use") {
+      return "This email is already registered. Please log in instead.";
+    }
+    if (code === "auth/weak-password") {
+      return "Password must be at least 8 characters.";
+    }
+    if (code === "auth/network-request-failed") {
+      return "Network error. Please check your connection and try again.";
+    }
+    if (code === "auth/too-many-requests") {
+      return "Too many attempts. Please try again in a bit.";
+    }
+
+    return "Could not create your account right now. Please try again.";
+  }
+
+  async function detectCountry(): Promise<CountryDetectionResponse | null> {
+    try {
+      const response = await fetch("/api/geo/country", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return (await response.json()) as CountryDetectionResponse;
+    } catch {
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    if (mode !== "signup") {
       return;
     }
+
+    let cancelled = false;
+
+    const initCountry = async () => {
+      const detection = await detectCountry();
+      if (cancelled) {
+        return;
+      }
+
+      if (!detection || !detection.detected) {
+        setSignupRestrictionMessage(
+          "We could not verify your country yet. Please try again on a stable connection."
+        );
+        return;
+      }
+
+      if (DIAL_CODES.some((option) => option.iso === detection.countryCode)) {
+        setDialIso(detection.countryCode);
+      }
+
+      setSignupRestrictionMessage(
+        detection.supported
+          ? null
+          : detection.message ?? "Quest signup is not available in your country yet."
+      );
+    };
+
+    void initCountry();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode]);
+
+  useEffect(() => {
+    if (!verificationEmail || emailVerified) {
+      return;
+    }
+
+    let active = true;
+    const timer = window.setInterval(async () => {
+      const user = getCurrentUser();
+      if (!user) {
+        return;
+      }
+
+      try {
+        const verified = await refreshVerificationStatus(user);
+        if (!active) {
+          return;
+        }
+
+        if (verified) {
+          setEmailVerified(true);
+          setVerificationMessage(null);
+        }
+      } catch {
+        // Ignore periodic refresh failures and let user retry manually.
+      }
+    }, 10000);
+
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [emailVerified, getCurrentUser, refreshVerificationStatus, verificationEmail]);
+
+  async function handleVerifyNow() {
+    const user = getCurrentUser();
+    if (!user) {
+      setVerificationMessage("Your session has expired. Please sign up again.");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      const verified = await refreshVerificationStatus(user);
+      setEmailVerified(verified);
+      setVerificationMessage(verified ? null : "Email not verified yet. Check your inbox and try again.");
+      if (verified) {
+        router.push("/browse-quest/list");
+      }
+    } catch {
+      setVerificationMessage("We could not verify your email right now. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    const user = getCurrentUser();
+    if (!user) {
+      setVerificationMessage("Your session has expired. Please sign up again.");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      await sendVerificationEmail(user);
+      setVerificationMessage("Verification email sent again.");
+    } catch {
+      setVerificationMessage("Unable to resend verification email right now.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleUseDifferentEmail() {
+    try {
+      setBusy(true);
+      await deleteCurrentUser();
+    } catch {
+      // Best effort cleanup. We still sign out and reset the local flow.
+    } finally {
+      await signOut().catch(() => undefined);
+      setVerificationEmail(null);
+      setEmailVerified(false);
+      setVerificationMessage(null);
+      setBusy(false);
+    }
+  }
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
     setErrorMessage(null);
 
@@ -489,22 +662,154 @@ export default function AuthScreen({
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
-    if (!email || !password) {
-      setErrorMessage("Please enter both email and password.");
+    if (mode === "login") {
+      if (!email || !password) {
+        setErrorMessage("Please enter both email and password.");
+        return;
+      }
+
+      try {
+        setBusy(true);
+        await signIn(email, password);
+
+        router.push("/browse-quest/list");
+      } catch (error) {
+        setErrorMessage(mapLoginError(error));
+      } finally {
+        setBusy(false);
+      }
+
       return;
     }
 
+    const firstName = String(formData.get("firstName") ?? "").trim();
+    const lastName = String(formData.get("lastName") ?? "").trim();
+    const confirmPassword = String(formData.get("confirmPassword") ?? "");
+    const dateOfBirth = String(formData.get("dob") ?? "").trim();
+    const sourcePlatform = String(formData.get("source") ?? "").trim();
+    const phone = String(formData.get("phone") ?? "").trim();
+    const dialCodeIso = String(formData.get("dialCode") ?? "").trim();
+
+    if (!firstName || !lastName || !email || !password) {
+      setErrorMessage("Please fill in your name, email, and password.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match.");
+      return;
+    }
+
+    const detection = await detectCountry();
+    if (!detection || !detection.detected) {
+      setErrorMessage(
+        "We could not verify your country yet. Please try again on a stable connection."
+      );
+      return;
+    }
+
+    if (!detection.supported) {
+      setErrorMessage(
+        detection.message ?? "Quest signup is not available in your country yet."
+      );
+      return;
+    }
+
+    if (DIAL_CODES.some((option) => option.iso === detection.countryCode)) {
+      setDialIso(detection.countryCode);
+    }
+    setSignupRestrictionMessage(null);
+
     try {
       setBusy(true);
-      await signIn(email, password);
+      const credential = await signUp(email, password);
+      await completeSignupProfile(credential.user, {
+        email,
+        firstName,
+        lastName,
+        countryCode: detection.countryCode,
+        dateOfBirth: dateOfBirth || undefined,
+        phone: phone || undefined,
+        dialCodeIso: dialCodeIso || undefined,
+        sourcePlatform: sourcePlatform || undefined,
+      });
+      await sendVerificationEmail(credential.user);
 
-      router.push("/browse-quest/list");
+      setVerificationEmail(email);
+      setEmailVerified(credential.user.emailVerified);
+      setVerificationMessage(
+        "We sent a verification link to your email."
+      );
     } catch (error) {
-      setErrorMessage(mapAuthError(error));
+      setErrorMessage(mapSignupError(error));
     } finally {
       setBusy(false);
     }
   }
+
+  const verificationStep = verificationEmail ? (
+    <section className={s.verify}>
+      <h2 className={s.verifyTitle}>Check your email for a verification link</h2>
+      <p className={s.verifyBody}>
+        A verification link has been sent to <strong>{verificationEmail}</strong>.
+      </p>
+      <p className={s.verifyBody}>Verify your email first, then continue.</p>
+      <div className={s.verifyActions}>
+        <button
+          type="button"
+          className={s.social}
+          onClick={() => window.open("mailto:", "_self")}
+          disabled={busy}
+        >
+          Open Email
+        </button>
+        <button
+          type="button"
+          className={s.social}
+          onClick={handleResendVerification}
+          disabled={busy}
+        >
+          Resend Email
+        </button>
+      </div>
+      <button
+        type="button"
+        className={s.submit}
+        disabled={busy || !emailVerified}
+        onClick={() => router.push("/browse-quest/list")}
+      >
+        Continue
+      </button>
+      <button
+        type="button"
+        className={s.verifyCheck}
+        onClick={handleVerifyNow}
+        disabled={busy}
+      >
+        I have verified my email
+      </button>
+      {!emailVerified ? (
+        <button
+          type="button"
+          className={s.verifyChange}
+          onClick={handleUseDifferentEmail}
+          disabled={busy}
+        >
+          Enter a different email address
+        </button>
+      ) : null}
+      {verificationMessage ? (
+        <p className={s.warning} role="status" aria-live="polite">
+          {verificationMessage}
+        </p>
+      ) : null}
+    </section>
+  ) : null;
 
   async function handleGoogleSignIn() {
     if (mode !== "login") {
@@ -518,7 +823,7 @@ export default function AuthScreen({
       await signInWithGoogle();
       router.push("/browse-quest/list");
     } catch (error) {
-      setErrorMessage(mapAuthError(error));
+      setErrorMessage(mapLoginError(error));
     } finally {
       setBusy(false);
     }
@@ -559,16 +864,21 @@ export default function AuthScreen({
           <div className={s.card}>
             <h1 className={s.title}>{c.title}</h1>
             <p className={s.sub}>{c.sub}</p>
-            <AuthForm
-              mode={mode}
-              layout={layout}
-              switchHref={switchHref}
-              onSwitch={onSwitch}
-              onSubmit={handleSubmit}
-              onGoogleSignIn={handleGoogleSignIn}
-              errorMessage={errorMessage}
-              busy={busy}
-            />
+            {verificationStep ?? (
+              <AuthForm
+                mode={mode}
+                layout={layout}
+                switchHref={switchHref}
+                onSwitch={onSwitch}
+                onSubmit={handleSubmit}
+                onGoogleSignIn={handleGoogleSignIn}
+                errorMessage={errorMessage}
+                busy={busy}
+                dialIso={dialIso}
+                onDialChange={setDialIso}
+                signupRestrictionMessage={signupRestrictionMessage}
+              />
+            )}
           </div>
         </section>
       </main>
@@ -586,16 +896,21 @@ export default function AuthScreen({
         <Brandmark />
         <h1 className={s.title}>{c.title}</h1>
         <p className={s.sub}>{c.sub}</p>
-        <AuthForm
-          mode={mode}
-          layout={layout}
-          switchHref={switchHref}
-          onSwitch={onSwitch}
-          onSubmit={handleSubmit}
-          onGoogleSignIn={handleGoogleSignIn}
-          errorMessage={errorMessage}
-          busy={busy}
-        />
+        {verificationStep ?? (
+          <AuthForm
+            mode={mode}
+            layout={layout}
+            switchHref={switchHref}
+            onSwitch={onSwitch}
+            onSubmit={handleSubmit}
+            onGoogleSignIn={handleGoogleSignIn}
+            errorMessage={errorMessage}
+            busy={busy}
+            dialIso={dialIso}
+            onDialChange={setDialIso}
+            signupRestrictionMessage={signupRestrictionMessage}
+          />
+        )}
       </section>
     </main>
   );

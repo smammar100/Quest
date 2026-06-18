@@ -35,7 +35,7 @@ const CURRENCY_SYMBOL_BY_CODE: Record<Lowercase<SupportedCurrencyCode>, string> 
   krw: '₩',
 };
 
-const isSupportedCountryCode = (value: string): value is SupportedCountryCode =>
+export const isSupportedCountryCode = (value: string): value is SupportedCountryCode =>
   Object.prototype.hasOwnProperty.call(CURRENCY_CODE_BY_COUNTRY, value);
 
 export function resolveSupportedCountryCode(countryCode?: string | null): SupportedCountryCode {
