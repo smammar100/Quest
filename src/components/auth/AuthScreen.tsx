@@ -646,6 +646,11 @@ export default function AuthScreen({
       return;
     }
 
+    if (!dateOfBirth) {
+      setErrorMessage("Please enter your date of birth.");
+      return;
+    }
+
     const detection = await detectCountry();
     if (!detection || !detection.detected) {
       setErrorMessage(
@@ -671,7 +676,7 @@ export default function AuthScreen({
         firstName,
         lastName,
         countryCode: detection.countryCode,
-        dateOfBirth: dateOfBirth || undefined,
+        dateOfBirth,
         sourcePlatform: sourcePlatform || undefined,
       });
       await sendVerificationEmail(credential.user);

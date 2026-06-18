@@ -1,4 +1,4 @@
-import { doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import type { UserProfile, UserRole } from '@/lib/models/user';
 import { app } from './config';
 
@@ -44,38 +44,6 @@ const toDate = (value: UserProfileDoc['createdAt']): Date => {
 };
 
 export const db = getFirestore(app);
-
-export type SignupProfileInput = {
-	uid: string;
-	email: string;
-	firstName: string;
-	lastName: string;
-	countryCode: string;
-	dateOfBirth?: string;
-	sourcePlatform?: string;
-};
-
-export async function upsertUserProfileOnSignup(input: SignupProfileInput): Promise<void> {
-	const displayName = `${input.firstName} ${input.lastName}`.trim();
-
-	await setDoc(
-		doc(db, 'users', input.uid),
-		{
-			email: input.email,
-			displayName,
-			firstName: input.firstName,
-			lastName: input.lastName,
-			countryCode: input.countryCode.toUpperCase(),
-			country_code: input.countryCode.toUpperCase(),
-			role: 'poster',
-			dateOfBirth: input.dateOfBirth ?? null,
-			sourcePlatform: input.sourcePlatform ?? null,
-			createdAt: serverTimestamp(),
-			updatedAt: serverTimestamp(),
-		},
-		{ merge: true }
-	);
-}
 
 export async function getUserProfileByUid(uid: string): Promise<UserProfile | null> {
 	const snap = await getDoc(doc(db, 'users', uid));

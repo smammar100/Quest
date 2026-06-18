@@ -10,8 +10,8 @@ import {
 	updateProfile,
 	type User,
 } from 'firebase/auth';
-import type { SignupProfileInput } from './firestore';
-import { upsertUserProfileOnSignup } from './firestore';
+import type { SignupProfileInput } from '@/lib/api/auth';
+import { signupUserViaApi } from '@/lib/api/auth';
 import { app } from './config';
 
 export const auth = getAuth(app);
@@ -31,7 +31,7 @@ export const completeEmailSignupProfile = async (
 		await updateProfile(user, { displayName });
 	}
 
-	await upsertUserProfileOnSignup({ ...profile, uid: user.uid });
+	await signupUserViaApi({ ...profile, uid: user.uid });
 };
 
 export const sendSignupVerificationEmail = (user: User) =>
