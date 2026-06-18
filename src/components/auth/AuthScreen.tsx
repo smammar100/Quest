@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/controllers/useAuth";
 import {
   SOURCE_PLATFORMS,
@@ -399,6 +399,11 @@ export default function AuthScreen({
 }) {
   const c = COPY[mode];
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prompt = searchParams.get("prompt")?.trim();
+  const postLoginDestination = prompt
+    ? `/post-quest?prompt=${encodeURIComponent(prompt)}`
+    : "/browse-quest/list";
   const {
     completeSignupProfile,
     deleteCurrentUser,
@@ -663,7 +668,7 @@ export default function AuthScreen({
         setBusy(true);
         await signIn(email, password);
 
-        router.push("/browse-quest/list");
+        router.push(postLoginDestination);
       } catch (error) {
         setErrorMessage(mapLoginError(error));
       } finally {
@@ -811,7 +816,7 @@ export default function AuthScreen({
     try {
       setBusy(true);
       await signInWithGoogle();
-      router.push("/browse-quest/list");
+      router.push(postLoginDestination);
     } catch (error) {
       setErrorMessage(mapLoginError(error));
     } finally {

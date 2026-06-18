@@ -71,7 +71,7 @@ export default function SiteHeader() {
   return (
     <div className={`header-wrapper${menuOpen ? " has-mega-open" : ""}`}>
       <header>
-        <a href="/" className="quest-logo" aria-label="Quest">
+        <Link href="/" className="quest-logo" aria-label="Quest">
           <img
             className="quest-logo__img"
             src="/images/logos/Logo.svg"
@@ -79,7 +79,7 @@ export default function SiteHeader() {
             width={80}
             height={30}
           />
-        </a>
+        </Link>
 
         <input className="menu-checkbox" type="checkbox" id="menu-checkbox" />
         <label className="menu-button" htmlFor="menu-checkbox">

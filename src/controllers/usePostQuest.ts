@@ -71,6 +71,7 @@ export function usePostQuest(initialPrompt?: string) {
     const countryCode = resolveSupportedCountryCode(
       userProfile?.countryCode ?? DEFAULT_COUNTRY_CODE
     );
+    const timezone = resolveClientTimeZone();
 
     const state: SessionState = {
       citizen_id: userId,
