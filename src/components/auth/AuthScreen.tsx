@@ -17,6 +17,15 @@ type CountryDetectionResponse = {
   message: string | null;
 };
 
+type PendingSignupProfile = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  countryCode: string;
+  dateOfBirth: string;
+  sourcePlatform?: string;
+};
+
 export type AuthMode = "login" | "signup";
 export type AuthLayout = "centered" | "split" | "social";
 
@@ -407,6 +416,8 @@ export default function AuthScreen({
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const [emailVerified, setEmailVerified] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
+  const [pendingSignupProfile, setPendingSignupProfile] = useState<PendingSignupProfile | null>(null);
+  const [profilePersisted, setProfilePersisted] = useState(false);
   const other: AuthMode = mode === "login" ? "signup" : "login";
   // default switch link stays within the prototype set; real /login + /signup
   // routes pass an explicit switchHref to point at each other.
@@ -554,7 +565,7 @@ export default function AuthScreen({
       setEmailVerified(verified);
       setVerificationMessage(verified ? null : "Email not verified yet. Check your inbox and try again.");
       if (verified) {
-        router.push("/browse-quest/list");
+        await finalizeSignupAfterVerification();
       }
     } catch {
       setVerificationMessage("We could not verify your email right now. Please try again.");
@@ -592,6 +603,43 @@ export default function AuthScreen({
       setVerificationEmail(null);
       setEmailVerified(false);
       setVerificationMessage(null);
+      setPendingSignupProfile(null);
+      setProfilePersisted(false);
+      setBusy(false);
+    }
+  }
+
+  async function finalizeSignupAfterVerification() {
+    const user = getCurrentUser();
+    if (!user || !pendingSignupProfile) {
+      setVerificationMessage("Your session has expired. Please sign up again.");
+      return;
+    }
+
+    try {
+      setBusy(true);
+
+      const verified = user.emailVerified || (await refreshVerificationStatus(user));
+      if (!verified) {
+        setEmailVerified(false);
+        setVerificationMessage("Email not verified yet. Check your inbox and try again.");
+        return;
+      }
+
+      setEmailVerified(true);
+
+      if (!profilePersisted) {
+        await completeSignupProfile(user, pendingSignupProfile);
+        setProfilePersisted(true);
+      }
+
+      setVerificationMessage(null);
+      router.push("/browse-quest/list");
+    } catch {
+      setVerificationMessage(
+        "Your email is verified, but we could not finish account setup right now. Please try again."
+      );
+    } finally {
       setBusy(false);
     }
   }
@@ -671,7 +719,7 @@ export default function AuthScreen({
     try {
       setBusy(true);
       const credential = await signUp(email, password);
-      await completeSignupProfile(credential.user, {
+      setPendingSignupProfile({
         email,
         firstName,
         lastName,
@@ -679,6 +727,7 @@ export default function AuthScreen({
         dateOfBirth,
         sourcePlatform: sourcePlatform || undefined,
       });
+      setProfilePersisted(false);
       await sendVerificationEmail(credential.user);
 
       setVerificationEmail(email);
@@ -722,7 +771,7 @@ export default function AuthScreen({
         type="button"
         className={s.submit}
         disabled={busy || !emailVerified}
-        onClick={() => router.push("/browse-quest/list")}
+        onClick={finalizeSignupAfterVerification}
       >
         Continue
       </button>
