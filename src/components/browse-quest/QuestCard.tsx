@@ -1,4 +1,8 @@
 import type { BrowseQuest } from '@/lib/models/browse-quest';
+import {
+  resolveCurrencySymbolForCountry,
+  resolveSupportedCountryCode,
+} from '@/lib/constants/country-pricing';
 import s from './QuestCard.module.css';
 
 type Props = {
@@ -130,7 +134,7 @@ const postedDiff = (postedAt?: string) => {
 };
 
 const isFullyVerified = (quest: BrowseQuest) => {
-  const countryCode = (quest.country_code ?? 'SG').toUpperCase();
+  const countryCode = resolveSupportedCountryCode(quest.country_code);
   if (countryCode === 'SG') {
     return Boolean(quest.my_info) && Boolean(quest.phone_verified) && Boolean(quest.email_verified);
   }
@@ -152,8 +156,11 @@ export default function QuestCard({ quest, userCountryCode }: Props) {
   const posterCountryName = getCountryName(posterCountryCode);
   const posterFlag = getFlagFromCountryCode(posterCountryCode);
 
-  const isGlobalCurrency = isGlobalQuest;
-  const currencySymbol = isGlobalCurrency ? 'US$' : '$';
+  const questCountryCode =
+    quest.country_code?.toUpperCase().trim() || posterCountryCode || userCountryCode;
+  const currencySymbol = isGlobalQuest
+    ? 'US$'
+    : resolveCurrencySymbolForCountry(questCountryCode);
   const priceFinal = `${currencySymbol}${quest.price ?? '0'}`;
 
   const name = getTruncatedName(quest.firstName, quest.lastName);

@@ -6,8 +6,6 @@ import type { UserProfile } from '@/lib/models/user';
 import { auth } from '@/lib/firebase/auth';
 import { getUserProfileByUid } from '@/lib/firebase/firestore';
 
-const DEFAULT_COUNTRY_CODE = process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG';
-
 export type AuthUser = {
   uid: string;
   email: string | null;
@@ -17,18 +15,21 @@ export type AuthUser = {
 type AuthContextValue = {
   user: AuthUser;
   userProfile: UserProfile | null;
+  profileLoaded: boolean;
   loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   userProfile: null,
+  profileLoaded: false,
   loading: true,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!firebaseUser) {
         setUser(null);
         setUserProfile(null);
+        setProfileLoaded(true);
         setLoading(false);
         return;
       }
@@ -55,9 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: firebaseUser.displayName ?? '',
         photoURL: firebaseUser.photoURL ?? undefined,
         role: 'poster',
-        countryCode: DEFAULT_COUNTRY_CODE,
         createdAt: new Date(),
       });
+      setProfileLoaded(false);
       setLoading(false);
 
       try {
@@ -69,6 +71,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch {
         if (!mounted) return;
+      } finally {
+        if (mounted) {
+          setProfileLoaded(true);
+        }
       }
     });
 
@@ -79,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading }}>
+    <AuthContext.Provider value={{ user, userProfile, profileLoaded, loading }}>
       {children}
     </AuthContext.Provider>
   );
