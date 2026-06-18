@@ -65,7 +65,7 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
 
   const heroHeading = sc?.heroHeading ?? `Hire a trusted ${low} human near you.`;
   const heroSubtext =
-    sc?.heroSubtext ?? `${cat.tagline} Describe the quest — a vetted human gets it done.`;
+    sc?.heroSubtext ?? `${cat.tagline} Describe the quest, a vetted human gets it done.`;
   const heroImage = sc?.heroImage?.asset
     ? urlForImage(sc.heroImage.asset).width(1600).quality(80).url()
     : cat.image;
@@ -97,7 +97,7 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
   const questsSubtext = sc?.questsSubtext ?? cat.tagline;
   const examples = sc?.quests?.length ? sc.quests.slice(0, 6) : cat.listings.slice(0, 6);
 
-  const faqHeading = sc?.faqHeading ?? `Hiring ${low} help — questions.`;
+  const faqHeading = sc?.faqHeading ?? `Hiring ${low} help, questions.`;
   const faqSubtext = sc?.faqSubtext ?? 'Everything you need to know about hiring on Quest.';
 
   const FAQS = sc?.faqs?.length
@@ -105,7 +105,7 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
     : [
         {
           q: `How do I hire someone for ${low} work?`,
-          a: `Describe the quest in a sentence — what you need, where, when, and your budget. We match you with vetted ${low} people nearby; you compare ratings and reviews, then assign whoever fits.`,
+          a: `Describe the quest in a sentence, what you need, where, when, and your budget. We match you with vetted ${low} people nearby; you compare ratings and reviews, then assign whoever fits.`,
         },
         {
           q: 'Are the people vetted?',
@@ -113,7 +113,7 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
         },
         {
           q: 'How does payment work, and is it safe?',
-          a: 'You agree the price up front. Funds are held securely and only released once the work is done and you’re happy — no cash needed, with a clear receipt for every quest.',
+          a: 'You agree the price up front. Funds are held securely and only released once the work is done and you’re happy, no cash needed, with a clear receipt for every quest.',
         },
         {
           q: 'What does it cost?',
@@ -131,7 +131,7 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
           <div className="qh__main">
             <div className="qh__content">
               <div className="qh__crumbs">
-                <Link href="/quests">Browse</Link>
+                <Link href="/browse-quest">Browse</Link>
                 <span aria-hidden="true">/</span>
                 <span aria-current="page">{cat.label}</span>
               </div>

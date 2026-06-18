@@ -58,7 +58,7 @@ export default function HowItWorks() {
                 <li className="qmock__row"><span className="qmock__rowicon material-symbols-outlined">schedule</span><span className="qmock__rowlabel">Timing</span><b>This weekend</b></li>
                 <li className="qmock__row"><span className="qmock__rowicon material-symbols-outlined">photo_library</span><span className="qmock__rowlabel">Photos</span><b>2 added</b></li>
               </ul>
-              <button className="qmock__cta">Post quest</button>
+              <button className="qmock__cta">Hire a human</button>
             </div>
           </div>
         </article>

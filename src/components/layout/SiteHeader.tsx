@@ -15,7 +15,7 @@ type Intent = "hero" | "poster";
 export default function SiteHeader() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [intent, setIntent] = useState<Intent>("hero");
+  const [intent, setIntent] = useState<Intent>("poster");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
@@ -115,7 +115,7 @@ export default function SiteHeader() {
             </li>
             {/* mobile drawer: plain link to the quests index */}
             <li className="nav-browse-mobile">
-              <Link href="/quests">
+              <Link href="/browse-quest">
                 <span className="nav-rn">Browse</span>
               </Link>
             </li>
@@ -154,6 +154,25 @@ export default function SiteHeader() {
                       <button
                         type="button"
                         role="tab"
+                        id="browse-tab-poster"
+                        aria-selected={intent === "poster"}
+                        aria-controls="browse-tabpanel"
+                        className={`nav-mega__tab${
+                          intent === "poster" ? " is-active" : ""
+                        }`}
+                        onClick={() => setIntent("poster")}
+                        onMouseEnter={() => setIntent("poster")}
+                      >
+                        <span className="nav-mega__tab-eyebrow">
+                          As a human
+                        </span>
+                        <span className="nav-mega__tab-desc">
+                          I’m looking to hire someone
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        role="tab"
                         id="browse-tab-hero"
                         aria-selected={intent === "hero"}
                         aria-controls="browse-tabpanel"
@@ -166,25 +185,6 @@ export default function SiteHeader() {
                         <span className="nav-mega__tab-eyebrow">As a Hero</span>
                         <span className="nav-mega__tab-desc">
                           I’m looking for work
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        role="tab"
-                        id="browse-tab-poster"
-                        aria-selected={intent === "poster"}
-                        aria-controls="browse-tabpanel"
-                        className={`nav-mega__tab${
-                          intent === "poster" ? " is-active" : ""
-                        }`}
-                        onClick={() => setIntent("poster")}
-                        onMouseEnter={() => setIntent("poster")}
-                      >
-                        <span className="nav-mega__tab-eyebrow">
-                          As a citizen
-                        </span>
-                        <span className="nav-mega__tab-desc">
-                          I’m looking to hire someone
                         </span>
                       </button>
                     </div>

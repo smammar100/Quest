@@ -68,9 +68,9 @@ const mockTurnIndex = new Map<string, number>();
 const MOCK_TURNS: AgentTurnResponse[] = [
   { message: "What pokemon would you like to use in this run through?", readyToPost: false },
   { message: "Which region would you like to simulate the experience to be in?", readyToPost: false },
-  { message: "Got it! Where do you need this done — roughly what city or area?", readyToPost: false },
-  { message: "And what's your budget — ballpark is fine. Also, does this need to happen by a specific date?", readyToPost: false },
-  { message: "Perfect — I have everything I need. Posting your quest now!", readyToPost: true },
+  { message: "Got it! Where do you need this done, roughly what city or area?", readyToPost: false },
+  { message: "And what's your budget, ballpark is fine. Also, does this need to happen by a specific date?", readyToPost: false },
+  { message: "Perfect, I have everything I need. Posting your quest now!", readyToPost: true },
 ];
 
 export async function createAgentSession(
