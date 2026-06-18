@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/controllers/useAuth';
 import type { ChatMessage } from '@/lib/models/quest';
 import { createAgentSession, sendAgentMessage, getAgentSession } from '@/lib/api/agent';
@@ -14,13 +14,22 @@ export type PostQuestPhase =
 
 type SessionRef = { userId: string; sessionId: string };
 
-export function usePostQuest() {
+export function usePostQuest(initialPrompt?: string) {
   const { user, userProfile } = useAuth();
   const [phase, setPhase] = useState<PostQuestPhase>('prompt');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [agentTyping, setAgentTyping] = useState(false);
 
   const sessionRef = useRef<SessionRef | null>(null);
+  const didAutoSubmit = useRef(false);
+
+  useEffect(() => {
+    if (initialPrompt && !didAutoSubmit.current) {
+      didAutoSubmit.current = true;
+      submitInitialPrompt(initialPrompt);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function submitInitialPrompt(prompt: string) {
     setMessages([{ role: 'user', content: prompt }]);

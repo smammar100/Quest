@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import PageScript from '../../components/sections/PageScript';
 import SiteHeader from '../../components/layout/SiteHeader';
+import HireHumanPrompt from '../../components/home/HireHumanPrompt';
 import ScrollFX from '../../components/sections/ScrollFX';
 import TasksShowcase from '../../components/sections/TasksShowcase';
 import AudiencesSection from '../../components/sections/AudiencesSection';
@@ -35,27 +36,7 @@ export default function Home() {
           <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything. Hire a <span className="rn-mark">human</span>.</h2>
           <p className="quest-hero__subtitle">Hire trusted people for the real-world work AI can&apos;t do.</p>
 
-          <div className="quest-prompt">
-            <input className="quest-prompt__input" type="text" placeholder="Pick up a parcel in New York for $40" aria-label="Describe what you need" />
-            <div className="quest-prompt__toolbar">
-              <button type="button" className="quest-prompt__icon-btn quest-prompt__add" aria-label="Add attachment"><span className="material-symbols-outlined">add</span></button>
-              <div className="quest-prompt__actions">
-                <button type="button" className="quest-prompt__icon-btn" aria-label="Adjust filters"><span className="material-symbols-outlined">tune</span></button>
-                <button type="button" className="quest-prompt__icon-btn" aria-label="Voice input"><span className="material-symbols-outlined">mic</span></button>
-                <a href="/signup" className="quest-prompt__submit">Hire a human</a>
-              </div>
-            </div>
-          </div>
-
-          <div className="quest-suggest">
-            <p className="quest-suggest__label">What do you need a human to do?</p>
-            <div className="quest-suggest__pills">
-              <a href="/signup" className="quest-pill">Pick up a parcel in New York</a>
-              <a href="/signup" className="quest-pill">Shoot a UGC video</a>
-              <a href="/signup" className="quest-pill">Check an apartment &amp; take photos</a>
-              <a href="/signup" className="quest-pill">Assemble furniture</a>
-            </div>
-          </div>
+          <HireHumanPrompt />
         </div>
       </section>
 
