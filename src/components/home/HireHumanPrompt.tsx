@@ -1,0 +1,69 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/controllers/useAuth';
+
+const SUGGESTIONS = [
+  'Pick up a parcel in New York',
+  'Shoot a UGC video',
+  'Check an apartment & take photos',
+  'Assemble furniture',
+];
+
+export default function HireHumanPrompt() {
+  const [value, setValue] = useState('');
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  function submit(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const encoded = encodeURIComponent(trimmed);
+    if (!loading && isAuthenticated) {
+      router.push(`/post-quest?prompt=${encoded}`);
+    } else {
+      router.push(`/login?prompt=${encoded}`);
+    }
+  }
+
+  return (
+    <>
+      <form className="quest-prompt" onSubmit={e => { e.preventDefault(); submit(value); }}>
+        <input
+          className="quest-prompt__input"
+          type="text"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder="Pick up a parcel in New York for $40"
+          aria-label="Describe what you need"
+        />
+        <div className="quest-prompt__toolbar">
+          <button type="button" className="quest-prompt__icon-btn quest-prompt__add" aria-label="Add attachment">
+            <span className="material-symbols-outlined">add</span>
+          </button>
+          <div className="quest-prompt__actions">
+            <button type="button" className="quest-prompt__icon-btn" aria-label="Adjust filters">
+              <span className="material-symbols-outlined">tune</span>
+            </button>
+            <button type="button" className="quest-prompt__icon-btn" aria-label="Voice input">
+              <span className="material-symbols-outlined">mic</span>
+            </button>
+            <button type="submit" className="quest-prompt__submit">Hire a human</button>
+          </div>
+        </div>
+      </form>
+
+      <div className="quest-suggest">
+        <p className="quest-suggest__label">What do you need a human to do?</p>
+        <div className="quest-suggest__pills">
+          {SUGGESTIONS.map(s => (
+            <button key={s} type="button" className="quest-pill" onClick={() => submit(s)}>
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
