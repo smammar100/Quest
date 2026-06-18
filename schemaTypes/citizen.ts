@@ -25,7 +25,7 @@ export const citizen = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description: 'URL segment — the page renders at /quests/<slug>/hire.',
+      description: 'URL segment, the page renders at /quests/<slug>/hire.',
       options: {source: 'title', maxLength: 96},
       validation: (r) => r.required(),
     }),
@@ -153,7 +153,7 @@ export const citizen = defineType({
       title: 'FAQ heading',
       type: 'string',
       group: 'faq',
-      description: 'e.g. "Hiring field data help — questions."',
+      description: 'e.g. "Hiring field data help, questions."',
     }),
     defineField({
       name: 'faqSubtext',

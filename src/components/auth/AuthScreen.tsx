@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/controllers/useAuth";
+import {
+  DEFAULT_DIAL_ISO,
+  DIAL_CODES,
+  SOURCE_PLATFORMS,
+} from "@/lib/data/dial-codes";
 import s from "./auth.module.css";
 
 // Quest auth prototype screens. Three Clerk-inspired layouts (centered card,
@@ -27,7 +32,7 @@ const COPY = {
   signup: {
     eyebrow: "Join Quest",
     title: "Create your account",
-    sub: "Hire trusted humans — or start earning as one.",
+    sub: "Hire trusted humans, or start earning as one.",
     submit: "Create account",
     switchText: "Already have an account?",
     switchCta: "Log in",
@@ -43,7 +48,7 @@ const SPLIT_BENEFITS = [
   {
     icon: "bolt",
     t: "Real work, done fast",
-    b: "Post a quest in a sentence and get matched in minutes.",
+    b: "Hire a human in a sentence and get matched in minutes.",
   },
   {
     icon: "lock",
@@ -124,6 +129,89 @@ function Field({
   );
 }
 
+function Select({
+  id,
+  label,
+  defaultValue,
+  placeholder,
+  children,
+}: {
+  id: string;
+  label: string;
+  defaultValue?: string;
+  placeholder?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className={s.field} htmlFor={id}>
+      <span className={s.fieldLabel}>{label}</span>
+      <div className={s.selectWrap}>
+        <select
+          id={id}
+          name={id}
+          className={s.select}
+          defaultValue={defaultValue ?? ""}
+        >
+          {placeholder ? (
+            <option value="" disabled>
+              {placeholder}
+            </option>
+          ) : null}
+          {children}
+        </select>
+        <span className={`material-symbols-outlined ${s.selectChevron}`} aria-hidden="true">
+          expand_more
+        </span>
+      </div>
+    </label>
+  );
+}
+
+// Phone field: IP-detected dial code (flag + code) paired with a number input.
+function PhoneField({
+  dialIso,
+  onDialChange,
+}: {
+  dialIso: string;
+  onDialChange: (iso: string) => void;
+}) {
+  return (
+    <div className={s.field}>
+      <span className={s.fieldLabel}>Phone number</span>
+      <div className={s.phoneRow}>
+        <div className={s.selectWrap}>
+          <select
+            id="dialCode"
+            name="dialCode"
+            className={`${s.select} ${s.dialSelect}`}
+            value={dialIso}
+            onChange={(e) => onDialChange(e.target.value)}
+            aria-label="Country dial code"
+          >
+            {DIAL_CODES.map((c) => (
+              <option key={c.iso} value={c.iso}>
+                {c.flag} {c.dial}
+              </option>
+            ))}
+          </select>
+          <span className={`material-symbols-outlined ${s.selectChevron}`} aria-hidden="true">
+            expand_more
+          </span>
+        </div>
+        <input
+          id="phone"
+          name="phone"
+          className={`${s.input} ${s.phoneInput}`}
+          type="tel"
+          inputMode="tel"
+          placeholder="555 000 1234"
+          autoComplete="tel-national"
+        />
+      </div>
+    </div>
+  );
+}
+
 // The shared form body: social buttons, divider, fields, submit, switch link.
 function AuthForm({
   mode,
@@ -146,7 +234,25 @@ function AuthForm({
 }) {
   const c = COPY[mode];
   const [showEmail, setShowEmail] = useState(layout !== "social");
+  const [dialIso, setDialIso] = useState(DEFAULT_DIAL_ISO);
+  const [agreed, setAgreed] = useState(false);
   const stacked = layout === "social";
+  const isSignup = mode === "signup";
+
+  // Best-effort country detection from the visitor's IP to pre-select the
+  // dial code. Silent fallback to the default on any failure/offline.
+  useEffect(() => {
+    if (!isSignup) return;
+    const ctrl = new AbortController();
+    fetch("https://ipapi.co/json/", { signal: ctrl.signal })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const iso = data?.country_code as string | undefined;
+        if (iso && DIAL_CODES.some((c) => c.iso === iso)) setDialIso(iso);
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [isSignup]);
 
   const social = (
     <div className={stacked ? s.socialStack : s.socialRow}>
@@ -191,23 +297,85 @@ function AuthForm({
         placeholder="you@example.com"
         autoComplete="email"
       />
-      <Field
-        id="password"
-        label="Password"
-        type="password"
-        placeholder="••••••••"
-        autoComplete={mode === "signup" ? "new-password" : "current-password"}
-      />
-      {mode === "signup" && (
+      {isSignup ? (
+        <div className={s.row2}>
+          <Field
+            id="password"
+            label="Password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+          />
+          <Field
+            id="confirmPassword"
+            label="Re-enter password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+          />
+        </div>
+      ) : (
         <Field
-          id="confirmPassword"
-          label="Re-enter password"
+          id="password"
+          label="Password"
           type="password"
           placeholder="••••••••"
-          autoComplete="new-password"
+          autoComplete="current-password"
         />
       )}
-      <button type="submit" className={s.submit} disabled={busy}>
+      {isSignup && (
+        <>
+          <div className={s.row2}>
+            <Field
+              id="dob"
+              label="Date of birth"
+              type="date"
+              autoComplete="bday"
+            />
+            <Select
+              id="source"
+              label="How did you hear about us?"
+              placeholder="Select an option"
+            >
+              {SOURCE_PLATFORMS.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <PhoneField dialIso={dialIso} onDialChange={setDialIso} />
+          <label className={s.agree} htmlFor="agree">
+            <input
+              id="agree"
+              name="agree"
+              type="checkbox"
+              className={s.agreeBox}
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+            />
+            <span className={s.agreeMark} aria-hidden="true">
+              <span className="material-symbols-outlined">check</span>
+            </span>
+            <span className={s.agreeText}>
+              I agree to Quest&apos;s{" "}
+              <Link href="/terms" className={s.agreeLink} target="_blank">
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className={s.agreeLink} target="_blank">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
+        </>
+      )}
+      <button
+        type="submit"
+        className={s.submit}
+        disabled={busy || (isSignup && !agreed)}
+      >
         {c.submit}
         <span className="material-symbols-outlined" aria-hidden="true">
           arrow_forward

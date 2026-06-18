@@ -30,11 +30,11 @@ export default function PromptInput({ onSubmit, authNote }: Props) {
   return (
     <section id="welcome" className="center post-quest-welcome">
       <h1>
-        <span className="sr-only">Post a quest. Hire trusted humans for real-world work.</span>
+        <span className="sr-only">Hire a human. Hire trusted humans for real-world work.</span>
       </h1>
 
       <div className="quest-hero">
-        <h2 className="quest-hero__title">Post a quest</h2>
+        <h2 className="quest-hero__title">Hire a human</h2>
         <p className="quest-hero__subtitle">
           Tell us what you need. A trusted human will take it from there.
         </p>
@@ -57,7 +57,7 @@ export default function PromptInput({ onSubmit, authNote }: Props) {
           />
           <div className="quest-prompt__toolbar">
             <button type="submit" className="quest-prompt__submit">
-              Post a quest
+              Hire a human
             </button>
           </div>
         </form>

@@ -27,7 +27,7 @@ export const category = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description: 'URL segment — the page renders at /quests/<slug>.',
+      description: 'URL segment, the page renders at /quests/<slug>.',
       options: {source: 'title', maxLength: 96},
       validation: (r) => r.required(),
     }),

@@ -6,7 +6,7 @@ import ScrollFX from "../../../components/sections/ScrollFX";
 import { QUEST_CATEGORIES } from "@/lib/data/quests-data";
 
 export const metadata: Metadata = {
-  title: 'Browse quests — real-world work for real humans | Quest',
+  title: 'Browse quests, real-world work for real humans | Quest',
   description: 'Explore open quests across field data, errands, content, events, and home. Pick a category and get paid for real-world work.',
 };
 
@@ -20,7 +20,7 @@ export default function QuestsIndexPage() {
 
       <section className="qp-hero">
         <h1 className="qp-hero__title">Browse quests.</h1>
-        <p className="qp-hero__proof">Real tasks posted by real people — pick a category and get to work.</p>
+        <p className="qp-hero__proof">Real tasks posted by real people, pick a category and get to work.</p>
         <a href="/#cta" className="qp-hero__cta">Become a Hero</a>
       </section>
 
