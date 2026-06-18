@@ -274,25 +274,6 @@
   color: var(--mid-grey);
 }
 
-/* ---------- phone (dial code + number) ---------- */
-.phoneRow {
-  display: grid;
-  grid-template-columns: 116px 1fr;
-  gap: 10px;
-}
-.dialSelect {
-  padding-left: 12px;
-  padding-right: 30px;
-  font-size: 0.92rem;
-  font-family: "Twemoji Country Flags", var(--q-work);
-}
-.dialSelect option {
-  font-family: "Twemoji Country Flags", var(--q-work);
-}
-.phoneInput {
-  flex: 1;
-}
-
 /* ---------- terms agreement ---------- */
 .agree {
   display: grid;
@@ -426,6 +407,13 @@
   font-weight: 600;
   color: #b02216;
 }
+.warning {
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: #8f2d00;
+}
 .switchLink {
   color: var(--coral);
   font-weight: 600;
@@ -441,6 +429,56 @@
   font-size: 0.78rem;
   color: var(--mid-grey);
   width: auto;
+}
+
+.verify {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.verifyTitle {
+  margin: 0;
+  text-align: center;
+  font-family: var(--q-display);
+  font-size: clamp(1.4rem, 2.3vw, 1.8rem);
+  line-height: 1.15;
+}
+
+.verifyBody {
+  margin: 0;
+  text-align: center;
+  color: var(--mid-grey);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.verifyActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.verifyCheck,
+.verifyChange {
+  border: 0;
+  background: transparent;
+  color: var(--coral);
+  font-family: var(--q-work);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.verifyCheck:hover,
+.verifyChange:hover {
+  text-decoration: underline;
+}
+
+.verifyCheck:disabled,
+.verifyChange:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 /* ================================================================== *
@@ -589,5 +627,8 @@
   }
   .title {
     font-size: 1.55rem;
+  }
+  .verifyActions {
+    grid-template-columns: 1fr;
   }
 }

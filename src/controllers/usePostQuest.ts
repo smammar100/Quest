@@ -5,6 +5,7 @@ import { useAuth } from '@/controllers/useAuth';
 import type { ChatMessage } from '@/lib/models/quest';
 import { createAgentSession, sendAgentMessage, getAgentSession } from '@/lib/api/agent';
 import type { SessionState } from '@/lib/api/agent';
+import { resolveSupportedCountryCode } from '@/lib/constants/country-pricing';
 
 export type PostQuestPhase =
   | 'prompt'   // initial input
@@ -13,6 +14,16 @@ export type PostQuestPhase =
   | 'error';
 
 type SessionRef = { userId: string; sessionId: string };
+
+const DEFAULT_COUNTRY_CODE = resolveSupportedCountryCode(
+  process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE
+);
+const DEFAULT_TIMEZONE = 'UTC';
+
+const resolveClientTimeZone = () => {
+  const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return detected && detected.trim().length > 0 ? detected : DEFAULT_TIMEZONE;
+};
 
 export function usePostQuest(initialPrompt?: string) {
   const { user, userProfile } = useAuth();
@@ -57,12 +68,14 @@ export function usePostQuest(initialPrompt?: string) {
 
     // TODO: replace '' with real Firebase ID token once auth is wired.
     const userId = user?.uid ?? 'cit-42';
-    const countryCode = userProfile?.countryCode?.trim().toUpperCase() || 'SG';
+    const countryCode = resolveSupportedCountryCode(
+      userProfile?.countryCode ?? DEFAULT_COUNTRY_CODE
+    );
 
     const state: SessionState = {
       citizen_id: userId,
       country_code: countryCode,
-      timezone: 'Asia/Singapore',
+      timezone,
       country_name: countryCode,
     };
 
