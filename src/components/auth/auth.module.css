@@ -81,6 +81,15 @@
 }
 .cardCentered {
   max-width: 500px;
+  position: relative;
+}
+.cardSocial {
+  position: relative;
+}
+/* signup centered card: logo, title and subtitle are centered */
+.cardCentered .title,
+.cardCentered .sub {
+  text-align: center;
 }
 
 .brand {
@@ -293,6 +302,63 @@
   flex: 1;
 }
 
+/* ---------- signup two-step ---------- */
+.stepPrompt {
+  margin: 0 0 2px;
+  text-align: center;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  width: auto;
+}
+.backBtn {
+  position: absolute;
+  top: clamp(20px, 2.6vw, 30px);
+  left: clamp(16px, 2.2vw, 26px);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--mid-grey);
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.backBtn:hover {
+  color: var(--ink);
+  background: rgba(20, 16, 31, 0.04);
+}
+.backBtn .material-symbols-outlined {
+  font-size: 18px;
+}
+.methodNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--coral-tint, #ffd9d2);
+  color: var(--ink);
+  font-family: var(--q-work);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  width: auto;
+}
+.methodNote .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--coral);
+  flex: none;
+}
+
 /* ---------- terms agreement ---------- */
 .agree {
   display: grid;
@@ -323,18 +389,18 @@
   place-items: center;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
-.agreeMark .material-symbols-outlined {
+.agreeMark :global(.material-symbols-outlined) {
   font-size: 17px;
-  color: #fff;
+  color: var(--coral);
   opacity: 0;
   transform: scale(0.6);
   transition: opacity 0.12s ease, transform 0.12s ease;
 }
 .agreeBox:checked + .agreeMark {
-  background: var(--coral);
+  background: var(--paper);
   border-color: var(--coral);
 }
-.agreeBox:checked + .agreeMark .material-symbols-outlined {
+.agreeBox:checked + .agreeMark :global(.material-symbols-outlined) {
   opacity: 1;
   transform: scale(1);
 }

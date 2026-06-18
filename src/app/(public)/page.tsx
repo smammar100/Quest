@@ -38,12 +38,7 @@ export default function Home() {
           <div className="quest-prompt">
             <input className="quest-prompt__input" type="text" placeholder="Pick up a parcel in New York for $40" aria-label="Describe what you need" />
             <div className="quest-prompt__toolbar">
-              <button type="button" className="quest-prompt__icon-btn quest-prompt__add" aria-label="Add attachment"><span className="material-symbols-outlined">add</span></button>
-              <div className="quest-prompt__actions">
-                <button type="button" className="quest-prompt__icon-btn" aria-label="Adjust filters"><span className="material-symbols-outlined">tune</span></button>
-                <button type="button" className="quest-prompt__icon-btn" aria-label="Voice input"><span className="material-symbols-outlined">mic</span></button>
-                <a href="/signup" className="quest-prompt__submit">Hire a human</a>
-              </div>
+              <a href="/signup" className="quest-prompt__submit">Hire a human</a>
             </div>
           </div>
 
@@ -111,13 +106,18 @@ export default function Home() {
           <a href="/signup" className="video-cta">Read the Manifesto <span className="material-symbols-outlined">arrow_forward</span></a>
           */}
         </div>
-        <div className="video-frame">
-          <video className="video-el" preload="metadata" playsInline>
+        <div className="video-frame is-playing">
+          <video
+            className="video-el"
+            preload="auto"
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls
+          >
             <source src="https://res.cloudinary.com/dxlcfrlkn/video/upload/q_auto/f_auto/v1781670637/Website_vid_final_ver_2_xhhqyr.mp4" type="video/mp4" />
           </video>
-          <button type="button" className="video-play" aria-label="Play video">
-            <span className="material-symbols-outlined">play_arrow</span>
-          </button>
         </div>
       </section>
 
@@ -139,7 +139,7 @@ export default function Home() {
             <span className="how-card__num">/ 01</span>
             <div className="how-card__visual" aria-hidden="true">
               <div className="qmock qmock--post">
-                <div className="qmock__head"><span className="qmock__title">New task</span><span className="qmock__step">Step 1 of 3</span></div>
+                <div className="qmock__head"><span className="qmock__title">New task</span></div>
                 <div className="qmock__prompt"><span>Mow my lawn in Dallas, $100</span><span className="qmock__send material-symbols-outlined">arrow_upward</span></div>
                 <div className="qmock__chips"><span className="qmock__chip">Sat, 9am</span><span className="qmock__chip">Dallas, TX</span><span className="qmock__chip">Lawn mowed</span></div>
                 <ul className="qmock__list">
@@ -179,7 +179,7 @@ export default function Home() {
                 <div className="qmock__hero qmock__hero--lg"><img className="qmock__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&auto=format&q=80" alt="" width={96} height={96} loading="lazy" decoding="async" /><span className="qmock__who"><b>Maya R.</b><small>Lawn mowing · Sat 9am · Dallas</small></span></div>
                 <ul className="qmock__lines">
                   <li className="qmock__line"><span>Task</span><span>$90.00</span></li>
-                  <li className="qmock__line"><span>Service fee</span><span>$10.00</span></li>
+                  <li className="qmock__line"><span>Booking fee</span><span>$10.00</span></li>
                   <li className="qmock__line qmock__line--total"><span>Total</span><span>$100.00</span></li>
                 </ul>
                 <div className="qmock__secure"><span className="material-symbols-outlined">lock</span>Funds held safely until the work is done</div>

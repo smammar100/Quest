@@ -1498,10 +1498,10 @@ html.lenis {
   gap: 0.45em;
   font-family: var(--q-work);
   font-weight: 500;
-  font-size: var(--type-label);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
   letter-spacing: 0.01em;
   margin: 0 0 clamp(14px, 1.6vw, 20px);
-  padding: 0.42em 0.95em;
+  padding: 0.55em 1.2em;
   border: 1px solid rgba(20, 16, 31, 0.14);
   border-radius: 999px;
   background: rgba(20, 16, 31, 0.025);
@@ -1860,16 +1860,18 @@ button.secondary:focus-visible {
   font-size: 0.9rem;
   color: var(--near-black);
 }
-.qmock__send {
+.qmock__prompt .qmock__send {
   flex: none;
   width: 30px;
   height: 30px;
   border-radius: 50%;
   background: var(--coral);
   color: #fff;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 18px;
+  line-height: 1;
 }
 .qmock__matchrow {
   display: flex;
@@ -2905,7 +2907,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 ::selection {
-  background: var(--coral);
+  background: var(--coral-tint);
   color: var(--near-black);
 }
 
@@ -3595,7 +3597,7 @@ nav a {
 .quest-prompt {
   width: min(785px, 100%);
   margin-top: 40px;
-  background: #f3f3f4;
+  background: var(--offwhite);
   border: 1px solid rgba(20, 16, 31, 0.08);
   border-radius: 24px;
   box-shadow: 0 1px 2px rgba(20, 16, 31, 0.04),
@@ -3625,7 +3627,7 @@ nav a {
 .quest-prompt__toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   width: 100%;
 }
 .quest-prompt__actions {
@@ -3665,7 +3667,7 @@ nav a {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  background: var(--near-black);
+  background: var(--coral);
   color: #ffffff;
   border: 0;
   border-radius: 10px;
@@ -4431,13 +4433,16 @@ nav a {
 }
 .ft-cols {
   display: grid;
-  grid-template-columns: repeat(4, auto);
+  grid-template-columns: repeat(3, auto);
   gap: clamp(28px, 4vw, 72px);
 }
 /* neutralize the generic `nav li`/`nav a` base rules (@layer shared) that bleed into this <nav> */
 .ft-cols li {
   border: 0;
   font-size: 1rem;
+}
+.ft-col {
+  text-align: left;
 }
 .ft-col__title {
   margin: 0 0 14px;
@@ -4454,6 +4459,7 @@ nav a {
   padding: 0;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 11px;
 }
 .ft-link {
@@ -4488,6 +4494,115 @@ nav a {
 .ft-link:focus-visible {
   background: transparent;
 }
+/* a .ft-link can also be a <button> (download-app trigger) — reset native chrome */
+button.ft-link {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* ---------- download-app QR modal ---------- */
+.dlapp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 16, 31, 0.55);
+  animation: dlapp-fade 0.18s ease;
+}
+.dlapp-modal {
+  position: relative;
+  width: min(372px, 100%);
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 30px 26px 26px;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(20, 16, 31, 0.28);
+  animation: dlapp-pop 0.2s ease;
+}
+.dlapp-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mid-grey);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.dlapp-close:hover {
+  color: var(--near-black);
+}
+.dlapp-title {
+  margin: 0 auto;
+  font-family: var(--q-display, var(--q-work));
+  font-weight: 800;
+  font-size: clamp(1.6rem, 5vw, 1.9rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--near-black);
+}
+.dlapp-sub {
+  margin: 6px auto 0;
+  max-width: 270px;
+  font-family: var(--q-work);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--mid-grey);
+}
+.dlapp-qr {
+  display: inline-flex;
+  margin: 18px auto;
+  padding: 14px;
+  background: #ffffff;
+  border: 1.5px solid rgba(20, 16, 31, 0.1);
+  border-radius: 16px;
+}
+.dlapp-stores {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.dlapp-store {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--near-black);
+  color: #ffffff;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.dlapp-store:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+.dlapp-store__icon {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+@keyframes dlapp-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes dlapp-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 /* bottom: copyright (left) + socials (right) */
 .ft-bottom {
@@ -4499,8 +4614,92 @@ nav a {
 }
 .ft-copy {
   margin: 0;
+  max-width: 30ch;
   font-family: var(--q-work);
   font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--mid-grey);
+}
+
+/* brand block: logo + tagline (top-left) */
+.ft-brand {
+  max-width: 300px;
+}
+.ft-brand__tagline {
+  margin: 16px 0 0;
+  font-family: var(--q-work);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--mid-grey);
+}
+
+/* download-app block: sits under the brand logo + tagline */
+.ft-download {
+  margin-top: 24px;
+}
+.ft-download__title {
+  margin: 0;
+  font-family: var(--q-display, var(--q-work));
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--near-black);
+}
+.ft-download__text {
+  margin: 6px 0 0;
+  font-family: var(--q-work);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--mid-grey);
+}
+.ft-download__label {
+  margin: 0;
+  padding: 8px 0;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--near-black);
+}
+.ft-download__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ft-store {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--near-black);
+  color: #ffffff;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.ft-store:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+.ft-store__icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.ft-social-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.ft-made {
+  margin: 0;
+  font-family: var(--q-work);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  text-align: right;
   color: var(--mid-grey);
 }
 .ft-socials {

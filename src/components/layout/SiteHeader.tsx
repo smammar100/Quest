@@ -116,7 +116,7 @@ export default function SiteHeader() {
             {/* mobile drawer: plain link to the quests index */}
             <li className="nav-browse-mobile">
               <Link href="/browse-quest">
-                <span className="nav-rn">Browse</span>
+                <span className="nav-rn">Categories</span>
               </Link>
             </li>
             {/* desktop: click-toggled Airtasker-style mega panel */}
@@ -129,7 +129,7 @@ export default function SiteHeader() {
                 aria-controls="browse-dropdown"
                 onClick={() => setMenuOpen((o) => !o)}
               >
-                <span className="nav-rn">Browse</span>
+                <span className="nav-rn">Categories</span>
                 <span
                   className="material-symbols-outlined nav-mega-trigger__chev"
                   aria-hidden="true"
@@ -164,7 +164,7 @@ export default function SiteHeader() {
                         onMouseEnter={() => setIntent("poster")}
                       >
                         <span className="nav-mega__tab-eyebrow">
-                          As a human
+                          Hire humans
                         </span>
                         <span className="nav-mega__tab-desc">
                           I’m looking to hire someone
@@ -182,7 +182,7 @@ export default function SiteHeader() {
                         onClick={() => setIntent("hero")}
                         onMouseEnter={() => setIntent("hero")}
                       >
-                        <span className="nav-mega__tab-eyebrow">As a Hero</span>
+                        <span className="nav-mega__tab-eyebrow">Get hired as a human</span>
                         <span className="nav-mega__tab-desc">
                           I’m looking for work
                         </span>

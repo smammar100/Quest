@@ -15,16 +15,9 @@
   min-height: 100dvh;
 }
 
-/* No +/tune/mic controls here — only the submit button, pushed to the right
-   (the global toolbar uses space-between for the homepage's left + button). */
-.post-quest-welcome .quest-prompt__toolbar {
-  justify-content: flex-end;
-}
-
-/* Beige card fill (--offwhite) instead of the homepage hero's grey box. */
-.post-quest-welcome .quest-prompt {
-  background: var(--offwhite);
-}
+/* The chat box (.quest-prompt) and its right-aligned toolbar are now identical
+   to the homepage hero — beige fill + flex-end submit live in the global rules
+   in globals.css, so no post-quest-specific overrides are needed here. */
 
 .post-quest-welcome__auth-note {
   margin: 22px auto 0;

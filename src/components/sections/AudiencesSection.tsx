@@ -108,9 +108,11 @@ export default function AudiencesSection({ className }: { className?: string }) 
 
         <div className="aud-aside">
           <p className="aud-aside__text">{a.asideText}</p>
+          {/* CTA links hidden for now — re-enable when destinations are ready.
           <a href="/signup" className="aud-aside__link">
             {a.link}
           </a>
+          */}
         </div>
       </div>
     </section>
