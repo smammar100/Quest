@@ -39,6 +39,16 @@ export function usePostQuest() {
     void runAgentTurn(prompt);
   }
 
+  // Start over — clears the conversation and returns to the prompt screen.
+  // Used by the done screen ("Post another quest") and error retry. Dropping the
+  // session ref forces a fresh agent session (and fresh mock turn index) next time.
+  function reset() {
+    sessionRef.current = null;
+    setMessages([]);
+    setAgentTyping(false);
+    setPhase('prompt');
+  }
+
   async function sendMessage(content: string) {
     setMessages(prev => [...prev, { role: 'user', content }]);
     await runAgentTurn(content);
@@ -87,5 +97,5 @@ export function usePostQuest() {
     }
   }
 
-  return { phase, messages, agentTyping, submitInitialPrompt, sendMessage };
+  return { phase, messages, agentTyping, submitInitialPrompt, sendMessage, reset };
 }

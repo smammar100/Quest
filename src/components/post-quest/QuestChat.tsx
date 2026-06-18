@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { ChatMessage } from '@/lib/models/quest';
+import { PostQuestSpark } from './PostQuestSpark';
+import PostQuestThinking from './PostQuestThinking';
 
 type Props = {
   messages: ChatMessage[];
@@ -18,64 +20,72 @@ export default function QuestChat({ messages, agentTyping, onSend }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, agentTyping]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function send() {
     const trimmed = input.trim();
     if (!trimmed || agentTyping) return;
     setInput('');
     onSend(trimmed);
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    send();
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const trimmed = input.trim();
-      if (trimmed && !agentTyping) {
-        setInput('');
-        onSend(trimmed);
-      }
+      send();
     }
   }
 
   return (
-    <div className="pq-chat">
-      <ul className="pq-chat__messages">
-        {messages.map((msg, i) => (
-          <li key={i} className={`pq-chat__message pq-chat__message--${msg.role}`}>
-            {msg.content}
-          </li>
-        ))}
+    <div className="post-quest-chat">
+      <div className="post-quest-chat__scroll">
+        <div className="post-quest-chat__thread">
+          {messages.map((msg, i) =>
+            msg.role === 'user' ? (
+              <div key={i} className="post-quest-chat__row post-quest-chat__row--user">
+                <div className="post-quest-chat__bubble">{msg.content}</div>
+              </div>
+            ) : (
+              <div key={i} className="post-quest-chat__row post-quest-chat__row--agent">
+                <PostQuestSpark className="post-quest-chat__avatar" />
+                <div className="post-quest-chat__text">{msg.content}</div>
+              </div>
+            )
+          )}
 
-        {agentTyping && (
-          <li className="pq-chat__message pq-chat__message--agent pq-chat__message--typing">
-            <span className="pq-chat__typing-dot" />
-            <span className="pq-chat__typing-dot" />
-            <span className="pq-chat__typing-dot" />
-          </li>
-        )}
+          {agentTyping && <PostQuestThinking />}
 
-        <div ref={bottomRef} />
-      </ul>
+          <div ref={bottomRef} />
+        </div>
+      </div>
 
-      <form className="pq-chat__input-row" onSubmit={handleSubmit}>
-        <textarea
-          className="pq-chat__input"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Reply…"
-          disabled={agentTyping}
-          autoFocus
-          rows={1}
-        />
-        <button
-          type="submit"
-          className="pq-chat__send"
-          disabled={agentTyping || !input.trim()}
-          aria-label="Send"
-        >
-          <span className="material-symbols-outlined">arrow_upward</span>
-        </button>
+      <form className="post-quest-chat__composer" onSubmit={handleSubmit}>
+        <div className="post-quest-chat__field">
+          <textarea
+            className="post-quest-chat__input"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Reply to Quest…"
+            disabled={agentTyping}
+            autoFocus
+            rows={1}
+          />
+          <button
+            type="submit"
+            className="post-quest-chat__send"
+            disabled={agentTyping || !input.trim()}
+            aria-label="Send"
+          >
+            <span className="material-symbols-outlined">arrow_upward</span>
+          </button>
+        </div>
+        <p className="post-quest-chat__disclaimer">
+          Quest can make mistakes. Check important details.
+        </p>
       </form>
     </div>
   );

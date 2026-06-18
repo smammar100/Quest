@@ -32,7 +32,7 @@ export default function AppHeader({
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                 add
               </span>
-              <span className="hidden sm:inline">Post a quest</span>
+              <span className="hidden sm:inline">Hire a human</span>
             </Button>
           )}
           <UserMenu />

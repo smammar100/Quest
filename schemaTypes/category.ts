@@ -1,11 +1,12 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 
-// A Quest "category" (Field data, Errands, Content, Events, Home …).
-// Drives the /quests/[slug] template: hero, the earnings "numbers"
-// section, the FAQ, and the list of sub-categories.
+// The "Hero" content type — drives the supply-side /quests/[slug] page
+// (earn-as-a-Hero): hero, the earnings "numbers" section, the FAQ, and the
+// list of sub-categories. Internal name stays `category` so existing
+// documents and the `_type == "category"` query keep working.
 export const category = defineType({
   name: 'category',
-  title: 'Category',
+  title: 'Hero',
   type: 'document',
   groups: [
     {name: 'hero', title: 'Hero', default: true},
@@ -26,7 +27,7 @@ export const category = defineType({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      description: 'URL segment — the page renders at /quests/<slug>.',
+      description: 'URL segment, the page renders at /quests/<slug>.',
       options: {source: 'title', maxLength: 96},
       validation: (r) => r.required(),
     }),

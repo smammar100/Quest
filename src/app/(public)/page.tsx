@@ -42,7 +42,7 @@ export default function Home() {
               <div className="quest-prompt__actions">
                 <button type="button" className="quest-prompt__icon-btn" aria-label="Adjust filters"><span className="material-symbols-outlined">tune</span></button>
                 <button type="button" className="quest-prompt__icon-btn" aria-label="Voice input"><span className="material-symbols-outlined">mic</span></button>
-                <button type="button" className="quest-prompt__submit">Hire a human</button>
+                <a href="/signup" className="quest-prompt__submit">Hire a human</a>
               </div>
             </div>
           </div>
@@ -50,10 +50,10 @@ export default function Home() {
           <div className="quest-suggest">
             <p className="quest-suggest__label">What do you need a human to do?</p>
             <div className="quest-suggest__pills">
-              <button type="button" className="quest-pill">Pick up a parcel in New York</button>
-              <button type="button" className="quest-pill">Shoot a UGC video</button>
-              <button type="button" className="quest-pill">Check an apartment &amp; take photos</button>
-              <button type="button" className="quest-pill">Assemble furniture</button>
+              <a href="/signup" className="quest-pill">Pick up a parcel in New York</a>
+              <a href="/signup" className="quest-pill">Shoot a UGC video</a>
+              <a href="/signup" className="quest-pill">Check an apartment &amp; take photos</a>
+              <a href="/signup" className="quest-pill">Assemble furniture</a>
             </div>
           </div>
         </div>
@@ -107,11 +107,13 @@ export default function Home() {
         <div className="video-head">
           <h2 className="video-title">Why humans still matter<br />in the age of AI.</h2>
           <p className="video-sub">We called them Heroes. Real-world work still needs humans.</p>
-          <a href="#" className="video-cta">Read the Manifesto <span className="material-symbols-outlined">arrow_forward</span></a>
+          {/* "Read the Manifesto" CTA hidden for now — restore when the manifesto page exists.
+          <a href="/signup" className="video-cta">Read the Manifesto <span className="material-symbols-outlined">arrow_forward</span></a>
+          */}
         </div>
         <div className="video-frame">
           <video className="video-el" preload="metadata" playsInline>
-            <source src="https://res.cloudinary.com/dxlcfrlkn/video/upload/v1781498253/Website_vid_2_bveee3.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dxlcfrlkn/video/upload/q_auto/f_auto/v1781670637/Website_vid_final_ver_2_xhhqyr.mp4" type="video/mp4" />
           </video>
           <button type="button" className="video-play" aria-label="Play video">
             <span className="material-symbols-outlined">play_arrow</span>

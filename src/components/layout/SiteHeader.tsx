@@ -13,13 +13,13 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 type Intent = "hero" | "poster";
 
 export default function SiteHeader() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [intent, setIntent] = useState<Intent>("hero");
+  const [intent, setIntent] = useState<Intent>("poster");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const { isAuthenticated, signOut } = useAuth();
-  const router = useRouter();
   const megaRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
@@ -115,7 +115,7 @@ export default function SiteHeader() {
             </li>
             {/* mobile drawer: plain link to the quests index */}
             <li className="nav-browse-mobile">
-              <Link href="/quests">
+              <Link href="/browse-quest">
                 <span className="nav-rn">Browse</span>
               </Link>
             </li>
@@ -140,17 +140,36 @@ export default function SiteHeader() {
 
               <div id="browse-dropdown" className="nav-mega" hidden={!menuOpen}>
                 <div className="nav-mega__inner">
-                  {/* left intent column — temporarily hidden, restore later
+                  {/* left intent column */}
                   <div className="nav-mega__intent">
                     <p className="nav-mega__intent-title">
                       What are you looking for?
                     </p>
-                    <p className="nav-mega__intent-sub">Pick a type of task.</p>
+                    <p className="nav-mega__intent-sub">Pick a type of quest.</p>
                     <div
                       className="nav-mega__tabs"
                       role="tablist"
                       aria-label="Browse intent"
                     >
+                      <button
+                        type="button"
+                        role="tab"
+                        id="browse-tab-poster"
+                        aria-selected={intent === "poster"}
+                        aria-controls="browse-tabpanel"
+                        className={`nav-mega__tab${
+                          intent === "poster" ? " is-active" : ""
+                        }`}
+                        onClick={() => setIntent("poster")}
+                        onMouseEnter={() => setIntent("poster")}
+                      >
+                        <span className="nav-mega__tab-eyebrow">
+                          As a human
+                        </span>
+                        <span className="nav-mega__tab-desc">
+                          I’m looking to hire someone
+                        </span>
+                      </button>
                       <button
                         type="button"
                         role="tab"
@@ -168,28 +187,8 @@ export default function SiteHeader() {
                           I’m looking for work
                         </span>
                       </button>
-                      <button
-                        type="button"
-                        role="tab"
-                        id="browse-tab-poster"
-                        aria-selected={intent === "poster"}
-                        aria-controls="browse-tabpanel"
-                        className={`nav-mega__tab${
-                          intent === "poster" ? " is-active" : ""
-                        }`}
-                        onClick={() => setIntent("poster")}
-                        onMouseEnter={() => setIntent("poster")}
-                      >
-                        <span className="nav-mega__tab-eyebrow">
-                          As a poster
-                        </span>
-                        <span className="nav-mega__tab-desc">
-                          I’m looking to hire someone
-                        </span>
-                      </button>
                     </div>
                   </div>
-                  */}
 
                   {/* right dense task-type list */}
                   <div
@@ -206,13 +205,13 @@ export default function SiteHeader() {
                       {TASK_TYPES.map((t) => (
                         <li key={t.label}>
                           <Link
-                            href={`/quests/${t.category}${
+                            href={
                               intent === "poster"
-                                ? ""
-                                : t.sub
-                                ? `?sub=${t.sub}`
-                                : ""
-                            }`}
+                                ? `/quests/${t.category}/hire`
+                                : `/quests/${t.category}${
+                                    t.sub ? `?sub=${t.sub}` : ""
+                                  }`
+                            }
                             className="nav-mega__link"
                             onClick={() => setMenuOpen(false)}
                           >
@@ -237,7 +236,7 @@ export default function SiteHeader() {
               </div>
             </li>
           </ul>
-          <a href="/#welcome" className="nav-cta">
+          <a href="/signup" className="nav-cta">
             Hire a human
           </a>
         </nav>
@@ -260,7 +259,7 @@ export default function SiteHeader() {
               <span className="nav-rn">Log out</span>
             </button>
           ) : null}
-          <button className="primary">
+          <button className="primary" onClick={() => router.push("/signup")}>
             <span>Hire a human</span>
           </button>
         </div>

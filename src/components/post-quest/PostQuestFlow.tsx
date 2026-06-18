@@ -6,11 +6,11 @@ import QuestChat from '@/components/post-quest/QuestChat';
 
 // Rendered only for authenticated users — PostQuestPageContent handles the gate.
 export default function PostQuestFlow() {
-  const { phase, messages, agentTyping, submitInitialPrompt, sendMessage } = usePostQuest();
+  const { phase, messages, agentTyping, submitInitialPrompt, sendMessage, reset } = usePostQuest();
 
   if (phase === 'chat') {
     return (
-      <div className="pq-fullscreen">
+      <div className="post-quest-fullscreen">
         <QuestChat
           messages={messages}
           agentTyping={agentTyping}
@@ -22,23 +22,28 @@ export default function PostQuestFlow() {
 
   if (phase === 'done') {
     return (
-      <div className="pq-outcome">
-        <span className="material-symbols-outlined pq-outcome__icon">check_circle</span>
-        <h2 className="pq-outcome__title">Quest posted!</h2>
-        <p className="pq-outcome__body">
+      <div className="post-quest-outcome">
+        <span className="material-symbols-outlined post-quest-outcome__icon">check_circle</span>
+        <h2 className="post-quest-outcome__title">Quest posted!</h2>
+        <p className="post-quest-outcome__body">
           We&apos;re matching you with a human. You&apos;ll hear from us soon.
         </p>
+        <button className="post-quest-outcome__btn" onClick={reset}>
+          Post another quest
+        </button>
       </div>
     );
   }
 
   if (phase === 'error') {
     return (
-      <div className="pq-outcome pq-outcome--error">
-        <span className="material-symbols-outlined pq-outcome__icon">error</span>
-        <h2 className="pq-outcome__title">Something went wrong</h2>
-        <p className="pq-outcome__body">Please try again.</p>
-        <button className="pq-outcome__retry" onClick={() => window.location.reload()}>
+      <div className="post-quest-outcome post-quest-outcome--error">
+        <span className="material-symbols-outlined post-quest-outcome__icon">error</span>
+        <h2 className="post-quest-outcome__title">Something went wrong</h2>
+        <p className="post-quest-outcome__body">
+          We couldn&apos;t post your quest. Please try again.
+        </p>
+        <button className="post-quest-outcome__btn" onClick={reset}>
           Try again
         </button>
       </div>
@@ -46,15 +51,5 @@ export default function PostQuestFlow() {
   }
 
   // 'prompt' phase — auth user lands here first, types their quest, then chat begins.
-  return (
-    <div className="pq-landing">
-      <section className="pq-landing__hero">
-        <h1 className="pq-landing__title">Post a quest</h1>
-        <p className="pq-landing__subtitle">
-          Tell us what you need. A trusted human will take it from there.
-        </p>
-        <PromptInput onSubmit={submitInitialPrompt} />
-      </section>
-    </div>
-  );
+  return <PromptInput onSubmit={submitInitialPrompt} />;
 }

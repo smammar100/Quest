@@ -32,19 +32,19 @@ const AUDS: Aud[] = [
     key: 'agent',
     icon: 'smart_toy',
     title: 'For AI agents',
-    body: 'Connect agents to trusted humans who can complete real-world tasks.',
+    body: 'Connect agents to trusted humans who can complete real-world quests.',
     image: '/images/cards/for-ai.webp',
     tint: '#E7E0FF',
-    card: { label: 'Tasks dispatched', value: '128', badge: 'live' },
+    card: { label: 'Quests dispatched', value: '128', badge: 'live' },
     chip: { icon: 'sync', text: 'Auto-coordinated' },
-    asideText: 'It only pays once the work is verified done — built for trust.',
+    asideText: 'It only pays once the work is verified done, built for trust.',
     link: 'Connect via MCP',
   },
   {
     key: 'hero',
     icon: 'bolt',
     title: 'For humans',
-    body: 'Choose flexible tasks and get paid for real-world work.',
+    body: 'Choose flexible quests and get paid for real-world work.',
     image: '/images/cards/for-people.webp',
     tint: '#DCEAFF',
     card: { label: 'Earned this week', value: '$740', badge: '★ 4.9' },
@@ -54,12 +54,12 @@ const AUDS: Aud[] = [
   },
 ];
 
-export default function AudiencesSection() {
+export default function AudiencesSection({ className }: { className?: string }) {
   const [active, setActive] = useState(0);
   const a = AUDS[active];
 
   return (
-    <section id="audiences">
+    <section id="audiences" className={className}>
       <h2 className="aud-title">Built for everyone who gets things done.</h2>
 
       <div className="aud-content">
@@ -108,7 +108,7 @@ export default function AudiencesSection() {
 
         <div className="aud-aside">
           <p className="aud-aside__text">{a.asideText}</p>
-          <a href="#welcome" className="aud-aside__link">
+          <a href="/signup" className="aud-aside__link">
             {a.link}
           </a>
         </div>
