@@ -52,8 +52,6 @@ export type SignupProfileInput = {
 	lastName: string;
 	countryCode: string;
 	dateOfBirth?: string;
-	phone?: string;
-	dialCodeIso?: string;
 	sourcePlatform?: string;
 };
 
@@ -71,8 +69,6 @@ export async function upsertUserProfileOnSignup(input: SignupProfileInput): Prom
 			country_code: input.countryCode.toUpperCase(),
 			role: 'poster',
 			dateOfBirth: input.dateOfBirth ?? null,
-			phone: input.phone ?? null,
-			dialCodeIso: input.dialCodeIso?.toUpperCase() ?? null,
 			sourcePlatform: input.sourcePlatform ?? null,
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),

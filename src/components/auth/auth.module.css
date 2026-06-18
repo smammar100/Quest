@@ -274,25 +274,6 @@
   color: var(--mid-grey);
 }
 
-/* ---------- phone (dial code + number) ---------- */
-.phoneRow {
-  display: grid;
-  grid-template-columns: 116px 1fr;
-  gap: 10px;
-}
-.dialSelect {
-  padding-left: 12px;
-  padding-right: 30px;
-  font-size: 0.92rem;
-  font-family: "Twemoji Country Flags", var(--q-work);
-}
-.dialSelect option {
-  font-family: "Twemoji Country Flags", var(--q-work);
-}
-.phoneInput {
-  flex: 1;
-}
-
 /* ---------- terms agreement ---------- */
 .agree {
   display: grid;

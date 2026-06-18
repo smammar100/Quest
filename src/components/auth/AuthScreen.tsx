@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/controllers/useAuth";
 import {
-  DEFAULT_DIAL_ISO,
-  DIAL_CODES,
   SOURCE_PLATFORMS,
 } from "@/lib/data/dial-codes";
 import s from "./auth.module.css";
@@ -169,51 +167,6 @@ function Select({
   );
 }
 
-// Phone field: IP-detected dial code (flag + code) paired with a number input.
-function PhoneField({
-  dialIso,
-  onDialChange,
-}: {
-  dialIso: string;
-  onDialChange: (iso: string) => void;
-}) {
-  return (
-    <div className={s.field}>
-      <span className={s.fieldLabel}>Phone number</span>
-      <div className={s.phoneRow}>
-        <div className={s.selectWrap}>
-          <select
-            id="dialCode"
-            name="dialCode"
-            className={`${s.select} ${s.dialSelect}`}
-            value={dialIso}
-            onChange={(e) => onDialChange(e.target.value)}
-            aria-label="Country dial code"
-          >
-            {DIAL_CODES.map((c) => (
-              <option key={c.iso} value={c.iso}>
-                {c.flag} {c.dial}
-              </option>
-            ))}
-          </select>
-          <span className={`material-symbols-outlined ${s.selectChevron}`} aria-hidden="true">
-            expand_more
-          </span>
-        </div>
-        <input
-          id="phone"
-          name="phone"
-          className={`${s.input} ${s.phoneInput}`}
-          type="tel"
-          inputMode="tel"
-          placeholder="555 000 1234"
-          autoComplete="tel-national"
-        />
-      </div>
-    </div>
-  );
-}
-
 // The shared form body: social buttons, divider, fields, submit, switch link.
 function AuthForm({
   mode,
@@ -224,8 +177,6 @@ function AuthForm({
   onGoogleSignIn,
   errorMessage,
   busy,
-  dialIso,
-  onDialChange,
   signupRestrictionMessage,
 }: {
   mode: AuthMode;
@@ -236,8 +187,6 @@ function AuthForm({
   onGoogleSignIn?: () => void;
   errorMessage?: string | null;
   busy?: boolean;
-  dialIso: string;
-  onDialChange: (iso: string) => void;
   signupRestrictionMessage?: string | null;
 }) {
   const c = COPY[mode];
@@ -336,7 +285,6 @@ function AuthForm({
               ))}
             </Select>
           </div>
-          <PhoneField dialIso={dialIso} onDialChange={onDialChange} />
           <label className={s.agree} htmlFor="agree">
             <input
               id="agree"
@@ -455,7 +403,6 @@ export default function AuthScreen({
   } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [dialIso, setDialIso] = useState(DEFAULT_DIAL_ISO);
   const [signupRestrictionMessage, setSignupRestrictionMessage] = useState<string | null>(null);
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const [emailVerified, setEmailVerified] = useState(false);
@@ -545,10 +492,6 @@ export default function AuthScreen({
           "We could not verify your country yet. Please try again on a stable connection."
         );
         return;
-      }
-
-      if (DIAL_CODES.some((option) => option.iso === detection.countryCode)) {
-        setDialIso(detection.countryCode);
       }
 
       setSignupRestrictionMessage(
@@ -687,8 +630,6 @@ export default function AuthScreen({
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
     const dateOfBirth = String(formData.get("dob") ?? "").trim();
     const sourcePlatform = String(formData.get("source") ?? "").trim();
-    const phone = String(formData.get("phone") ?? "").trim();
-    const dialCodeIso = String(formData.get("dialCode") ?? "").trim();
 
     if (!firstName || !lastName || !email || !password) {
       setErrorMessage("Please fill in your name, email, and password.");
@@ -720,9 +661,6 @@ export default function AuthScreen({
       return;
     }
 
-    if (DIAL_CODES.some((option) => option.iso === detection.countryCode)) {
-      setDialIso(detection.countryCode);
-    }
     setSignupRestrictionMessage(null);
 
     try {
@@ -734,8 +672,6 @@ export default function AuthScreen({
         lastName,
         countryCode: detection.countryCode,
         dateOfBirth: dateOfBirth || undefined,
-        phone: phone || undefined,
-        dialCodeIso: dialCodeIso || undefined,
         sourcePlatform: sourcePlatform || undefined,
       });
       await sendVerificationEmail(credential.user);
@@ -874,8 +810,6 @@ export default function AuthScreen({
                 onGoogleSignIn={handleGoogleSignIn}
                 errorMessage={errorMessage}
                 busy={busy}
-                dialIso={dialIso}
-                onDialChange={setDialIso}
                 signupRestrictionMessage={signupRestrictionMessage}
               />
             )}
@@ -906,8 +840,6 @@ export default function AuthScreen({
             onGoogleSignIn={handleGoogleSignIn}
             errorMessage={errorMessage}
             busy={busy}
-            dialIso={dialIso}
-            onDialChange={setDialIso}
             signupRestrictionMessage={signupRestrictionMessage}
           />
         )}
