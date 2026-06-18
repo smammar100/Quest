@@ -1,4 +1,4 @@
-import AppHeader from '@/components/layout/AppHeader';
+import SiteHeader from '@/components/layout/SiteHeader';
 
 // Every route under (protected)/ gets the authenticated nav automatically.
 // Middleware (src/middleware.ts) is responsible for redirecting unauthenticated
@@ -6,7 +6,7 @@ import AppHeader from '@/components/layout/AppHeader';
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <AppHeader />
+      <SiteHeader />
       {children}
     </>
   );
