@@ -13,7 +13,7 @@ import QuestCard from './QuestCard';
 import s from './QuestList.module.css';
 
 const DEFAULT_COUNTRY_CODE = resolveSupportedCountryCode(
-  process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE
+  process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG'
 );
 const DEFAULT_USER_ID = process.env.NEXT_PUBLIC_QUEST_BROWSE_USER_ID ?? 'web_guest';
 
