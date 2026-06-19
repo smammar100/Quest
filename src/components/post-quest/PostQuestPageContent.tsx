@@ -18,7 +18,12 @@ export default function PostQuestPageContent() {
   if (loading) return null;
 
   if (isAuthenticated) {
-    return <PostQuestFlow initialPrompt={initialPrompt} />;
+    return (
+      <>
+        <SiteHeader />
+        <PostQuestFlow initialPrompt={initialPrompt} />
+      </>
+    );
   }
 
   function handlePublicSubmit(prompt: string) {
