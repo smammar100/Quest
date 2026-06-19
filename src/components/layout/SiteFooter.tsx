@@ -21,6 +21,24 @@ function GooglePlayLogo() {
 
 const COLUMNS = [
   {
+    title: 'Product',
+    links: [
+      { label: 'How it works', href: '#how' },
+      { label: 'For Business', href: '#bento' },
+      { label: 'For AI Agents', href: '/agents' },
+      { label: 'Manifesto', href: '#video' },
+    ],
+  },
+  {
+    title: 'For Humans',
+    links: [
+      { label: 'Earn as a human', href: '#audiences' },
+      { label: 'How payouts work', href: '#faq' },
+      { label: 'Safety & trust', href: '#faq' },
+      { label: 'Human app', href: '#' },
+    ],
+  },
+  {
     title: 'Company',
     links: [
       { label: 'About us', href: 'https://quest-inc.co/aboutus/', external: true },

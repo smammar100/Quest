@@ -8,10 +8,13 @@ import {
   type BrowseQuest,
   type BrowseQuestResponse,
 } from '@/lib/models/browse-quest';
+import { resolveSupportedCountryCode } from '@/lib/constants/country-pricing';
 import QuestCard from './QuestCard';
 import s from './QuestList.module.css';
 
-const DEFAULT_COUNTRY_CODE = process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG';
+const DEFAULT_COUNTRY_CODE = resolveSupportedCountryCode(
+  process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG'
+);
 const DEFAULT_USER_ID = process.env.NEXT_PUBLIC_QUEST_BROWSE_USER_ID ?? 'web_guest';
 
 type FetchMode = 'replace' | 'append';
@@ -72,7 +75,7 @@ const requestQuests = async ({
 };
 
 export default function QuestList() {
-  const { user, userProfile } = useAuthContext();
+  const { user, userProfile, profileLoaded, loading: authLoading } = useAuthContext();
   const [category, setCategory] = useState<BrowseCategory>('All');
   const [quests, setQuests] = useState<BrowseQuest[]>([]);
   const [resultCount, setResultCount] = useState<string | number>('0');
@@ -83,9 +86,12 @@ export default function QuestList() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const countryCode =
-    userProfile?.countryCode?.trim().toUpperCase() || DEFAULT_COUNTRY_CODE;
+  const countryCode = resolveSupportedCountryCode(
+    userProfile?.countryCode ?? DEFAULT_COUNTRY_CODE
+  );
   const userID = user?.uid ?? DEFAULT_USER_ID;
+  const shouldWaitForCountry = authLoading || (user !== null && !profileLoaded);
+  const isLoadingView = shouldWaitForCountry || loading;
 
   const fetchQuests = useCallback(
     async (nextPage: number, nextOffset: number, mode: FetchMode) => {
@@ -128,6 +134,10 @@ export default function QuestList() {
   );
 
   useEffect(() => {
+    if (shouldWaitForCountry) {
+      return;
+    }
+
     let cancelled = false;
 
     const run = async () => {
@@ -167,7 +177,7 @@ export default function QuestList() {
     return () => {
       cancelled = true;
     };
-  }, [category, countryCode, userID]);
+  }, [category, countryCode, userID, shouldWaitForCountry]);
 
   const subtitle = useMemo(() => {
     const activeLabel = category === 'All' ? 'all categories' : category;
@@ -224,14 +234,14 @@ export default function QuestList() {
         })}
       </div>
 
-      {loading && <p className={s.stateLine}>Loading quests...</p>}
+      {isLoadingView && <p className={s.stateLine}>Loading quests...</p>}
       {error && <p className={s.errorLine}>{error}</p>}
 
-      {!loading && !error && quests.length === 0 && (
+      {!isLoadingView && !error && quests.length === 0 && (
         <p className={s.stateLine}>No quests found for this category yet.</p>
       )}
 
-      {!loading && quests.length > 0 && (
+      {!isLoadingView && quests.length > 0 && (
         <>
           <div className={s.grid}>
             {quests.map((quest, index) => (

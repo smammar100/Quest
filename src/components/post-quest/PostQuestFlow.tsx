@@ -4,9 +4,11 @@ import { usePostQuest } from '@/controllers/usePostQuest';
 import PromptInput from '@/components/post-quest/PromptInput';
 import QuestChat from '@/components/post-quest/QuestChat';
 
+type Props = { initialPrompt?: string };
+
 // Rendered only for authenticated users — PostQuestPageContent handles the gate.
-export default function PostQuestFlow() {
-  const { phase, messages, agentTyping, submitInitialPrompt, sendMessage, reset } = usePostQuest();
+export default function PostQuestFlow({ initialPrompt }: Props) {
+  const { phase, messages, agentTyping, submitInitialPrompt, sendMessage, reset } = usePostQuest(initialPrompt);
 
   if (phase === 'chat') {
     return (

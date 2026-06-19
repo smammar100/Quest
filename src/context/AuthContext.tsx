@@ -6,7 +6,39 @@ import type { UserProfile } from '@/lib/models/user';
 import { auth } from '@/lib/firebase/auth';
 import { getUserProfileByUid } from '@/lib/firebase/firestore';
 
-const DEFAULT_COUNTRY_CODE = process.env.NEXT_PUBLIC_QUEST_BROWSE_COUNTRY_CODE ?? 'SG';
+type BackendSelfUserPayload = {
+  user?: {
+    countryCode?: unknown;
+    country_code?: unknown;
+  } | null;
+};
+
+const normalizeCountryCode = (value: unknown): string | undefined => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalized = value.trim().toUpperCase();
+  return normalized.length === 2 ? normalized : undefined;
+};
+
+const getBackendCountryCodeByUid = async (uid: string): Promise<string | undefined> => {
+  const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    return undefined;
+  }
+
+  const payload = (await response.json()) as BackendSelfUserPayload;
+  const backendUser = payload.user;
+
+  return (
+    normalizeCountryCode(backendUser?.country_code) ??
+    normalizeCountryCode(backendUser?.countryCode)
+  );
+};
 
 export type AuthUser = {
   uid: string;
@@ -17,18 +49,21 @@ export type AuthUser = {
 type AuthContextValue = {
   user: AuthUser;
   userProfile: UserProfile | null;
+  profileLoaded: boolean;
   loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   userProfile: null,
+  profileLoaded: false,
   loading: true,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!firebaseUser) {
         setUser(null);
         setUserProfile(null);
+        setProfileLoaded(true);
         setLoading(false);
         return;
       }
@@ -49,26 +85,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: firebaseUser.email,
         displayName: firebaseUser.displayName,
       });
-      setUserProfile({
+      const baseProfile: UserProfile = {
         uid: firebaseUser.uid,
         email: firebaseUser.email ?? '',
         displayName: firebaseUser.displayName ?? '',
         photoURL: firebaseUser.photoURL ?? undefined,
         role: 'poster',
-        countryCode: DEFAULT_COUNTRY_CODE,
         createdAt: new Date(),
-      });
+      };
+      setUserProfile(baseProfile);
+      setProfileLoaded(false);
       setLoading(false);
 
       try {
-        const profile = await getUserProfileByUid(firebaseUser.uid);
+        const [backendCountryResult, firestoreProfileResult] = await Promise.allSettled([
+          getBackendCountryCodeByUid(firebaseUser.uid),
+          getUserProfileByUid(firebaseUser.uid),
+        ]);
+
         if (!mounted) return;
 
-        if (profile) {
-          setUserProfile(profile);
-        }
+        const backendCountryCode =
+          backendCountryResult.status === 'fulfilled'
+            ? backendCountryResult.value
+            : undefined;
+        const firestoreProfile =
+          firestoreProfileResult.status === 'fulfilled'
+            ? firestoreProfileResult.value
+            : null;
+
+        setUserProfile({
+          uid: firebaseUser.uid,
+          email: firestoreProfile?.email ?? baseProfile.email,
+          displayName: firestoreProfile?.displayName ?? baseProfile.displayName,
+          photoURL: firestoreProfile?.photoURL ?? baseProfile.photoURL,
+          role: firestoreProfile?.role ?? baseProfile.role,
+          createdAt: firestoreProfile?.createdAt ?? baseProfile.createdAt,
+          countryCode: backendCountryCode ?? firestoreProfile?.countryCode,
+        });
       } catch {
         if (!mounted) return;
+      } finally {
+        if (mounted) {
+          setProfileLoaded(true);
+        }
       }
     });
 
@@ -79,7 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading }}>
+    <AuthContext.Provider value={{ user, userProfile, profileLoaded, loading }}>
       {children}
     </AuthContext.Provider>
   );
