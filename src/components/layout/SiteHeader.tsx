@@ -200,10 +200,10 @@ export default function SiteHeader() {
                             onMouseEnter={() => setIntent("poster")}
                           >
                             <span className="nav-mega__tab-eyebrow">
-                              As a human
+                              I want to
                             </span>
                             <span className="nav-mega__tab-desc">
-                              I’m looking to hire someone
+                              Hire humans.
                             </span>
                           </button>
                           <button
@@ -218,9 +218,9 @@ export default function SiteHeader() {
                             onClick={() => setIntent("hero")}
                             onMouseEnter={() => setIntent("hero")}
                           >
-                            <span className="nav-mega__tab-eyebrow">As a Hero</span>
+                            <span className="nav-mega__tab-eyebrow">I want to</span>
                             <span className="nav-mega__tab-desc">
-                              I’m looking for work
+                              Earn as a human.
                             </span>
                           </button>
                         </div>
