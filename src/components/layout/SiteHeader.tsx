@@ -119,7 +119,7 @@ export default function SiteHeader() {
                   </a>
                 </li>
                 <li>
-                  <a href="/#audiences">
+                  <a href="/agents">
                     <span className="nav-rn">For AI agents</span>
                   </a>
                 </li>

@@ -32,7 +32,7 @@ export default function Home() {
       <section id="welcome" className="center">
         <h1><span className="sr-only">Quest. Hire trusted humans for real-world work AI can&apos;t do.</span></h1>
         <div className="quest-hero">
-          <p className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></p>
+          <a href="/agents" className="quest-hero__eyebrow"><span className="quest-hero__eyebrow-emoji">🤖</span><span className="quest-shiny">Let your AI hire humans</span><span className="quest-hero__eyebrow-arrow">→</span></a>
           <h2 className="quest-hero__title">Your AI can&apos;t do<br />everything. Hire a <span className="rn-mark">human</span>.</h2>
           <p className="quest-hero__subtitle">Hire trusted people for the real-world work AI can&apos;t do.</p>
 

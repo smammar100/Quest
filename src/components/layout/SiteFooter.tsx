@@ -4,7 +4,7 @@ const COLUMNS = [
     links: [
       { label: 'How it works', href: '#how' },
       { label: 'For Business', href: '#bento' },
-      { label: 'For AI Agents', href: '#audiences' },
+      { label: 'For AI Agents', href: '/agents' },
       { label: 'Manifesto', href: '#video' },
     ],
   },
