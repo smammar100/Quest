@@ -49,13 +49,19 @@ export const DIAL_CODES: DialCode[] = [
 export const DEFAULT_DIAL_ISO = "US";
 
 export const SOURCE_PLATFORMS = [
-  "Instagram",
+  "Saw an advertisement",
+  "Social media",
+  "Shared by friends/family",
   "TikTok",
-  "X (Twitter)",
-  "Google search",
-  "Friend or referral",
-  "App store",
-  "YouTube",
-  "LinkedIn",
-  "Other",
+  "Lemon8",
+  "Instagram",
+  "Facebook",
+  "Reddit",
+  "Picked up a flyer",
+  "Searched on App Store/Play Store",
+  "Googled for Quest",
+  "Googled for something related",
+  "Saw an article talking about Quest",
+  "Can't recall",
+  "Others (specify)",
 ] as const;

@@ -11,8 +11,10 @@ export default defineConfig({
   // router reads the "studio" URL segment as a tool ("Tool not found: studio").
   basePath: '/studio',
 
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  // Public, safe fallbacks so the embedded Studio loads even without a local
+  // .env (mirrors src/sanity/client.ts).
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '2pg6mq7a',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
 
   plugins: [structureTool(), visionTool()],
 

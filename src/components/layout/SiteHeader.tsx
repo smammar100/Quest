@@ -11,6 +11,7 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 // already on the homepage. "Browse" opens an Airtasker-style mega panel:
 // left = intent tabs (As a Hero / As a poster), right = dense task-type list.
 type Intent = "hero" | "poster";
+type MenuItem = { label: string; category: string; sub?: string };
 
 export default function SiteHeader() {
   const router = useRouter();
@@ -23,6 +24,31 @@ export default function SiteHeader() {
   const megaRef = useRef<HTMLLIElement>(null);
   const browseHref = isAuthenticated ? "/browse-quest/list" : "/browse-quest";
   const hireHref = isAuthenticated ? "/post-quest" : "/signup";
+
+  // Browse-menu lists. Seed from the static list (no flash / works offline),
+  // then swap in the Sanity-driven lists once /api/menu responds. Poster tab =
+  // citizen capabilities, hero tab = category subcategories.
+  const [posterItems, setPosterItems] = useState<MenuItem[]>(() =>
+    TASK_TYPES.map((t) => ({ label: t.label, category: t.category }))
+  );
+  const [heroItems, setHeroItems] = useState<MenuItem[]>(() =>
+    TASK_TYPES.map((t) => ({ label: t.label, category: t.category, sub: t.sub }))
+  );
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/menu", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!alive || !data) return;
+        if (data.poster?.length) setPosterItems(data.poster);
+        if (data.hero?.length) setHeroItems(data.hero);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;

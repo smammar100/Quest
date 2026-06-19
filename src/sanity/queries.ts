@@ -72,6 +72,60 @@ export async function getSanityCategory(
   }
 }
 
+// ── Browse mega-menu lists ──────────────────────────────────────────────────
+
+// One entry in the Browse mega-menu. `sub` only applies to the hero list
+// (it deep-links to a subcategory filter); the poster list links to /hire.
+export type MenuItem = { label: string; category: string; sub?: string };
+export type MenuLists = { poster: MenuItem[]; hero: MenuItem[] };
+
+// Includes BOTH the 5 vertical docs and the flat menu-category docs. Verticals
+// have no `vertical` field, so coalesce falls back to their own slug (links to
+// /quests/<slug>); menu categories use their parent vertical (+ sub for hero).
+const MENU_LISTS = /* groq */ `{
+  "hero": *[_type == "category"]{
+    "label": title,
+    "category": coalesce(vertical, slug.current),
+    "sub": subSlug
+  },
+  "poster": *[_type == "citizen"]{
+    "label": title,
+    "category": coalesce(vertical, slug.current)
+  }
+}`;
+
+// Drives the two Browse-menu tabs from Sanity: the "Hire humans" (poster) tab
+// from each citizen doc's capabilities, the "Get hired" (Hero) tab from each
+// category doc's subcategories. Returns null on failure so the header can fall
+// back to the static list in lib/data/quests-data.ts.
+export async function getMenuLists(): Promise<MenuLists | null> {
+  try {
+    const raw = await sanityClient.fetch<{
+      hero: { label: string; category: string; sub?: string }[];
+      poster: { label: string; category: string }[];
+    }>(MENU_LISTS, {}, { cache: "no-store" });
+
+    const byLabel = (a: MenuItem, b: MenuItem) => a.label.localeCompare(b.label);
+
+    // Both tabs now read standalone "menu category" docs (flat lists):
+    // hero = category docs (isMenuCategory), poster = citizen docs (isMenuCategory).
+    const hero = (raw.hero ?? [])
+      .map((i) => ({ label: i.label, category: i.category, sub: i.sub }))
+      .filter((i) => i.label && i.category)
+      .sort(byLabel);
+    const poster = (raw.poster ?? [])
+      .map((i) => ({ label: i.label, category: i.category }))
+      .filter((i) => i.label && i.category)
+      .sort(byLabel);
+
+    if (!hero.length && !poster.length) return null;
+    return { poster, hero };
+  } catch (err) {
+    console.error("[sanity] getMenuLists failed:", err);
+    return null;
+  }
+}
+
 // ── Citizen (demand-side /quests/[slug]/hire page) ──────────────────────────
 
 // Shape returned by the citizen-by-slug query. All sections optional so the
