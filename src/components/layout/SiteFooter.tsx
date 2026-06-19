@@ -1,3 +1,6 @@
+'use client';
+
+import { useAuth } from '@/controllers/useAuth';
 import DownloadAppModal from './DownloadAppModal';
 
 const APP_STORE_URL = 'https://apps.apple.com/sg/app/quest-hire-a-hero/id1554496579';
@@ -94,6 +97,8 @@ const SOCIALS = [
 ];
 
 export default function SiteFooter() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <footer className="site-footer">
       <div className="ft-inner">
@@ -121,30 +126,32 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          <nav className="ft-cols" aria-label="Footer">
-            {COLUMNS.map((col) => (
-              <div className="ft-col" key={col.title}>
-                <h3 className="ft-col__title">{col.title}</h3>
-                <ul className="ft-col__list">
-                  {col.links.map((l) => (
-                    <li key={l.label}>
-                      {'action' in l && l.action === 'download-app' ? (
-                        <DownloadAppModal className="ft-link">{l.label}</DownloadAppModal>
-                      ) : (
-                        <a
-                          href={l.href}
-                          className="ft-link"
-                          {...('external' in l && l.external ? { target: '_blank', rel: 'noopener' } : {})}
-                        >
-                          {l.label}
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
+          {!isAuthenticated && (
+            <nav className="ft-cols" aria-label="Footer">
+              {COLUMNS.map((col) => (
+                <div className="ft-col" key={col.title}>
+                  <h3 className="ft-col__title">{col.title}</h3>
+                  <ul className="ft-col__list">
+                    {col.links.map((l) => (
+                      <li key={l.label}>
+                        {'action' in l && l.action === 'download-app' ? (
+                          <DownloadAppModal className="ft-link">{l.label}</DownloadAppModal>
+                        ) : (
+                          <a
+                            href={l.href}
+                            className="ft-link"
+                            {...('external' in l && l.external ? { target: '_blank', rel: 'noopener' } : {})}
+                          >
+                            {l.label}
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
+          )}
         </div>
 
         <div className="ft-bottom">
