@@ -24,6 +24,7 @@ export default function SiteHeader() {
   const megaRef = useRef<HTMLLIElement>(null);
   const browseHref = isAuthenticated ? "/browse-quest/list" : "/browse-quest";
   const hireHref = isAuthenticated ? "/post-quest" : "/signup";
+  const logoHref = isAuthenticated ? "/post-quest" : "/";
 
   // Browse-menu lists. Seed from the static list (no flash / works offline),
   // then swap in the Sanity-driven lists once /api/menu responds. Poster tab =
@@ -97,7 +98,7 @@ export default function SiteHeader() {
   return (
     <div className={`header-wrapper${menuOpen ? " has-mega-open" : ""}`}>
       <header>
-        <Link href="/" className="quest-logo" aria-label="Quest">
+        <Link href={logoHref} className="quest-logo" aria-label="Quest">
           <img
             className="quest-logo__img"
             src="/images/logos/Logo.svg"
