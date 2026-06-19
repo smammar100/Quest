@@ -318,3 +318,59 @@
   background: #f0402c;
   transform: translateY(-1px);
 }
+.post-quest-outcome__btn--secondary {
+  background: transparent;
+  color: var(--mid-grey);
+  border: 1.5px solid rgba(20, 16, 31, 0.18);
+}
+.post-quest-outcome__btn--secondary:hover {
+  background: rgba(20, 16, 31, 0.05);
+  transform: translateY(-1px);
+}
+
+/* ── Success animation ───────────────────────────────────────────────────── */
+.pq-anim {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes pq-draw-circle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pq-draw-check {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pq-sparkle {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+.pq-circle {
+  stroke-dasharray: 226;
+  stroke-dashoffset: 226;
+  animation: pq-draw-circle 0.55s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.pq-check {
+  stroke-dasharray: 65;
+  stroke-dashoffset: 65;
+  animation: pq-draw-check 0.38s ease forwards 0.5s;
+}
+
+.pq-sparkle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  margin: -4.5px 0 0 -4.5px;
+  opacity: 0;
+  animation: pq-sparkle 0.55s ease forwards var(--delay, 0.5s);
+}
