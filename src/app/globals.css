@@ -3667,7 +3667,7 @@ nav a {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  background: var(--coral);
+  background: var(--near-black);
   color: #ffffff;
   border: 0;
   border-radius: 10px;
@@ -6142,6 +6142,18 @@ button.ft-link {
 }
 
 /* shared pill buttons */
+/* These CTA classes are sometimes rendered as <button> (download-app modal
+   trigger) — strip native button chrome so they match the <a> versions.
+   Background is left to each class/modifier, so it's not reset here. */
+button.hc-btn,
+button.qh__earn-cta,
+button.hc-card__view,
+button.ft-cta-btn {
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
 .hc-btn {
   display: inline-flex;
   align-items: center;

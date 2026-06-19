@@ -11,6 +11,7 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 // already on the homepage. "Browse" opens an Airtasker-style mega panel:
 // left = intent tabs (As a Hero / As a poster), right = dense task-type list.
 type Intent = "hero" | "poster";
+type MenuItem = { label: string; category: string; sub?: string };
 
 export default function SiteHeader() {
   const router = useRouter();
@@ -21,6 +22,31 @@ export default function SiteHeader() {
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const { isAuthenticated, signOut } = useAuth();
   const megaRef = useRef<HTMLLIElement>(null);
+
+  // Browse-menu lists. Seed from the static list (no flash / works offline),
+  // then swap in the Sanity-driven lists once /api/menu responds. Poster tab =
+  // citizen capabilities, hero tab = category subcategories.
+  const [posterItems, setPosterItems] = useState<MenuItem[]>(() =>
+    TASK_TYPES.map((t) => ({ label: t.label, category: t.category }))
+  );
+  const [heroItems, setHeroItems] = useState<MenuItem[]>(() =>
+    TASK_TYPES.map((t) => ({ label: t.label, category: t.category, sub: t.sub }))
+  );
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/menu", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!alive || !data) return;
+        if (data.poster?.length) setPosterItems(data.poster);
+        if (data.hero?.length) setHeroItems(data.hero);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -164,10 +190,10 @@ export default function SiteHeader() {
                         onMouseEnter={() => setIntent("poster")}
                       >
                         <span className="nav-mega__tab-eyebrow">
-                          Hire humans
+                          I want to
                         </span>
                         <span className="nav-mega__tab-desc">
-                          I’m looking to hire someone
+                          Hire humans.
                         </span>
                       </button>
                       <button
@@ -182,9 +208,9 @@ export default function SiteHeader() {
                         onClick={() => setIntent("hero")}
                         onMouseEnter={() => setIntent("hero")}
                       >
-                        <span className="nav-mega__tab-eyebrow">Get hired as a human</span>
+                        <span className="nav-mega__tab-eyebrow">I want to</span>
                         <span className="nav-mega__tab-desc">
-                          I’m looking for work
+                          Earn as a human.
                         </span>
                       </button>
                     </div>
@@ -202,8 +228,8 @@ export default function SiteHeader() {
                     }
                   >
                     <ul className="nav-mega__grid">
-                      {TASK_TYPES.map((t) => (
-                        <li key={t.label}>
+                      {(intent === "poster" ? posterItems : heroItems).map((t, i) => (
+                        <li key={`${t.category}-${t.label}-${i}`}>
                           <Link
                             href={
                               intent === "poster"

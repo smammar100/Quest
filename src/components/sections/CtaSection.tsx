@@ -5,7 +5,11 @@ const TRUST_AVATARS = [
   'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=96&h=96&fit=crop&crop=faces&auto=format&q=80',
 ];
 
-export default function CtaSection() {
+import DownloadAppModal from '@/components/layout/DownloadAppModal';
+
+// `appModal`: on hero category pages the CTA opens the app-download QR modal
+// instead of linking to signup.
+export default function CtaSection({ appModal }: { appModal?: boolean }) {
   return (
     <section id="cta">
       <div className="ft-cta">
@@ -20,7 +24,11 @@ export default function CtaSection() {
           </div>
           <h2 className="ft-cta__title">Creating the next million jobs uniquely human</h2>
           <p className="ft-cta__sub">Describe a quest in a sentence. A trusted human gets it done.</p>
-          <a href="/signup" className="ft-cta-btn ft-cta-btn--primary">Hire a human</a>
+          {appModal ? (
+            <DownloadAppModal className="ft-cta-btn ft-cta-btn--primary">Get the app</DownloadAppModal>
+          ) : (
+            <a href="/signup" className="ft-cta-btn ft-cta-btn--primary">Hire a human</a>
+          )}
         </div>
       </div>
     </section>

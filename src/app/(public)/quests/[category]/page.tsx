@@ -5,13 +5,14 @@ import { notFound } from 'next/navigation';
 import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
 import CtaSection from '@/components/sections/CtaSection';
+import DownloadAppModal from '@/components/layout/DownloadAppModal';
 import ScrollFX from '@/components/sections/ScrollFX';
 import { QUEST_CATEGORIES, getCategory, monthlyEstimate } from '@/lib/data/quests-data';
 import { HERO_REASONS, HOW_STEPS, TOP_HEROES, HERO_FAQS, EARN_CURVE } from '@/lib/data/hero-page-data';
 import { getSanityCategory } from '@/sanity/queries';
 import { urlForImage } from '@/sanity/image';
 
-// Hero category landing template (the "As a Hero" page). Structure adapts the
+// Human category landing template (the "As a Human" page). Structure adapts the
 // Airtasker individual-category page into Quest's design system:
 //   image hero → why join → open quests (3×3) → earnings (dark, animated) →
 //   how to earn → meet the heroes → category FAQ → CTA → footer.
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const cat = getCategory((await params).category);
   if (!cat) return {};
   return {
-    title: `Earn as a ${cat.label} Hero on Quest`,
+    title: `Earn as a ${cat.label} Human on Quest`,
     description: `Find ${cat.count} open ${cat.label.toLowerCase()} quests near you. Set your price, work your hours, get paid fast.`,
   };
 }
@@ -46,7 +47,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
   // Listing grid — CMS-driven when authored, else local data.
   const quests = (sc?.quests?.length ? sc.quests : cat.listings).slice(0, 9);
 
-  // ── Hero (CMS-driven: H1, subtext, image) ──
+  // ── Human (CMS-driven: H1, subtext, image) ──
   const heroHeading = sc?.heroHeading ?? `${cat.label} quests near you.`;
   const heroSubtext =
     sc?.heroSubtext ?? `Browse over ${cat.count} open ${low} quests near you.`;
@@ -59,7 +60,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
   const bandMin = earn?.bandMin ?? cat.earn.min;
   const bandMax = earn?.bandMax ?? cat.earn.max;
   const earnEyebrow = earn?.eyebrow ?? 'The numbers';
-  const earnHeading = earn?.heading ?? `What ${low} Heroes earn.`;
+  const earnHeading = earn?.heading ?? `What ${low} Humans earn.`;
   const earnBars = earn?.bars?.length ? earn.bars : EARN_CURVE.bars;
   const earnMedian = earn?.medianIndex ?? EARN_CURVE.medianIndex;
   const earnAxis = earn?.axisLabel ?? EARN_CURVE.axisLabel;
@@ -85,7 +86,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
     <>
       <SiteHeader />
 
-      {/* ── Hero ── */}
+      {/* ── Human ── */}
       <section className="qh">
         <div className="qh__banner" style={{ '--qh-img': `url(${heroImage})` } as CSSProperties}>
           <div className="qh__main">
@@ -113,7 +114,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="qh__earn-amount">
               {monthly}<span className="qh__earn-per">per month</span>
             </p>
-            <a href="/#cta" className="qh__earn-cta">Become a Hero</a>
+            <DownloadAppModal className="qh__earn-cta">Become a Human</DownloadAppModal>
             <p className="qh__earn-fine">Based on average {low} payouts. Actual earnings vary.</p>
           </aside>
           </div>
@@ -142,9 +143,9 @@ export default async function CategoryPage({ params }: { params: Params }) {
       </section>
       */}
 
-      {/* ── Why Heroes choose Quest ── */}
+      {/* ── Why Humans choose Quest ── */}
       <section className="hc-why">
-        <p className="hc-eyebrow">Why Heroes choose Quest</p>
+        <p className="hc-eyebrow">Why Humans choose Quest</p>
         <h2 className="hc-h2">Built around your<br />time, not ours.</h2>
         <div className="hc-why__grid">
           {HERO_REASONS.map((r) => (
@@ -178,15 +179,14 @@ export default async function CategoryPage({ params }: { params: Params }) {
                 <span className="hc-card__time">
                   <span className="material-symbols-outlined">schedule</span>{q.time}
                 </span>
-                <a href="/#welcome" className="hc-card__view">View<span className="material-symbols-outlined">arrow_forward</span></a>
               </div>
             </article>
           ))}
         </div>
 
-        <a href="/browse-quest" className="hc-btn hc-btn--primary hc-quests__cta">
+        <DownloadAppModal className="hc-btn hc-btn--primary hc-quests__cta">
           Browse all {cat.label} quests<span className="material-symbols-outlined">arrow_forward</span>
-        </a>
+        </DownloadAppModal>
       </section>
 
       {/* ── Earnings (dark, full-bleed, animated chart) ── */}
@@ -198,15 +198,15 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="hc-earn__text">
               {earn?.description ?? (
                 <>
-                  Most {low} Heroes settle in the <strong>${bandMin}–${bandMax}/hr</strong> band.
+                  Most {low} Humans settle in the <strong>${bandMin}–${bandMax}/hr</strong> band.
                   Take on recurring quests and the curve shifts right, fast.
                 </>
               )}
             </p>
-            <a href="/#cta" className="hc-btn hc-btn--white">Become a Hero<span className="material-symbols-outlined">arrow_forward</span></a>
+            <DownloadAppModal className="hc-btn hc-btn--white">Become a Human<span className="material-symbols-outlined">arrow_forward</span></DownloadAppModal>
           </div>
 
-          <figure className="hc-chart" aria-label={`Distribution of ${low} Hero hourly rates`}>
+          <figure className="hc-chart" aria-label={`Distribution of ${low} Human hourly rates`}>
             <div className="hc-chart__bars">
               {earnBars.map((v, i) => (
                 <span
@@ -234,7 +234,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="hc-eyebrow">Getting started</p>
             <h2 className="hc-h2">How to earn on Quest.</h2>
           </div>
-          <a href="/#cta" className="hc-btn hc-btn--primary hc-how__cta">Become a Hero<span className="material-symbols-outlined">arrow_forward</span></a>
+          <DownloadAppModal className="hc-btn hc-btn--primary hc-how__cta">Become a Human<span className="material-symbols-outlined">arrow_forward</span></DownloadAppModal>
         </div>
 
         <div className="hc-how__grid">
@@ -288,7 +288,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
                       <span className="hc-paid__label">You've been paid</span>
                       <span className="hc-paid__amt">{quests[0]?.pay ?? '$120'}</span>
                       <span className="hc-paid__stars">★★★★★</span>
-                      <span className="hc-paid__sub">5-star {low} Hero</span>
+                      <span className="hc-paid__sub">5-star {low} Human</span>
                     </div>
                     <span className="hc-confetti" aria-hidden="true" />
                   </div>
@@ -309,7 +309,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="hc-eyebrow">Meet the heroes</p>
             <h2 className="hc-h2">Real people,<br />getting it done.</h2>
           </div>
-          <a href="/#cta" className="hc-btn hc-btn--primary hc-heroes__cta">Become a Hero<span className="material-symbols-outlined">arrow_forward</span></a>
+          <a href="/#cta" className="hc-btn hc-btn--primary hc-heroes__cta">Become a Human<span className="material-symbols-outlined">arrow_forward</span></a>
         </div>
 
         <div className="hc-heroes__grid">
@@ -338,7 +338,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
       <section className="hc-faq">
         <div className="faq-head">
           <h2 className="faq-title">{cat.label} quest questions.</h2>
-          <p className="faq-lede">Everything you need to know about earning as a {low} Hero.</p>
+          <p className="faq-lede">Everything you need to know about earning as a {low} Human.</p>
         </div>
         <div className="faq-list">
           {FAQS.map((item, i) => (
@@ -355,7 +355,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
         </div>
       </section>
 
-      <CtaSection />
+      <CtaSection appModal />
       <SiteFooter />
       <ScrollFX />
     </>
