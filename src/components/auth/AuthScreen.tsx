@@ -175,6 +175,7 @@ function Select({
     </label>
   );
 }
+type SignupMethod = "email" | "google" | "apple";
 
 // The shared form body: social buttons, divider, fields, submit, switch link.
 function AuthForm({
@@ -206,6 +207,24 @@ function AuthForm({
   const [method, setMethod] = useState<SignupMethod | null>(null);
   const stacked = layout === "social";
   const isSignup = mode === "signup";
+
+  function chooseMethod(m: SignupMethod) {
+    setMethod(m);
+    setStep(2);
+  }
+
+  const loginSocial = (
+    <div className={stacked ? s.socialStack : s.socialRow}>
+      <button type="button" className={s.social} onClick={onGoogleSignIn} disabled={busy}>
+        <GoogleIcon />
+        <span>{stacked ? "Continue with Google" : "Google"}</span>
+      </button>
+      <button type="button" className={s.social} disabled={busy}>
+        <AppleIcon />
+        <span>{stacked ? "Continue with Apple" : "Apple"}</span>
+      </button>
+    </div>
+  );
 
   const social = (
     <div className={stacked ? s.socialStack : s.socialRow}>
@@ -260,18 +279,18 @@ function AuthForm({
     </div>
   );
 
-   const submitBtn = (
+  const submitBtn = (
     <button type="submit" className={s.submit} disabled={busy || (isSignup && (!agreed || Boolean(signupRestrictionMessage)))}>
       {c.submit}
       <span className="material-symbols-outlined" aria-hidden="true">
         arrow_forward
       </span>
     </button>
-      //    {isSignup && signupRestrictionMessage ? (
-      //   <p className={s.warning} role="alert" aria-live="polite">
-      //     {signupRestrictionMessage}
-      //   </p>
-      // ) : null}
+    //    {isSignup && signupRestrictionMessage ? (
+    //   <p className={s.warning} role="alert" aria-live="polite">
+    //     {signupRestrictionMessage}
+    //   </p>
+    // ) : null}
   );
 
   const switchEl = onSwitch ? (
