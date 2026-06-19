@@ -54,17 +54,17 @@ export default function AgentWaitlistForm() {
       <div className="agents-form__row">
         <label className="agents-form__field">
           <span className="agents-form__label">Name</span>
-          <input className="agents-form__input" type="text" name="name" required placeholder="Your name" />
+          <input className="agents-form__input" type="text" name="name" required placeholder="e.g. Sam Altman" />
         </label>
         <label className="agents-form__field">
           <span className="agents-form__label">Company <span className="agents-form__optional">(optional)</span></span>
-          <input className="agents-form__input" type="text" name="company" placeholder="Your company" />
+          <input className="agents-form__input" type="text" name="company" placeholder="e.g. OpenAI" />
         </label>
       </div>
 
       <label className="agents-form__field">
         <span className="agents-form__label">Email</span>
-        <input className="agents-form__input" type="email" name="email" required placeholder="you@company.com" />
+        <input className="agents-form__input" type="email" name="email" required placeholder="sam@openai.com" />
       </label>
 
       <label className="agents-form__field">
@@ -73,7 +73,7 @@ export default function AgentWaitlistForm() {
           className="agents-form__input agents-form__textarea"
           name="building"
           required
-          placeholder="Describe your agent or product…"
+          placeholder="e.g. AGI — we're very close this time, I promise"
           rows={3}
         />
       </label>
@@ -84,7 +84,7 @@ export default function AgentWaitlistForm() {
           className="agents-form__input agents-form__textarea"
           name="tasks"
           required
-          placeholder="e.g. shelf photos, field surveys, on-site checks…"
+          placeholder="e.g. Check if the board tried to fire me again, scout data center locations, verify AGI is still contained"
           rows={3}
         />
       </label>
