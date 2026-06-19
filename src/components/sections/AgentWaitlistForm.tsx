@@ -94,10 +94,10 @@ export default function AgentWaitlistForm() {
           <span className="agents-form__label">Expected volume</span>
           <select className="agents-form__input agents-form__select" name="volume" required defaultValue="">
             <option value="" disabled>Select range</option>
-            <option value="under-100">Under 100 tasks / month</option>
+            <option value="under-10">Under 10 tasks / month</option>
+            <option value="10-100">10 – 100 tasks / month</option>
             <option value="100-1000">100 – 1,000 tasks / month</option>
-            <option value="1000-10000">1,000 – 10,000 tasks / month</option>
-            <option value="over-10000">10,000+ tasks / month</option>
+            <option value="over-1000">Over 1,000 tasks / month</option>
           </select>
         </label>
         <label className="agents-form__field">
