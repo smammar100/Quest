@@ -3,6 +3,7 @@
 import { usePostQuest } from '@/controllers/usePostQuest';
 import PromptInput from '@/components/post-quest/PromptInput';
 import QuestChat from '@/components/post-quest/QuestChat';
+import { APP_STORE_URL, PLAY_STORE_URL, AppleLogo, GooglePlayLogo } from '@/components/layout/DownloadAppModal';
 
 type Props = { initialPrompt?: string };
 
@@ -28,11 +29,18 @@ export default function PostQuestFlow({ initialPrompt }: Props) {
         <span className="material-symbols-outlined post-quest-outcome__icon">check_circle</span>
         <h2 className="post-quest-outcome__title">Quest posted!</h2>
         <p className="post-quest-outcome__body">
-          We&apos;re matching you with a human. You&apos;ll hear from us soon.
+          To see your quest, check it out on our app!
         </p>
-        <button className="post-quest-outcome__btn" onClick={reset}>
-          Post another quest
-        </button>
+        <div className="dlapp-stores">
+          <a href={APP_STORE_URL} target="_blank" rel="noopener" className="dlapp-store">
+            <AppleLogo />
+            App Store
+          </a>
+          <a href={PLAY_STORE_URL} target="_blank" rel="noopener" className="dlapp-store">
+            <GooglePlayLogo />
+            Google Play
+          </a>
+        </div>
       </div>
     );
   }
