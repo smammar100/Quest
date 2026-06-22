@@ -2,6 +2,7 @@ import {
 	createUserWithEmailAndPassword,
 	getAuth,
 	GoogleAuthProvider,
+	OAuthProvider,
 	reload,
 	sendEmailVerification,
 	signInWithEmailAndPassword,
@@ -54,5 +55,12 @@ export const deleteCurrentAuthUser = async () => {
 };
 
 export const signInGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+
+export const signInApple = async () => {
+	const provider = new OAuthProvider('apple.com');
+	provider.addScope('email');
+	provider.addScope('name');
+	return signInWithPopup(auth, provider);
+};
 
 export const logOut = () => signOut(auth);

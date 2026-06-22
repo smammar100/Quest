@@ -184,6 +184,7 @@ function AuthForm({
   onSwitch,
   onSubmit,
   onGoogleSignIn,
+  onAppleSignIn,
   errorMessage,
   busy,
   signupRestrictionMessage,
@@ -194,6 +195,7 @@ function AuthForm({
   onSwitch?: () => void;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   onGoogleSignIn?: () => void;
+  onAppleSignIn?: () => void;
   errorMessage?: string | null;
   busy?: boolean;
   signupRestrictionMessage?: string | null;
@@ -215,7 +217,12 @@ function AuthForm({
         <GoogleIcon />
         <span>{stacked ? "Continue with Google" : "Google"}</span>
       </button>
-      <button type="button" className={s.social} disabled={busy}>
+      <button
+        type="button"
+        className={s.social}
+        onClick={onAppleSignIn}
+        disabled={busy}
+      >
         <AppleIcon />
         <span>{stacked ? "Continue with Apple" : "Apple"}</span>
       </button>
@@ -411,6 +418,7 @@ export default function AuthScreen({
     refreshVerificationStatus,
     sendVerificationEmail,
     signIn,
+    signInWithApple,
     signInWithGoogle,
     signOut,
     signUp,
@@ -444,11 +452,21 @@ export default function AuthScreen({
     if (code === "auth/too-many-requests") {
       return "Too many attempts. Please try again in a bit.";
     }
-    if (code === "auth/popup-closed-by-user") {
-      return "Google sign-in was cancelled.";
-    }
 
     return "Could not log in right now. Please try again.";
+  }
+
+  function mapSocialLoginError(error: unknown, providerName: string) {
+    if (!error || typeof error !== "object" || !("code" in error)) {
+      return `Could not sign in with ${providerName} right now. Please try again.`;
+    }
+
+    const code = String((error as { code?: unknown }).code ?? "");
+    if (code === "auth/popup-closed-by-user") {
+      return `${providerName} sign-in was cancelled.`;
+    }
+
+    return `Could not sign in with ${providerName} right now. Please try again.`;
   }
 
   function mapSignupError(error: unknown) {
@@ -818,7 +836,25 @@ export default function AuthScreen({
       await signInWithGoogle();
       router.push(postLoginDestination);
     } catch (error) {
-      setErrorMessage(mapLoginError(error));
+      setErrorMessage(mapSocialLoginError(error, "Google"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleAppleSignIn() {
+    if (mode !== "login") {
+      return;
+    }
+
+    setErrorMessage(null);
+
+    try {
+      setBusy(true);
+      await signInWithApple();
+      router.push(postLoginDestination);
+    } catch (error) {
+      setErrorMessage(mapSocialLoginError(error, "Apple"));
     } finally {
       setBusy(false);
     }
@@ -867,6 +903,7 @@ export default function AuthScreen({
                 onSwitch={onSwitch}
                 onSubmit={handleSubmit}
                 onGoogleSignIn={handleGoogleSignIn}
+                onAppleSignIn={handleAppleSignIn}
                 errorMessage={errorMessage}
                 busy={busy}
                 signupRestrictionMessage={signupRestrictionMessage}
@@ -897,6 +934,7 @@ export default function AuthScreen({
             onSwitch={onSwitch}
             onSubmit={handleSubmit}
             onGoogleSignIn={handleGoogleSignIn}
+            onAppleSignIn={handleAppleSignIn}
             errorMessage={errorMessage}
             busy={busy}
             signupRestrictionMessage={signupRestrictionMessage}
