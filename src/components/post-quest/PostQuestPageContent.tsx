@@ -10,12 +10,12 @@ import PromptInput from '@/components/post-quest/PromptInput';
 // Unauth users see a public landing; submitting the prompt redirects to login
 // with the prompt preserved as a query param so it can be recovered post-auth.
 export default function PostQuestPageContent() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, profileLoaded } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get('prompt') ?? undefined;
 
-  if (loading) return null;
+  if (loading || (isAuthenticated && !profileLoaded)) return null;
 
   if (isAuthenticated) {
     return (
