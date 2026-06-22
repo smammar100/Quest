@@ -2,7 +2,6 @@
 
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
 import type { UserProfile } from '@/lib/models/user';
 import { auth, handleAuthRedirectResult } from '@/lib/firebase/auth';
 import { getUserProfileByUid } from '@/lib/firebase/firestore';
@@ -15,6 +14,7 @@ type BackendSelfUserPayload = {
 };
 
 const AUTH_COOKIE_NAME = 'quest_auth';
+const backendCountryCodeRequestCache = new Map<string, Promise<string | undefined>>();
 
 const setAuthCookie = (isAuthenticated: boolean) => {
   if (typeof document === 'undefined') {
@@ -39,21 +39,29 @@ const normalizeCountryCode = (value: unknown): string | undefined => {
 };
 
 const getBackendCountryCodeByUid = async (uid: string): Promise<string | undefined> => {
-  const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`, {
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    return undefined;
+  const cachedRequest = backendCountryCodeRequestCache.get(uid);
+  if (cachedRequest) {
+    return cachedRequest;
   }
 
-  const payload = (await response.json()) as BackendSelfUserPayload;
-  const backendUser = payload.user;
+  const request = (async () => {
+    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`);
 
-  return (
-    normalizeCountryCode(backendUser?.country_code) ??
-    normalizeCountryCode(backendUser?.countryCode)
-  );
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const payload = (await response.json()) as BackendSelfUserPayload;
+    const backendUser = payload.user;
+
+    return (
+      normalizeCountryCode(backendUser?.country_code) ??
+      normalizeCountryCode(backendUser?.countryCode)
+    );
+  })();
+
+  backendCountryCodeRequestCache.set(uid, request);
+  return request;
 };
 
 export type AuthUser = {
@@ -77,7 +85,6 @@ const AuthContext = createContext<AuthContextValue>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const [user, setUser] = useState<AuthUser>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -90,7 +97,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const result = await handleAuthRedirectResult();
         console.info('[auth] redirect result', {
-          pathname,
           hasUser: Boolean(result?.user),
           providerId: result?.providerId ?? null,
           operationType: result?.operationType ?? null,
@@ -170,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       unsub();
     };
-  }, [pathname]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, userProfile, profileLoaded, loading }}>
