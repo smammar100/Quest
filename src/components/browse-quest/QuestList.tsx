@@ -10,6 +10,7 @@ import {
 } from '@/lib/models/browse-quest';
 import { resolveSupportedCountryCode } from '@/lib/constants/country-pricing';
 import QuestCard from './QuestCard';
+import LoadingState from './LoadingState';
 import s from './QuestList.module.css';
 
 const DEFAULT_COUNTRY_CODE = resolveSupportedCountryCode(
@@ -224,7 +225,7 @@ export default function QuestList() {
         })}
       </div>
 
-      {isLoadingView && <p className={s.stateLine}>Loading quests...</p>}
+      {isLoadingView && <LoadingState label="Loading quests" />}
       {error && <p className={s.errorLine}>{error}</p>}
 
       {!isLoadingView && !error && quests.length === 0 && (
@@ -251,7 +252,7 @@ export default function QuestList() {
               onClick={() => void fetchQuests(currentPage + 1, offset, 'append')}
               disabled={!hasMore || loadingMore}
             >
-              {loadingMore ? 'Loading...' : hasMore ? 'Load more quests' : 'No more quests'}
+              {loadingMore ? 'Loading more quests...' : hasMore ? 'Load more quests' : 'No more quests'}
             </button>
           </div>
         </>

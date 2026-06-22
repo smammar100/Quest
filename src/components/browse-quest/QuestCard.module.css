@@ -1,3 +1,15 @@
+.cardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid #14101f;
+  outline-offset: 4px;
+  border-radius: 14px;
+}
+
 .card {
   border-radius: 12px;
   border: 1px solid #e9e5de;
@@ -11,6 +23,12 @@
   min-width: 0;
   overflow: hidden;
   gap: 0.55rem;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.cardLink:hover .card {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(20, 16, 31, 0.09);
 }
 
 .headRow {
