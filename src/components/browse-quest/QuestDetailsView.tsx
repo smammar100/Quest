@@ -99,8 +99,39 @@ const readCountryName = (countryCode?: string) => {
   }
 };
 
+const isOnlineQuest = (quest: QuestDetails) => {
+  const country = (quest.starting_country ?? '').trim().toLowerCase();
+  const location = (quest.starting_location?.primaryText ?? '').trim().toLowerCase();
+  const address = (quest.address ?? '').trim().toLowerCase();
+
+  return country === 'online' || location === 'online' || address === 'online';
+};
+
+const readLocationMapUrl = (quest: QuestDetails) => {
+  if (isOnlineQuest(quest)) return null;
+
+  const lat =
+    parseNumber(quest.starting_location?.lat) ?? parseNumber(quest.lat);
+  const lng =
+    parseNumber(quest.starting_location?.lng) ?? parseNumber(quest.lng);
+
+  if (lat != null && lng != null) {
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  }
+
+  const query =
+    quest.starting_location?.primaryText?.trim() ||
+    quest.address?.trim() ||
+    quest.ending_location?.primaryText?.trim() ||
+    '';
+
+  if (!query) return null;
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+};
+
 const readLocationValue = (quest: QuestDetails) => {
-  if ((quest.starting_country ?? '').toLowerCase() === 'online') {
+  if (isOnlineQuest(quest)) {
     return 'Online';
   }
 
@@ -252,6 +283,7 @@ export default function QuestDetailsView({ questID }: Props) {
     const endingCountry = readCountryName(quest.ending_country);
 
     const locationValue = readLocationValue(quest);
+    const locationMapUrl = readLocationMapUrl(quest);
     const completionDate = readCompletionDate(quest);
     const durationHours = parseNumber(quest.number_of_hours);
 
@@ -278,6 +310,7 @@ export default function QuestDetailsView({ questID }: Props) {
       additional,
       negotiable: Boolean(quest.price_negotiable),
       locationValue,
+      locationMapUrl,
       completionDate,
       durationHours,
       heroesRequired: readHeroesRequired(quest),
@@ -390,7 +423,18 @@ export default function QuestDetailsView({ questID }: Props) {
           <div className={s.grid}>
             <article className={s.block}>
               <p className={s.blockLabel}>Location</p>
-              <p className={s.blockValue}>{viewModel.locationValue}</p>
+              {viewModel.locationMapUrl ? (
+                <a
+                  className={`${s.blockValue} ${s.locationLink}`}
+                  href={viewModel.locationMapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {viewModel.locationValue}
+                </a>
+              ) : (
+                <p className={s.blockValue}>{viewModel.locationValue}</p>
+              )}
               {viewModel.startingCountry || viewModel.endingCountry ? (
                 <p className={s.blockValue}>
                   {viewModel.startingCountry ?? 'Unknown'}
@@ -432,13 +476,13 @@ export default function QuestDetailsView({ questID }: Props) {
           <div className={s.detailsStack}>
             <article className={s.block}>
               <p className={s.blockLabel}>Description</p>
-              <p className={s.blockValue}>{viewModel.description}</p>
+              <p className={`${s.blockValue} ${s.multilineValue}`}>{viewModel.description}</p>
             </article>
 
             {viewModel.requirements ? (
               <article className={s.block}>
                 <p className={s.blockLabel}>Requirements</p>
-                <p className={s.blockValue}>{viewModel.requirements}</p>
+                <p className={`${s.blockValue} ${s.multilineValue}`}>{viewModel.requirements}</p>
               </article>
             ) : null}
           </div>

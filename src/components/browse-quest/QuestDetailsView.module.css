@@ -248,6 +248,22 @@
   line-height: 1.35;
 }
 
+.multilineValue {
+  white-space: pre-line;
+}
+
+.locationLink {
+  display: inline-block;
+  text-decoration: underline;
+  text-decoration-color: rgba(20, 16, 31, 0.35);
+  text-underline-offset: 0.14em;
+}
+
+.locationLink:hover {
+  color: #0b4aa9;
+  text-decoration-color: currentColor;
+}
+
 .detailsStack {
   margin-top: 1rem;
   display: grid;
