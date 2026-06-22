@@ -192,20 +192,6 @@ export default function QuestList() {
         <p className={s.sub}>{subtitle}</p>
       </div>
 
-      <div className={s.toolbar}>
-        <div className={s.searchBox}>
-          <span className="material-symbols-outlined" aria-hidden="true">
-            search
-          </span>
-          <input
-            type="text"
-            placeholder="Search quests, locations, or keywords"
-            aria-label="Search quests"
-          />
-        </div>
-        <p className={s.searchHint}>Search coming soon</p>
-      </div>
-
       <div className={s.categoryRail} role="tablist" aria-label="Quest categories">
         {BROWSE_CATEGORIES.map((item) => {
           const selected = item === category;

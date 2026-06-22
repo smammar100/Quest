@@ -174,7 +174,7 @@ export default function QuestCard({ quest, userCountryCode }: Props) {
         <div className={s.titleWrap}>
           {highlighted ? (
             <span className={`material-symbols-outlined ${s.highlight}`} aria-hidden="true">
-              kid_star
+              keyboard_double_arrow_up
             </span>
           ) : null}
           <h2 className={s.title}>{title}</h2>

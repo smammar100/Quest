@@ -58,17 +58,23 @@ export default function PageScript() {
       );
     }
 
-    // Video section: click-to-play
+    // Video section: auto-play whenever it scrolls into view (muted loop).
+    // Browsers pause muted autoplay videos once they leave the viewport, so an
+    // observer resumes playback on re-entry — no click needed.
     const frame = document.querySelector<HTMLElement>('#video .video-frame');
     if (frame) {
-      const btn = frame.querySelector('.video-play');
       const vid = frame.querySelector<HTMLVideoElement>('.video-el');
-      if (btn && vid) {
-        btn.addEventListener('click', () => {
-          frame.classList.add('is-playing');
-          vid.setAttribute('controls', '');
-          void vid.play();
-        });
+      if (vid) {
+        frame.classList.add('is-playing');
+        const tryPlay = () => { void vid.play().catch(() => {}); };
+        tryPlay();
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver(
+            (entries) => entries.forEach((e) => { if (e.isIntersecting) tryPlay(); }),
+            { threshold: 0.25 }
+          );
+          io.observe(vid);
+        }
       }
     }
 
