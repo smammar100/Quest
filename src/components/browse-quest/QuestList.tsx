@@ -112,7 +112,11 @@ export default function QuestList() {
         setQuests((prev) =>
           mode === 'append' ? dedupeById([...prev, ...incoming]) : dedupeById(incoming)
         );
-        setResultCount(payload.resultCount ?? '0');
+        setResultCount((prev) => {
+          // Some append responses do not include resultCount; keep the current total in that case.
+          if (payload.resultCount == null && mode === 'append') return prev;
+          return payload.resultCount ?? '0';
+        });
         setCurrentPage(nextPage);
         setOffset(nextOffset + incoming.length);
         setHasMore(incoming.length > 2);
