@@ -23,9 +23,8 @@
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  border: 3px solid rgba(20, 16, 31, 0.12);
-  border-top-color: #ff5a47;
-  border-right-color: #2e5bff;
+  border: 3px solid rgba(255, 90, 71, 0.2);
+  border-top-color: var(--color-coral);
   animation: spin 0.9s linear infinite;
 }
 

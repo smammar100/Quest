@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import PostQuestFlow from '@/components/post-quest/PostQuestFlow';
 import SiteHeader from '@/components/layout/SiteHeader';
 import PromptInput from '@/components/post-quest/PromptInput';
+import FullscreenLoader from '@/components/ui/FullscreenLoader';
 
 // Auth users go straight to the agent chat flow.
 // Unauth users see a public landing; submitting the prompt redirects to login
@@ -15,7 +16,7 @@ export default function PostQuestPageContent() {
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get('prompt') ?? undefined;
 
-  if (loading || (isAuthenticated && !profileLoaded)) return null;
+  if (loading || (isAuthenticated && !profileLoaded)) return <FullscreenLoader />;
 
   if (isAuthenticated) {
     return (
