@@ -1,7 +1,6 @@
 services:
   web:
-    # image: asia-southeast1-docker.pkg.dev/quest-migration-843ed/quest-sg-dockerized-images/quest-website-dev:${IMAGE_TAG:-latest}
-    image: asia-southeast1-docker.pkg.dev/quest-e0144/quest-sg-dockerized-images/quest-website:${IMAGE_TAG:-latest}
+    image: ${IMAGE_NAME}:${IMAGE_TAG:-latest}
     platform: linux/amd64
     build:
       context: .
