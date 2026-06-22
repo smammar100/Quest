@@ -37,9 +37,11 @@
 /* Full-screen chat phase — modern centered conversation ---------------------- */
 .post-quest-fullscreen {
   /* Fixed overlay removes this element from the body grid, so the grid row
-     never grows to content height and body-level scroll never appears. */
+     never grows to content height and body-level scroll never appears.
+     top offset clears the fixed navbar. */
   position: fixed;
   inset: 0;
+  top: 64px;
   display: flex;
   flex-direction: column;
   background: #fff;
