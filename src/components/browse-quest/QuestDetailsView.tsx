@@ -286,6 +286,7 @@ export default function QuestDetailsView({ questID }: Props) {
     const locationMapUrl = readLocationMapUrl(quest);
     const completionDate = readCompletionDate(quest);
     const durationHours = parseNumber(quest.number_of_hours);
+    const offersReceived = parseNumber(quest.proposalsCount) ?? 0;
 
     const images = Array.isArray(quest.jobImgURL)
       ? quest.jobImgURL
@@ -314,6 +315,7 @@ export default function QuestDetailsView({ questID }: Props) {
       completionDate,
       durationHours,
       heroesRequired: readHeroesRequired(quest),
+      offersReceived,
       urgent: Boolean(quest.urgent),
       timeRange: quest.time_range?.trim() || null,
       postingPersona: quest.posting_persona?.trim() || null,
@@ -422,7 +424,12 @@ export default function QuestDetailsView({ questID }: Props) {
 
           <div className={s.grid}>
             <article className={s.block}>
-              <p className={s.blockLabel}>Location</p>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                  location_on
+                </span>
+                <span className={s.blockLabel}>Location</span>
+              </p>
               {viewModel.locationMapUrl ? (
                 <a
                   className={`${s.blockValue} ${s.locationLink}`}
@@ -444,7 +451,12 @@ export default function QuestDetailsView({ questID }: Props) {
             </article>
 
             <article className={s.block}>
-              <p className={s.blockLabel}>Completion Date</p>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                  event
+                </span>
+                <span className={s.blockLabel}>Completion Date</span>
+              </p>
               <p className={s.blockValue}>
                 {viewModel.completionDate}
                 {viewModel.timeRange ? ` (${viewModel.timeRange})` : ''}
@@ -452,7 +464,12 @@ export default function QuestDetailsView({ questID }: Props) {
             </article>
 
             <article className={s.block}>
-              <p className={s.blockLabel}>Duration</p>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                  schedule
+                </span>
+                <span className={s.blockLabel}>Duration</span>
+              </p>
               <p className={s.blockValue}>
                 {viewModel.durationHours != null
                   ? `${Number.isInteger(viewModel.durationHours) ? viewModel.durationHours : viewModel.durationHours.toFixed(1)} Hour(s)`
@@ -461,13 +478,33 @@ export default function QuestDetailsView({ questID }: Props) {
             </article>
 
             <article className={s.block}>
-              <p className={s.blockLabel}>Heroes Required</p>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                  group
+                </span>
+                <span className={s.blockLabel}>Heroes Required</span>
+              </p>
               <p className={s.blockValue}>{viewModel.heroesRequired}</p>
+            </article>
+
+            <article className={s.block}>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                  local_offer
+                </span>
+                <span className={s.blockLabel}>Offers Received</span>
+              </p>
+              <p className={s.blockValue}>{viewModel.offersReceived}</p>
             </article>
 
             {viewModel.postingPersona ? (
               <article className={s.block}>
-                <p className={s.blockLabel}>Posting Persona</p>
+                <p className={s.blockLabelRow}>
+                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                    person
+                  </span>
+                  <span className={s.blockLabel}>Posting Persona</span>
+                </p>
                 <p className={s.blockValue}>{viewModel.postingPersona}</p>
               </article>
             ) : null}
@@ -475,13 +512,23 @@ export default function QuestDetailsView({ questID }: Props) {
 
           <div className={s.detailsStack}>
             <article className={s.block}>
-              <p className={s.blockLabel}>Description</p>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                  description
+                </span>
+                <span className={s.blockLabel}>Description</span>
+              </p>
               <p className={`${s.blockValue} ${s.multilineValue}`}>{viewModel.description}</p>
             </article>
 
             {viewModel.requirements ? (
               <article className={s.block}>
-                <p className={s.blockLabel}>Requirements</p>
+                <p className={s.blockLabelRow}>
+                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
+                    checklist
+                  </span>
+                  <span className={s.blockLabel}>Requirements</span>
+                </p>
                 <p className={`${s.blockValue} ${s.multilineValue}`}>{viewModel.requirements}</p>
               </article>
             ) : null}
