@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 import {
   BROWSE_CATEGORIES,
@@ -76,6 +77,13 @@ const requestQuests = async ({
 
 export default function QuestList() {
   const { user, userProfile, profileLoaded, loading: authLoading } = useAuthContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && user === null) {
+      router.replace('/login');
+    }
+  }, [authLoading, user, router]);
   const [category, setCategory] = useState<BrowseCategory>('All');
   const [quests, setQuests] = useState<BrowseQuest[]>([]);
   const [resultCount, setResultCount] = useState<string | number>('0');
