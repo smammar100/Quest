@@ -38,6 +38,39 @@ export const category = defineType({
       description: 'Material Symbols glyph name, e.g. "pin_drop".',
     }),
 
+    // ── Browse-menu category (flat "Earn as a human" list) ──
+    defineField({
+      name: 'isMenuCategory',
+      title: 'Browse-menu category',
+      type: 'boolean',
+      description:
+        'On = this is a flat "Earn as a human" Browse-menu category (not a full vertical page). It links to its parent vertical + sub below.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'vertical',
+      title: 'Parent vertical',
+      type: 'string',
+      description: 'For menu categories: which vertical page this links to.',
+      options: {
+        list: [
+          {title: 'Field data', value: 'field-data'},
+          {title: 'Errands', value: 'errands'},
+          {title: 'Content', value: 'content'},
+          {title: 'Events', value: 'events'},
+          {title: 'Home', value: 'home'},
+        ],
+      },
+      hidden: ({parent}) => !parent?.isMenuCategory,
+    }),
+    defineField({
+      name: 'subSlug',
+      title: 'Subcategory filter slug',
+      type: 'string',
+      description: 'For menu categories: deep-links to /quests/<vertical>?sub=<subSlug>.',
+      hidden: ({parent}) => !parent?.isMenuCategory,
+    }),
+
     // ── Hero ──
     defineField({
       name: 'heroHeading',

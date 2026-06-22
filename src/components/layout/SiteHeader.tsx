@@ -11,6 +11,7 @@ import { TASK_TYPES } from "@/lib/data/quests-data";
 // already on the homepage. "Browse" opens an Airtasker-style mega panel:
 // left = intent tabs (As a Hero / As a poster), right = dense task-type list.
 type Intent = "hero" | "poster";
+type MenuItem = { label: string; category: string; sub?: string };
 
 export default function SiteHeader() {
   const router = useRouter();
@@ -23,6 +24,32 @@ export default function SiteHeader() {
   const megaRef = useRef<HTMLLIElement>(null);
   const browseHref = isAuthenticated ? "/browse-quest/list" : "/browse-quest";
   const hireHref = isAuthenticated ? "/post-quest" : "/signup";
+  const logoHref = isAuthenticated ? "/post-quest" : "/";
+
+  // Browse-menu lists. Seed from the static list (no flash / works offline),
+  // then swap in the Sanity-driven lists once /api/menu responds. Poster tab =
+  // citizen capabilities, hero tab = category subcategories.
+  const [posterItems, setPosterItems] = useState<MenuItem[]>(() =>
+    TASK_TYPES.map((t) => ({ label: t.label, category: t.category }))
+  );
+  const [heroItems, setHeroItems] = useState<MenuItem[]>(() =>
+    TASK_TYPES.map((t) => ({ label: t.label, category: t.category, sub: t.sub }))
+  );
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/menu", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!alive || !data) return;
+        if (data.poster?.length) setPosterItems(data.poster);
+        if (data.hero?.length) setHeroItems(data.hero);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -71,7 +98,7 @@ export default function SiteHeader() {
   return (
     <div className={`header-wrapper${menuOpen ? " has-mega-open" : ""}`}>
       <header>
-        <Link href="/" className="quest-logo" aria-label="Quest">
+        <Link href={logoHref} className="quest-logo" aria-label="Quest">
           <img
             className="quest-logo__img"
             src="/images/logos/Logo.svg"
@@ -119,7 +146,7 @@ export default function SiteHeader() {
                   </a>
                 </li>
                 <li>
-                  <a href="/#audiences">
+                  <a href="/agents">
                     <span className="nav-rn">For AI agents</span>
                   </a>
                 </li>
@@ -174,10 +201,10 @@ export default function SiteHeader() {
                             onMouseEnter={() => setIntent("poster")}
                           >
                             <span className="nav-mega__tab-eyebrow">
-                              As a human
+                              I want to
                             </span>
                             <span className="nav-mega__tab-desc">
-                              I’m looking to hire someone
+                              Hire humans.
                             </span>
                           </button>
                           <button
@@ -192,9 +219,9 @@ export default function SiteHeader() {
                             onClick={() => setIntent("hero")}
                             onMouseEnter={() => setIntent("hero")}
                           >
-                            <span className="nav-mega__tab-eyebrow">As a Hero</span>
+                            <span className="nav-mega__tab-eyebrow">I want to</span>
                             <span className="nav-mega__tab-desc">
-                              I’m looking for work
+                              Earn as a human.
                             </span>
                           </button>
                         </div>

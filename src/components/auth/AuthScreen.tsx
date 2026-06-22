@@ -175,6 +175,7 @@ function Select({
     </label>
   );
 }
+type SignupMethod = "email" | "google" | "apple";
 
 // The shared form body: social buttons, divider, fields, submit, switch link.
 function AuthForm({
@@ -203,17 +204,20 @@ function AuthForm({
   const c = COPY[mode];
   const [showEmail, setShowEmail] = useState(layout !== "social");
   const [agreed, setAgreed] = useState(false);
+  // Signup-only: step 1 = choose method, step 2 = details for that method.
+  const [step, setStep] = useState<1 | 2>(1);
+  const [method, setMethod] = useState<SignupMethod | null>(null);
   const stacked = layout === "social";
   const isSignup = mode === "signup";
 
-  const social = (
+  function chooseMethod(m: SignupMethod) {
+    setMethod(m);
+    setStep(2);
+  }
+
+  const loginSocial = (
     <div className={stacked ? s.socialStack : s.socialRow}>
-      <button
-        type="button"
-        className={s.social}
-        onClick={onGoogleSignIn}
-        disabled={busy}
-      >
+      <button type="button" className={s.social} onClick={onGoogleSignIn} disabled={busy}>
         <GoogleIcon />
         <span>{stacked ? "Continue with Google" : "Google"}</span>
       </button>
@@ -229,120 +233,71 @@ function AuthForm({
     </div>
   );
 
-  const emailBlock = (
-    <>
-      {mode === "signup" && (
-        <div className={s.row2}>
-          <Field
-            id="firstName"
-            label="First name"
-            placeholder="Jane"
-            autoComplete="given-name"
-          />
-          <Field
-            id="lastName"
-            label="Last name"
-            placeholder="Doe"
-            autoComplete="family-name"
-          />
-        </div>
-      )}
-      <Field
-        id="email"
-        label="Email address"
-        type="email"
-        placeholder="you@example.com"
-        autoComplete="email"
-      />
-      {isSignup ? (
-        <div className={s.row2}>
-          <Field
-            id="password"
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-          <Field
-            id="confirmPassword"
-            label="Re-enter password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-          />
-        </div>
-      ) : (
-        <Field
-          id="password"
-          label="Password"
-          type="password"
-          placeholder="••••••••"
-          autoComplete="current-password"
-        />
-      )}
-      {isSignup && (
-        <>
-          <div className={s.row2}>
-            <Field
-              id="dob"
-              label="Date of birth"
-              type="date"
-              autoComplete="bday"
-            />
-            <Select
-              id="source"
-              label="How did you hear about us?"
-              placeholder="Select an option"
-            >
-              {SOURCE_PLATFORMS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <label className={s.agree} htmlFor="agree">
-            <input
-              id="agree"
-              name="agree"
-              type="checkbox"
-              className={s.agreeBox}
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-            />
-            <span className={s.agreeMark} aria-hidden="true">
-              <span className="material-symbols-outlined">check</span>
-            </span>
-            <span className={s.agreeText}>
-              I agree to Quest&apos;s{" "}
-              <Link href="/terms" className={s.agreeLink} target="_blank">
-                Terms of Use
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className={s.agreeLink} target="_blank">
-                Privacy Policy
-              </Link>
-              .
-            </span>
-          </label>
-        </>
-      )}
-      <button
-        type="submit"
-        className={s.submit}
-        disabled={busy || (isSignup && (!agreed || Boolean(signupRestrictionMessage)))}
-      >
-        {c.submit}
-        <span className="material-symbols-outlined" aria-hidden="true">
-          arrow_forward
-        </span>
+  const social = (
+    <div className={stacked ? s.socialStack : s.socialRow}>
+      <button type="button" className={s.social} onClick={onGoogleSignIn} disabled={busy}>
+        <GoogleIcon />
+        <span>{stacked ? "Continue with Google" : "Google"}</span>
       </button>
-      {isSignup && signupRestrictionMessage ? (
-        <p className={s.warning} role="alert" aria-live="polite">
-          {signupRestrictionMessage}
-        </p>
-      ) : null}
-    </>
+      <button type="button" className={s.social} disabled={busy}>
+        <AppleIcon />
+        <span>{stacked ? "Continue with Apple" : "Apple"}</span>
+      </button>
+    </div>
+  );
+
+  const termsLabel = (
+    <label className={s.agree} htmlFor="agree">
+      <input
+        id="agree"
+        name="agree"
+        type="checkbox"
+        className={s.agreeBox}
+        checked={agreed}
+        onChange={(e) => setAgreed(e.target.checked)}
+      />
+      <span className={s.agreeMark} aria-hidden="true">
+        <span className="material-symbols-outlined">check</span>
+      </span>
+      <span className={s.agreeText}>
+        I agree to Quest&apos;s{" "}
+        <a href="https://quest-inc.co/terms-of-use/" className={s.agreeLink} target="_blank" rel="noopener">
+          Terms of Use
+        </a>{" "}
+        and{" "}
+        <a href="https://quest-inc.co/privacy-policy/" className={s.agreeLink} target="_blank" rel="noopener">
+          Privacy Policy
+        </a>
+        .
+      </span>
+    </label>
+  );
+
+  const dobAndSource = (
+    <div className={s.row2}>
+      <Field id="dob" label="Date of birth" type="date" autoComplete="bday" />
+      <Select id="source" label="How did you hear about us?" placeholder="Select an option">
+        {SOURCE_PLATFORMS.map((p) => (
+          <option key={p} value={p}>
+            {p}
+          </option>
+        ))}
+      </Select>
+    </div>
+  );
+
+  const submitBtn = (
+    <button type="submit" className={s.submit} disabled={busy || (isSignup && (!agreed || Boolean(signupRestrictionMessage)))}>
+      {c.submit}
+      <span className="material-symbols-outlined" aria-hidden="true">
+        arrow_forward
+      </span>
+    </button>
+    //    {isSignup && signupRestrictionMessage ? (
+    //   <p className={s.warning} role="alert" aria-live="polite">
+    //     {signupRestrictionMessage}
+    //   </p>
+    // ) : null}
   );
 
   const switchEl = onSwitch ? (
@@ -355,23 +310,112 @@ function AuthForm({
     </Link>
   );
 
+  // ── Login: email + single password ──
+  const loginEmailBlock = (
+    <>
+      <Field id="email" label="Email address" type="email" placeholder="you@example.com" autoComplete="email" />
+      <Field id="password" label="Password" type="password" placeholder="••••••••" autoComplete="current-password" />
+      {submitBtn}
+    </>
+  );
+
+  // ── Signup Step 1: choose a method ──
+  const signupStep1 = (
+    <>
+      <p className={s.stepPrompt}>How would you like to sign up?</p>
+      <div className={s.socialStack}>
+        <button type="button" className={s.social} onClick={() => chooseMethod("google")} disabled={busy}>
+          <GoogleIcon />
+          <span>Continue with Google</span>
+        </button>
+        <button type="button" className={s.social} onClick={() => chooseMethod("apple")} disabled={busy}>
+          <AppleIcon />
+          <span>Continue with Apple</span>
+        </button>
+      </div>
+      <Divider />
+      <button type="button" className={s.emailToggle} onClick={() => chooseMethod("email")}>
+        <span className="material-symbols-outlined" aria-hidden="true">
+          mail
+        </span>
+        Continue with email
+      </button>
+    </>
+  );
+
+  // ── Signup Step 2: details for the chosen method ──
+  const backBtn = (
+    <button
+      type="button"
+      className={s.backBtn}
+      onClick={() => {
+        setStep(1);
+        setMethod(null);
+      }}
+    >
+      <span className="material-symbols-outlined" aria-hidden="true">
+        arrow_back
+      </span>
+      Back
+    </button>
+  );
+
+  const signupStep2 = (
+    <>
+      {backBtn}
+      {method === "email" ? (
+        <>
+          <div className={s.row2}>
+            <Field id="firstName" label="First name" placeholder="Jane" autoComplete="given-name" />
+            <Field id="lastName" label="Last name" placeholder="Doe" autoComplete="family-name" />
+          </div>
+          <Field id="email" label="Email address" type="email" placeholder="you@example.com" autoComplete="email" />
+          <div className={s.row2}>
+            <Field id="password" label="Password" type="password" placeholder="••••••••" autoComplete="new-password" />
+            <Field id="confirmPassword" label="Re-enter password" type="password" placeholder="••••••••" autoComplete="new-password" />
+          </div>
+          {dobAndSource}
+          {termsLabel}
+        </>
+      ) : (
+        <>
+          <p className={s.methodNote}>
+            <span className="material-symbols-outlined" aria-hidden="true">
+              check_circle
+            </span>
+            Continuing with {method === "google" ? "Google" : "Apple"}. Just a couple more details.
+          </p>
+          {dobAndSource}
+          {termsLabel}
+        </>
+      )}
+      {submitBtn}
+    </>
+  );
+
   return (
     <form className={s.form} onSubmit={onSubmit ?? ((e) => e.preventDefault())}>
-      {social}
-      <Divider />
-      {stacked && !showEmail ? (
-        <button
-          type="button"
-          className={s.emailToggle}
-          onClick={() => setShowEmail(true)}
-        >
-          <span className="material-symbols-outlined" aria-hidden="true">
-            mail
-          </span>
-          Continue with email
-        </button>
+      {isSignup ? (
+        step === 1 ? (
+          signupStep1
+        ) : (
+          signupStep2
+        )
       ) : (
-        emailBlock
+        <>
+          {loginSocial}
+          <Divider />
+          {stacked && !showEmail ? (
+            <button type="button" className={s.emailToggle} onClick={() => setShowEmail(true)}>
+              <span className="material-symbols-outlined" aria-hidden="true">
+                mail
+              </span>
+              Continue with email
+            </button>
+          ) : (
+            loginEmailBlock
+          )}
+        </>
       )}
       {errorMessage ? (
         <p className={s.error} role="alert" aria-live="polite">

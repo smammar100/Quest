@@ -36,6 +36,33 @@ export const citizen = defineType({
       description: 'Material Symbols glyph name, e.g. "pin_drop".',
     }),
 
+    // ── Browse-menu category (flat "Hire humans" list) ──
+    defineField({
+      name: 'isMenuCategory',
+      title: 'Browse-menu category',
+      type: 'boolean',
+      description:
+        'On = this is a flat "Hire humans" Browse-menu category (not a full vertical hire page). It links to its parent vertical below.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'vertical',
+      title: 'Parent vertical',
+      type: 'string',
+      description:
+        'For menu categories: which vertical hire page this links to.',
+      options: {
+        list: [
+          {title: 'Field data', value: 'field-data'},
+          {title: 'Errands', value: 'errands'},
+          {title: 'Content', value: 'content'},
+          {title: 'Events', value: 'events'},
+          {title: 'Home', value: 'home'},
+        ],
+      },
+      hidden: ({parent}) => !parent?.isMenuCategory,
+    }),
+
     // ── Hero ──
     defineField({
       name: 'heroHeading',

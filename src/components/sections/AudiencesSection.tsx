@@ -12,6 +12,7 @@ type Aud = {
   card: { label: string; value: string; badge: string };
   asideText: string;
   link: string;
+  href: string;
   chip: { icon: string; text: string };
 };
 
@@ -27,6 +28,7 @@ const AUDS: Aud[] = [
     chip: { icon: 'verified_user', text: 'Vetted & insured' },
     asideText: 'Vetted, reliable people you can book in minutes and trust on the job.',
     link: 'Hire for business',
+    href: '/signup',
   },
   {
     key: 'agent',
@@ -39,6 +41,7 @@ const AUDS: Aud[] = [
     chip: { icon: 'sync', text: 'Auto-coordinated' },
     asideText: 'It only pays once the work is verified done, built for trust.',
     link: 'Connect via MCP',
+    href: '/agents',
   },
   {
     key: 'hero',
@@ -51,6 +54,7 @@ const AUDS: Aud[] = [
     chip: { icon: 'bolt', text: 'Same-day pay' },
     asideText: 'Get paid fast for work that fits your life.',
     link: 'Earn as a human on Quest',
+    href: '/signup',
   },
 ];
 
@@ -108,9 +112,12 @@ export default function AudiencesSection({ className }: { className?: string }) 
 
         <div className="aud-aside">
           <p className="aud-aside__text">{a.asideText}</p>
+          {/* CTA links hidden for now — re-enable when destinations are ready.
           <a href="/signup" className="aud-aside__link">
+          <a href={a.href} className="aud-aside__link">
             {a.link}
           </a>
+          */}
         </div>
       </div>
     </section>
