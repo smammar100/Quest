@@ -14,6 +14,21 @@ type BackendSelfUserPayload = {
   } | null;
 };
 
+const AUTH_COOKIE_NAME = 'quest_auth';
+
+const setAuthCookie = (isAuthenticated: boolean) => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  if (isAuthenticated) {
+    document.cookie = `${AUTH_COOKIE_NAME}=1; Path=/; Max-Age=2592000; SameSite=Lax`;
+    return;
+  }
+
+  document.cookie = `${AUTH_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`;
+};
+
 const normalizeCountryCode = (value: unknown): string | undefined => {
   if (typeof value !== 'string') {
     return undefined;
@@ -89,12 +104,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       if (!firebaseUser) {
+        setAuthCookie(false);
         setUser(null);
         setUserProfile(null);
         setProfileLoaded(true);
         setLoading(false);
         return;
       }
+
+      setAuthCookie(true);
 
       setUser({
         uid: firebaseUser.uid,

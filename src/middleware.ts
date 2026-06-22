@@ -1,18 +1,28 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Route protection — runs on the server before any page renders.
-// TODO: replace the stub check with real Firebase session-cookie verification.
-// See: https://firebase.google.com/docs/auth/admin/manage-cookies
+const AUTH_COOKIE_NAME = 'quest_auth';
+
 export function middleware(request: NextRequest) {
-  // const session = request.cookies.get('session')?.value;
-  // if (!session) {
-  //   return NextResponse.redirect(new URL('/login', request.url));
-  // }
+  const pathname = request.nextUrl.pathname;
+  const isAuthenticated = request.cookies.get(AUTH_COOKIE_NAME)?.value === '1';
+
+  if (!isAuthenticated) {
+    const loginUrl = new URL('/login', request.url);
+    const redirectTarget = `${pathname}${request.nextUrl.search}`;
+    loginUrl.searchParams.set('next', redirectTarget);
+    return NextResponse.redirect(loginUrl);
+  }
+
   return NextResponse.next();
 }
 
 // Add every protected URL pattern here as the app grows.
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/tasks/:path*'],
+  matcher: [
+    '/browse-quest/list/:path*',
+    '/dashboard/:path*',
+    '/profile/:path*',
+    '/tasks/:path*',
+  ],
 };
