@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/controllers/useAuth";
 import { TASK_TYPES } from "@/lib/data/quests-data";
 
@@ -15,6 +15,7 @@ type MenuItem = { label: string; category: string; sub?: string };
 
 export default function SiteHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [intent, setIntent] = useState<Intent>("poster");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -130,13 +131,17 @@ export default function SiteHeader() {
             {isAuthenticated ? (
               <li>
                 <Link href={browseHref}>
-                  <span className="nav-rn">Browse</span>
+                  <span className="nav-rn">Categories</span>
                 </Link>
               </li>
             ) : (
               <>
                 <li>
-                  <a href="/#bento">
+                  <a
+                    href="/business"
+                    className={pathname === "/business" ? "is-active" : undefined}
+                    aria-current={pathname === "/business" ? "page" : undefined}
+                  >
                     <span className="nav-rn">For business</span>
                   </a>
                 </li>
@@ -146,27 +151,35 @@ export default function SiteHeader() {
                   </a>
                 </li>
                 <li>
-                  <a href="/agents">
+                  <a
+                    href="/agents"
+                    className={pathname?.startsWith("/agents") ? "is-active" : undefined}
+                    aria-current={pathname?.startsWith("/agents") ? "page" : undefined}
+                  >
                     <span className="nav-rn">For AI agents</span>
                   </a>
                 </li>
                 {/* mobile drawer: plain link to the quests index */}
                 <li className="nav-browse-mobile">
                   <Link href={browseHref}>
-                    <span className="nav-rn">Browse</span>
+                    <span className="nav-rn">Categories</span>
                   </Link>
                 </li>
                 {/* desktop: click-toggled Airtasker-style mega panel */}
                 <li className="nav-mega-li" ref={megaRef}>
                   <button
                     type="button"
-                    className="nav-mega-trigger"
+                    className={`nav-mega-trigger${
+                      pathname?.startsWith("/quests") || pathname?.startsWith("/browse-quest")
+                        ? " is-active"
+                        : ""
+                    }`}
                     aria-expanded={menuOpen}
                     aria-haspopup="true"
                     aria-controls="browse-dropdown"
                     onClick={() => setMenuOpen((o) => !o)}
                   >
-                    <span className="nav-rn">Browse</span>
+                    <span className="nav-rn">Categories</span>
                     <span
                       className="material-symbols-outlined nav-mega-trigger__chev"
                       aria-hidden="true"

@@ -91,11 +91,6 @@ export default async function CategoryPage({ params }: { params: Params }) {
         <div className="qh__banner" style={{ '--qh-img': `url(${heroImage})` } as CSSProperties}>
           <div className="qh__main">
           <div className="qh__content">
-            <div className="qh__crumbs">
-              <Link href="/browse-quest">Browse</Link>
-              <span aria-hidden="true">/</span>
-              <span aria-current="page">{cat.label}</span>
-            </div>
             <h1 className="qh__title">{heroHeading}</h1>
             <p className="qh__sub">{heroSubtext}</p>
           </div>
@@ -105,7 +100,6 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <div className="qh__earn-field">
               <span className="material-symbols-outlined">tune</span>
               <span className="qh__earn-field-val">1–2 quests / week</span>
-              <span className="material-symbols-outlined qh__earn-chev">expand_more</span>
             </div>
             <div className="qh__earn-field qh__earn-field--loc">
               <span className="material-symbols-outlined">location_on</span>
@@ -114,7 +108,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="qh__earn-amount">
               {monthly}<span className="qh__earn-per">per month</span>
             </p>
-            <DownloadAppModal className="qh__earn-cta">Become a Human</DownloadAppModal>
+            <DownloadAppModal className="qh__earn-cta">Earn as a human</DownloadAppModal>
             <p className="qh__earn-fine">Based on average {low} payouts. Actual earnings vary.</p>
           </aside>
           </div>
@@ -203,7 +197,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
                 </>
               )}
             </p>
-            <DownloadAppModal className="hc-btn hc-btn--white">Become a Human<span className="material-symbols-outlined">arrow_forward</span></DownloadAppModal>
+            <DownloadAppModal className="hc-btn hc-btn--white">Earn as a human<span className="material-symbols-outlined">arrow_forward</span></DownloadAppModal>
           </div>
 
           <figure className="hc-chart" aria-label={`Distribution of ${low} Human hourly rates`}>
@@ -234,7 +228,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="hc-eyebrow">Getting started</p>
             <h2 className="hc-h2">How to earn on Quest.</h2>
           </div>
-          <DownloadAppModal className="hc-btn hc-btn--primary hc-how__cta">Become a Human<span className="material-symbols-outlined">arrow_forward</span></DownloadAppModal>
+          <DownloadAppModal className="hc-btn hc-btn--primary hc-how__cta">Earn as a human<span className="material-symbols-outlined">arrow_forward</span></DownloadAppModal>
         </div>
 
         <div className="hc-how__grid">
@@ -309,7 +303,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="hc-eyebrow">Meet the heroes</p>
             <h2 className="hc-h2">Real people,<br />getting it done.</h2>
           </div>
-          <a href="/#cta" className="hc-btn hc-btn--primary hc-heroes__cta">Become a Human<span className="material-symbols-outlined">arrow_forward</span></a>
+          <a href="/#cta" className="hc-btn hc-btn--primary hc-heroes__cta">Earn as a human<span className="material-symbols-outlined">arrow_forward</span></a>
         </div>
 
         <div className="hc-heroes__grid">
