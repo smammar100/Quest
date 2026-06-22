@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { User } from "firebase/auth";
 import { useAuth } from "@/controllers/useAuth";
+import { handleAuthRedirectResult } from "@/lib/firebase/auth";
 import {
   SOURCE_PLATFORMS,
 } from "@/lib/data/dial-codes";
@@ -25,6 +27,45 @@ type PendingSignupProfile = {
   dateOfBirth: string;
   sourcePlatform?: string;
 };
+
+type PendingSocialSignup = {
+  provider: "google" | "apple";
+  countryCode: string;
+  dateOfBirth: string;
+  sourcePlatform?: string;
+};
+
+const PENDING_SOCIAL_SIGNUP_KEY = "quest.pending-social-signup";
+
+function readPendingSocialSignup(): PendingSocialSignup | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const value = window.sessionStorage.getItem(PENDING_SOCIAL_SIGNUP_KEY);
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(value) as PendingSocialSignup;
+  } catch {
+    return null;
+  }
+}
+
+function writePendingSocialSignup(pending: PendingSocialSignup | null) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (!pending) {
+    window.sessionStorage.removeItem(PENDING_SOCIAL_SIGNUP_KEY);
+    return;
+  }
+
+  window.sessionStorage.setItem(PENDING_SOCIAL_SIGNUP_KEY, JSON.stringify(pending));
+}
 
 export type AuthMode = "login" | "signup";
 export type AuthLayout = "centered" | "split" | "social";
@@ -205,6 +246,7 @@ function AuthForm({
   signupMethod,
   onSignupMethodChange,
   errorMessage,
+  redirectStatus,
   busy,
   signupRestrictionMessage,
 }: {
@@ -220,6 +262,7 @@ function AuthForm({
   signupMethod?: SignupMethod | null;
   onSignupMethodChange?: (method: SignupMethod | null, isStep2: boolean) => void;
   errorMessage?: string | null;
+  redirectStatus?: string | null;
   busy?: boolean;
   signupRestrictionMessage?: string | null;
 }) {
@@ -448,6 +491,11 @@ function AuthForm({
           {errorMessage}
         </p>
       ) : null}
+      {redirectStatus ? (
+        <p className={s.warning} role="status" aria-live="polite">
+          {redirectStatus}
+        </p>
+      ) : null}
       <p className={s.switch}>
         {c.switchText} {switchEl}
       </p>
@@ -492,6 +540,7 @@ export default function AuthScreen({
     signInWithGoogle,
     signOut,
     signUp,
+    user,
   } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -502,6 +551,7 @@ export default function AuthScreen({
   const [pendingSignupProfile, setPendingSignupProfile] = useState<PendingSignupProfile | null>(null);
   const [profilePersisted, setProfilePersisted] = useState(false);
   const [signupMethod, setSignupMethod] = useState<SignupMethod | null>(null);
+  const [redirectStatus, setRedirectStatus] = useState<string | null>(null);
   const other: AuthMode = mode === "login" ? "signup" : "login";
   // default switch link stays within the prototype set; real /login + /signup
   // routes pass an explicit switchHref to point at each other.
@@ -639,6 +689,89 @@ export default function AuthScreen({
       cancelled = true;
     };
   }, [mode]);
+
+  useEffect(() => {
+    let active = true;
+
+    const finalizeSocialRedirect = async () => {
+      try {
+        const result = await handleAuthRedirectResult();
+        if (!active) {
+          return;
+        }
+
+        const redirectUser = result?.user ?? getCurrentUser();
+
+        if (!redirectUser) {
+          return;
+        }
+
+        setRedirectStatus(null);
+
+        const pendingSignup = readPendingSocialSignup();
+        writePendingSocialSignup(null);
+
+        if (!pendingSignup) {
+          router.replace(postLoginDestination);
+          return;
+        }
+
+        if (!redirectUser.email) {
+          setErrorMessage("We could not complete your sign-in because no email was returned.");
+          return;
+        }
+
+        const firstName = redirectUser.displayName?.split(" ")[0] ?? "";
+        const lastName = redirectUser.displayName?.split(" ").slice(1).join(" ") ?? "";
+        const profile: PendingSignupProfile = {
+          email: redirectUser.email,
+          firstName,
+          lastName,
+          countryCode: pendingSignup.countryCode,
+          dateOfBirth: pendingSignup.dateOfBirth,
+          sourcePlatform: pendingSignup.sourcePlatform,
+        };
+
+        setPendingSignupProfile(profile);
+        setProfilePersisted(false);
+
+        if (!redirectUser.emailVerified) {
+          await sendVerificationEmail(redirectUser);
+          setVerificationEmail(redirectUser.email);
+          setEmailVerified(false);
+          setVerificationMessage("We sent a verification link to your email.");
+          return;
+        }
+
+        await completeSignupProfile(redirectUser, profile);
+        setProfilePersisted(true);
+        setVerificationMessage(null);
+        router.replace(postLoginDestination);
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        const providerName = readPendingSocialSignup()?.provider === "apple" ? "Apple" : "Google";
+        setRedirectStatus(`The ${providerName} sign-in redirect failed.`);
+        setErrorMessage(mapSocialLoginError(error, providerName));
+      }
+    };
+
+    void finalizeSocialRedirect();
+
+    return () => {
+      active = false;
+    };
+  }, [completeSignupProfile, postLoginDestination, router, sendVerificationEmail]);
+
+  useEffect(() => {
+    if (mode !== "login" || !user) {
+      return;
+    }
+
+    router.replace(postLoginDestination);
+  }, [mode, postLoginDestination, router, user]);
 
   useEffect(() => {
     if (!verificationEmail || emailVerified) {
@@ -946,8 +1079,10 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      await signInWithGoogle();
-      router.push(postLoginDestination);
+      const credential = await signInWithGoogle();
+      if (credential?.user) {
+        router.replace(postLoginDestination);
+      }
     } catch (error) {
       setErrorMessage(mapSocialLoginError(error, "Google"));
     } finally {
@@ -964,13 +1099,52 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      await signInWithApple();
-      router.push(postLoginDestination);
+      const credential = await signInWithApple();
+      if (credential?.user) {
+        router.replace(postLoginDestination);
+      }
     } catch (error) {
       setErrorMessage(mapSocialLoginError(error, "Apple"));
     } finally {
       setBusy(false);
     }
+  }
+
+  async function continueSocialSignup(
+    socialUser: User,
+    socialPending: PendingSocialSignup
+  ) {
+    if (!socialUser.email) {
+      setErrorMessage("We could not complete your sign-in because no email was returned.");
+      return;
+    }
+
+    const firstName = socialUser.displayName?.split(" ")[0] ?? "";
+    const lastName = socialUser.displayName?.split(" ").slice(1).join(" ") ?? "";
+    const profile: PendingSignupProfile = {
+      email: socialUser.email,
+      firstName,
+      lastName,
+      countryCode: socialPending.countryCode,
+      dateOfBirth: socialPending.dateOfBirth,
+      sourcePlatform: socialPending.sourcePlatform,
+    };
+
+    setPendingSignupProfile(profile);
+    setProfilePersisted(false);
+
+    if (!socialUser.emailVerified) {
+      await sendVerificationEmail(socialUser);
+      setVerificationEmail(socialUser.email);
+      setEmailVerified(false);
+      setVerificationMessage("We sent a verification link to your email.");
+      return;
+    }
+
+    await completeSignupProfile(socialUser, profile);
+    setProfilePersisted(true);
+    setVerificationMessage(null);
+    router.replace(postLoginDestination);
   }
 
   async function handleGoogleSignupStep2(event: React.SyntheticEvent<HTMLFormElement>) {
@@ -1003,52 +1177,20 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      const credential = await signInWithGoogle();
-      
-      if (!credential.user.email) {
-        throw new Error("No email from Google sign-in");
-      }
-
-      // Check if user already has a profile in the backend
-      const userExistsInBackend = await checkUserExistsInBackend(credential.user.uid);
-
-      if (userExistsInBackend) {
-        // User already has a profile, sign them in and redirect
-        router.push(postLoginDestination);
-        return;
-      }
-
-      // User doesn't have a profile yet, continue with signup
-      const firstName = credential.user.displayName?.split(" ")[0] ?? "";
-      const lastName = credential.user.displayName?.split(" ").slice(1).join(" ") ?? "";
-
-      setPendingSignupProfile({
-        email: credential.user.email,
-        firstName,
-        lastName,
+      const socialPending: PendingSocialSignup = {
+        provider: "google",
         countryCode: detection.countryCode,
         dateOfBirth,
         sourcePlatform: sourcePlatform || undefined,
-      });
+      };
+      const credential = await signInWithGoogle();
 
-      if (!credential.user.emailVerified) {
-        await sendVerificationEmail(credential.user);
-        setVerificationEmail(credential.user.email);
-        setEmailVerified(false);
-        setVerificationMessage("We sent a verification link to your email.");
-      } else {
-        setEmailVerified(true);
-        await completeSignupProfile(credential.user, {
-          email: credential.user.email,
-          firstName,
-          lastName,
-          countryCode: detection.countryCode,
-          dateOfBirth,
-          sourcePlatform: sourcePlatform || undefined,
-        });
-        setProfilePersisted(true);
-        router.push("/browse-quest/list");
+      if (!credential?.user) {
+        writePendingSocialSignup(socialPending);
+        return;
       }
+
+      await continueSocialSignup(credential.user, socialPending);
     } catch (error) {
       setErrorMessage(mapSignupError(error));
     } finally {
@@ -1086,52 +1228,20 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      const credential = await signInWithApple();
-      
-      if (!credential.user.email) {
-        throw new Error("No email from Apple sign-in");
-      }
-
-      // Check if user already has a profile in the backend
-      const userExistsInBackend = await checkUserExistsInBackend(credential.user.uid);
-
-      if (userExistsInBackend) {
-        // User already has a profile, sign them in and redirect
-        router.push(postLoginDestination);
-        return;
-      }
-
-      // User doesn't have a profile yet, continue with signup
-      const firstName = credential.user.displayName?.split(" ")[0] ?? "";
-      const lastName = credential.user.displayName?.split(" ").slice(1).join(" ") ?? "";
-
-      setPendingSignupProfile({
-        email: credential.user.email,
-        firstName,
-        lastName,
+      const socialPending: PendingSocialSignup = {
+        provider: "apple",
         countryCode: detection.countryCode,
         dateOfBirth,
         sourcePlatform: sourcePlatform || undefined,
-      });
+      };
+      const credential = await signInWithApple();
 
-      if (!credential.user.emailVerified) {
-        await sendVerificationEmail(credential.user);
-        setVerificationEmail(credential.user.email);
-        setEmailVerified(false);
-        setVerificationMessage("We sent a verification link to your email.");
-      } else {
-        setEmailVerified(true);
-        await completeSignupProfile(credential.user, {
-          email: credential.user.email,
-          firstName,
-          lastName,
-          countryCode: detection.countryCode,
-          dateOfBirth,
-          sourcePlatform: sourcePlatform || undefined,
-        });
-        setProfilePersisted(true);
-        router.push("/browse-quest/list");
+      if (!credential?.user) {
+        writePendingSocialSignup(socialPending);
+        return;
       }
+
+      await continueSocialSignup(credential.user, socialPending);
     } catch (error) {
       setErrorMessage(mapSignupError(error));
     } finally {
@@ -1188,6 +1298,7 @@ export default function AuthScreen({
                 signupMethod={signupMethod}
                 onSignupMethodChange={(m) => setSignupMethod(m)}
                 errorMessage={errorMessage}
+                redirectStatus={redirectStatus}
                 busy={busy}
                 signupRestrictionMessage={signupRestrictionMessage}
               />
@@ -1223,6 +1334,7 @@ export default function AuthScreen({
             signupMethod={signupMethod}
             onSignupMethodChange={(m) => setSignupMethod(m)}
             errorMessage={errorMessage}
+            redirectStatus={redirectStatus}
             busy={busy}
             signupRestrictionMessage={signupRestrictionMessage}
           />

@@ -2,8 +2,9 @@
 
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import type { UserProfile } from '@/lib/models/user';
-import { auth } from '@/lib/firebase/auth';
+import { auth, handleAuthRedirectResult } from '@/lib/firebase/auth';
 import { getUserProfileByUid } from '@/lib/firebase/firestore';
 
 type BackendSelfUserPayload = {
@@ -61,6 +62,7 @@ const AuthContext = createContext<AuthContextValue>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const [user, setUser] = useState<AuthUser>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -68,6 +70,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+
+    void (async () => {
+      try {
+        const result = await handleAuthRedirectResult();
+        console.info('[auth] redirect result', {
+          pathname,
+          hasUser: Boolean(result?.user),
+          providerId: result?.providerId ?? null,
+          operationType: result?.operationType ?? null,
+        });
+      } catch (error) {
+        console.error('[auth] redirect result error', error);
+      }
+    })();
 
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!mounted) return;
@@ -136,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       unsub();
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <AuthContext.Provider value={{ user, userProfile, profileLoaded, loading }}>
