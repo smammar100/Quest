@@ -5,6 +5,13 @@ import type { ChatMessage } from '@/lib/models/quest';
 import { PostQuestSpark } from './PostQuestSpark';
 import PostQuestThinking from './PostQuestThinking';
 
+function renderBold(text: string) {
+  const parts = text.split(/\*\*(.+?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+  );
+}
+
 type Props = {
   messages: ChatMessage[];
   agentTyping: boolean;
@@ -14,11 +21,19 @@ type Props = {
 export default function QuestChat({ messages, agentTyping, onSend }: Props) {
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Scroll to the latest message whenever the list updates.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, agentTyping]);
+
+  // Re-focus the input after the agent finishes typing.
+  useEffect(() => {
+    if (!agentTyping) {
+      inputRef.current?.focus();
+    }
+  }, [agentTyping]);
 
   function send() {
     const trimmed = input.trim();
@@ -51,7 +66,7 @@ export default function QuestChat({ messages, agentTyping, onSend }: Props) {
             ) : (
               <div key={i} className="post-quest-chat__row post-quest-chat__row--agent">
                 <PostQuestSpark className="post-quest-chat__avatar" />
-                <div className="post-quest-chat__text">{msg.content}</div>
+                <div className="post-quest-chat__text">{renderBold(msg.content)}</div>
               </div>
             )
           )}
@@ -65,11 +80,12 @@ export default function QuestChat({ messages, agentTyping, onSend }: Props) {
       <form className="post-quest-chat__composer" onSubmit={handleSubmit}>
         <div className="post-quest-chat__field">
           <textarea
+            ref={inputRef}
             className="post-quest-chat__input"
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Reply to Quest…"
+            placeholder="Reply to Quest posting agent…"
             disabled={agentTyping}
             autoFocus
             rows={1}
@@ -84,7 +100,7 @@ export default function QuestChat({ messages, agentTyping, onSend }: Props) {
           </button>
         </div>
         <p className="post-quest-chat__disclaimer">
-          Quest can make mistakes. Check important details.
+          Agents can make mistakes. Check important details.
         </p>
       </form>
     </div>

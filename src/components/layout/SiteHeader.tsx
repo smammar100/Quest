@@ -20,7 +20,7 @@ export default function SiteHeader() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
-  const { isAuthenticated, signOut } = useAuth();
+  const { isAuthenticated, loading, signOut } = useAuth();
   const megaRef = useRef<HTMLLIElement>(null);
   const browseHref = isAuthenticated ? "/browse-quest/list" : "/browse-quest";
   const hireHref = isAuthenticated ? "/post-quest" : "/signup";
@@ -93,6 +93,24 @@ export default function SiteHeader() {
     } finally {
       setSigningOut(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="header-wrapper">
+        <header>
+          <Link href="/" className="quest-logo" aria-label="Quest">
+            <img
+              className="quest-logo__img"
+              src="/images/logos/Logo.svg"
+              alt="Quest"
+              width={80}
+              height={30}
+            />
+          </Link>
+        </header>
+      </div>
+    );
   }
 
   return (
