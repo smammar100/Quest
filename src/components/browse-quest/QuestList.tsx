@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import {
   BROWSE_CATEGORIES,
@@ -77,6 +78,14 @@ const requestQuests = async ({
 
 export default function QuestList() {
   const { user, userProfile, profileLoaded, loading: authLoading } = useAuthContext();
+  const categoryRailRef = useRef<HTMLDivElement | null>(null);
+  const dragStateRef = useRef({
+    isDown: false,
+    isDragging: false,
+    startX: 0,
+    startScrollLeft: 0,
+    suppressNextClick: false,
+  });
   const [category, setCategory] = useState<BrowseCategory>('All');
   const [quests, setQuests] = useState<BrowseQuest[]>([]);
   const [resultCount, setResultCount] = useState<string | number>('0');
@@ -189,6 +198,59 @@ export default function QuestList() {
     return `${formatCount(resultCount)} quests in ${activeLabel}`;
   }, [category, resultCount]);
 
+  const handleCategoryRailMouseDown = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+
+    const rail = categoryRailRef.current;
+    if (!rail) return;
+
+    dragStateRef.current = {
+      isDown: true,
+      isDragging: false,
+      startX: event.clientX,
+      startScrollLeft: rail.scrollLeft,
+      suppressNextClick: false,
+    };
+
+    rail.classList.add(s.dragging);
+  }, []);
+
+  const handleCategoryRailMouseMove = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
+    const rail = categoryRailRef.current;
+    const dragState = dragStateRef.current;
+
+    if (!rail || !dragState.isDown) return;
+
+    const deltaX = event.clientX - dragState.startX;
+
+    if (!dragState.isDragging && Math.abs(deltaX) < 8) return;
+
+    dragState.isDragging = true;
+    event.preventDefault();
+    rail.scrollLeft = dragState.startScrollLeft - deltaX;
+  }, []);
+
+  const endCategoryRailDrag = useCallback(() => {
+    const rail = categoryRailRef.current;
+    const dragState = dragStateRef.current;
+
+    if (rail) {
+      rail.classList.remove(s.dragging);
+    }
+
+    if (!dragState.isDown) return;
+
+    if (dragState.isDragging) {
+      dragState.suppressNextClick = true;
+      window.setTimeout(() => {
+        dragState.suppressNextClick = false;
+      }, 0);
+    }
+
+    dragState.isDown = false;
+    dragState.isDragging = false;
+  }, []);
+
   return (
     <section className={s.pageWrap}>
       <div className={s.hero}>
@@ -197,7 +259,16 @@ export default function QuestList() {
         <p className={s.sub}>{subtitle}</p>
       </div>
 
-      <div className={s.categoryRail} role="tablist" aria-label="Quest categories">
+      <div
+        ref={categoryRailRef}
+        className={s.categoryRail}
+        role="tablist"
+        aria-label="Quest categories"
+        onMouseDown={handleCategoryRailMouseDown}
+        onMouseMove={handleCategoryRailMouseMove}
+        onMouseUp={endCategoryRailDrag}
+        onMouseLeave={endCategoryRailDrag}
+      >
         {BROWSE_CATEGORIES.map((item) => {
           const selected = item === category;
           return (
@@ -208,6 +279,7 @@ export default function QuestList() {
               aria-selected={selected}
               className={`${s.categoryChip}${selected ? ` ${s.active}` : ''}`}
               onClick={() => {
+                if (dragStateRef.current.suppressNextClick) return;
                 if (item === category) return;
                 setLoading(true);
                 setError(null);
