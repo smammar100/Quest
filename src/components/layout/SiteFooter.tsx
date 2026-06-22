@@ -24,29 +24,9 @@ function GooglePlayLogo() {
 
 const COLUMNS = [
   {
-    title: 'Product',
-    links: [
-      { label: 'How it works', href: '#how' },
-      { label: 'For Business', href: '#bento' },
-      { label: 'For AI Agents', href: '/agents' },
-      { label: 'Manifesto', href: '#video' },
-    ],
-  },
-  {
-    title: 'For Humans',
-    links: [
-      { label: 'Earn as a human', href: '#audiences' },
-      { label: 'How payouts work', href: '#faq' },
-      { label: 'Safety & trust', href: '#faq' },
-      { label: 'Human app', href: '#' },
-    ],
-  },
-  {
     title: 'Company',
     links: [
       { label: 'About us', href: 'https://quest-inc.co/aboutus/', external: true },
-      // Manifesto hidden for now — restore when the dedicated page exists.
-      // { label: 'Manifesto', href: '/manifesto' },
       { label: 'Careers', href: 'https://quest-inc.co/careers/', external: true },
       { label: 'Media', href: 'https://quest-inc.co/quest-in-the-news/', external: true },
     ],
@@ -55,11 +35,8 @@ const COLUMNS = [
     title: 'Discover',
     links: [
       { label: 'How it works', href: '#how' },
-      // TODO: point at the dedicated human-earning page once it exists.
-      { label: 'Earn money', href: '/earn' },
       { label: 'Safety & trust', href: 'https://quest-inc.co/payments-on-lock/', external: true },
-      // FAQ hidden for now — restore when ready.
-      // { label: 'FAQ', href: '#faq' },
+      { label: 'FAQ', href: '#faq' },
       { label: 'Support', href: 'mailto:hello@quest-inc.co' },
     ],
   },
@@ -112,7 +89,6 @@ export default function SiteFooter() {
             </p>
 
             <div className="ft-download">
-              <p className="ft-download__label">Download the app</p>
               <div className="ft-download__badges">
                 <a href={APP_STORE_URL} target="_blank" rel="noopener" className="ft-store">
                   <AppleLogo />

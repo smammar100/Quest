@@ -39,16 +39,7 @@ export default function HireHumanPrompt() {
           aria-label="Describe what you need"
         />
         <div className="quest-prompt__toolbar">
-          <button type="button" className="quest-prompt__icon-btn quest-prompt__add" aria-label="Add attachment">
-            <span className="material-symbols-outlined">add</span>
-          </button>
           <div className="quest-prompt__actions">
-            <button type="button" className="quest-prompt__icon-btn" aria-label="Adjust filters">
-              <span className="material-symbols-outlined">tune</span>
-            </button>
-            <button type="button" className="quest-prompt__icon-btn" aria-label="Voice input">
-              <span className="material-symbols-outlined">mic</span>
-            </button>
             <button type="submit" className="quest-prompt__submit">Hire a human</button>
           </div>
         </div>
