@@ -34,9 +34,9 @@ const COLUMNS = [
   {
     title: 'Discover',
     links: [
-      { label: 'How it works', href: '#how' },
+      // { label: 'How it works', href: '#how' },
       { label: 'Safety & trust', href: 'https://quest-inc.co/payments-on-lock/', external: true },
-      { label: 'FAQ', href: '#faq' },
+     // { label: 'FAQ', href: '#faq' },
       { label: 'Support', href: 'mailto:hello@quest-inc.co' },
     ],
   },
@@ -150,7 +150,7 @@ export default function SiteFooter() {
                 </li>
               ))}
             </ul>
-            <p className="ft-made">Designed with Love ❤️ by the Quest team</p>
+            <p className="ft-made">Designed with love ❤️ by the Quest team</p>
           </div>
         </div>
       </div>

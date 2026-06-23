@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 import {
   BROWSE_CATEGORIES,
@@ -78,6 +79,7 @@ const requestQuests = async ({
 
 export default function QuestList() {
   const { user, userProfile, profileLoaded, loading: authLoading } = useAuthContext();
+  const router = useRouter();
   const categoryRailRef = useRef<HTMLDivElement | null>(null);
   const dragStateRef = useRef({
     isDown: false,
@@ -86,6 +88,12 @@ export default function QuestList() {
     startScrollLeft: 0,
     suppressNextClick: false,
   });
+
+  useEffect(() => {
+    if (!authLoading && user === null) {
+      router.replace('/login');
+    }
+  }, [authLoading, user, router]);
   const [category, setCategory] = useState<BrowseCategory>('All');
   const [quests, setQuests] = useState<BrowseQuest[]>([]);
   const [resultCount, setResultCount] = useState<string | number>('0');

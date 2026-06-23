@@ -130,11 +130,6 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
         <div className="qh__banner" style={{ '--qh-img': `url(${heroImage})` } as CSSProperties}>
           <div className="qh__main">
             <div className="qh__content">
-              <div className="qh__crumbs">
-                <Link href="/browse-quest">Browse</Link>
-                <span aria-hidden="true">/</span>
-                <span aria-current="page">{cat.label}</span>
-              </div>
               <h1 className="qh__title">{heroHeading}</h1>
               <p className="qh__sub">{heroSubtext}</p>
             </div>
@@ -151,7 +146,7 @@ export default async function HireCategoryPage({ params }: { params: Params }) {
                 <li className="qh-card__item qh-card__item--more">… or anything else</li>
               </ul>
               <Link href="/post-quest" className="qh-card__cta">
-                Find a {low} expert near me
+                Hire a human for {low}
                 <span className="material-symbols-outlined">arrow_forward</span>
               </Link>
               <p className="qh-card__fine">It only takes 2 minutes. And it’s free.</p>

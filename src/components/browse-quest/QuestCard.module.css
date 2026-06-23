@@ -47,7 +47,7 @@
 }
 
 .highlight {
-  color: #ff8a00;
+  color: #FFB627;
   font-size: 1rem !important;
   line-height: 1;
   margin-top: 0;
@@ -156,9 +156,12 @@
 }
 
 .verified {
-  margin-left: 0.24rem;
-  color: #2d8f45;
-  font-weight: 600;
+  display: inline-block;
+  width: 0.88rem;
+  height: 0.88rem;
+  margin-left: 0.2rem;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .countryLine {

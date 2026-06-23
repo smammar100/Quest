@@ -222,7 +222,12 @@ export default function QuestCard({ quest, userCountryCode }: Props) {
             <p className={s.posterLine}>
               <span>{postedDiff(quest.datePosted)} by </span>
               <span className={s.posterName}>{name}</span>
-              {verified ? <span className={s.verified}>verified</span> : null}
+              {verified ? (
+                <svg className={s.verified} viewBox="0 0 24 24" aria-label="Verified" role="img">
+                  <circle cx="12" cy="12" r="12" fill="#1D9BF0" />
+                  <path d="M6.5 12.5l3.5 3.5 7.5-7.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : null}
             </p>
             {isGlobalQuest && posterCountryName ? (
               <p className={s.countryLine}>

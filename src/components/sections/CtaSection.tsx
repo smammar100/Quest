@@ -8,8 +8,21 @@ const TRUST_AVATARS = [
 import DownloadAppModal from '@/components/layout/DownloadAppModal';
 
 // `appModal`: on hero category pages the CTA opens the app-download QR modal
-// instead of linking to signup.
-export default function CtaSection({ appModal }: { appModal?: boolean }) {
+// instead of linking to signup. Content defaults to the homepage copy; pass
+// title/sub/ctaText/ctaHref to reuse this section elsewhere (e.g. /business).
+export default function CtaSection({
+  appModal,
+  title = 'Creating the next million jobs uniquely human',
+  sub = 'Describe a quest in a sentence. A trusted human gets it done.',
+  ctaText = 'Hire a human',
+  ctaHref = '/signup',
+}: {
+  appModal?: boolean;
+  title?: string;
+  sub?: string;
+  ctaText?: string;
+  ctaHref?: string;
+}) {
   return (
     <section id="cta">
       <div className="ft-cta">
@@ -22,12 +35,12 @@ export default function CtaSection({ appModal }: { appModal?: boolean }) {
             </div>
             <p className="ft-trust__text">Trusted by <strong>750k+</strong> humans</p>
           </div>
-          <h2 className="ft-cta__title">Creating the next million jobs uniquely human</h2>
-          <p className="ft-cta__sub">Describe a quest in a sentence. A trusted human gets it done.</p>
+          <h2 className="ft-cta__title">{title}</h2>
+          <p className="ft-cta__sub">{sub}</p>
           {appModal ? (
             <DownloadAppModal className="ft-cta-btn ft-cta-btn--primary">Get the app</DownloadAppModal>
           ) : (
-            <a href="/signup" className="ft-cta-btn ft-cta-btn--primary">Hire a human</a>
+            <a href={ctaHref} className="ft-cta-btn ft-cta-btn--primary">{ctaText}</a>
           )}
         </div>
       </div>

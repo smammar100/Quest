@@ -77,7 +77,8 @@ export default function ScrollFX() {
       // The headline (.quest-hero__title) is intentionally NOT animated so the
       // rough-notation highlight on .rn-mark keeps a stable box.
       const heroBits = gsap.utils.toArray<HTMLElement>(
-        ".quest-hero__eyebrow, .quest-hero__subtitle, .quest-prompt, .quest-suggest"
+        ".quest-hero__eyebrow, .quest-hero__subtitle, .quest-prompt, .quest-suggest, " +
+          ".biz-hero__title, .biz-hero__body, .biz-hero__ctas, .biz-hero__partners, .biz-hero__media"
       );
       if (heroBits.length) {
         gsap.set(heroBits, { opacity: 0, y: 20 });
@@ -110,7 +111,9 @@ export default function ScrollFX() {
         ".faq-title, .faq-lede",
         ".faq-item",
         ".ft-cta",
-        ".ft-top, .ft-bottom",
+        /* footer is NOT scroll-revealed — on short pages it sits at the very
+           bottom and never crosses the trigger line, which would leave it
+           stuck at opacity 0 (empty band where the copyright/socials sit) */
         // /quests pages (selectors no-op on the homepage)
         ".qp-hero__title, .qp-hero__proof, .qp-hero__cta",
         ".qp-sample-head",
@@ -118,6 +121,15 @@ export default function ScrollFX() {
         ".qp-seo__intro, .qp-seo__block",
         ".qp-related__col",
         ".qx-card",
+        // /business page (selectors no-op elsewhere). Hero is driven by the
+        // mount-based load-in above, not these scroll reveals.
+        ".biz-head",
+        ".biz-case",
+        ".biz-why__head, .biz-why__col",
+        ".biz-fg__head, .biz-fg2",
+        ".biz-step",
+        ".cz-trust__title, .cz-trust__item",
+        ".biz-final__title, .biz-final__sub, .biz-final__ctas",
       ].forEach(revealUp);
 
       // Recalc positions after client sections / fonts / images settle.
