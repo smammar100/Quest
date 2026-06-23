@@ -28,30 +28,63 @@ export async function GET(request: Request) {
     userID,
   });
 
-  const upstreamURL = `${backendURL}/quest/view-quest/?${upstreamParams.toString()}`;
+  const detailsURL = `${backendURL}/quest/view-quest/?${upstreamParams.toString()}`;
+  const proposalCountURL = `${backendURL}/proposal/count-by-quest?${new URLSearchParams({ questID }).toString()}`;
 
   try {
-    const response = await fetch(upstreamURL, {
-      method: 'GET',
-      cache: 'no-store',
-      signal: AbortSignal.timeout(15000),
-      headers: {
-        Accept: 'application/json',
-      },
-    });
+    const [detailsResponse, proposalCountResponse] = await Promise.all([
+      fetch(detailsURL, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(15000),
+        headers: {
+          Accept: 'application/json',
+        },
+      }),
+      fetch(proposalCountURL, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(15000),
+        headers: {
+          Accept: 'application/json',
+        },
+      }),
+    ]);
 
-    if (!response.ok) {
+    if (!detailsResponse.ok) {
       return NextResponse.json(
         {
           error: 'Quest details upstream error',
-          status: response.status,
+          status: detailsResponse.status,
         },
         { status: 502 }
       );
     }
 
-    const data: unknown = await response.json();
-    return NextResponse.json(data, { status: 200 });
+    if (!proposalCountResponse.ok) {
+      return NextResponse.json(
+        {
+          error: 'Quest proposal count upstream error',
+          status: proposalCountResponse.status,
+        },
+        { status: 502 }
+      );
+    }
+
+    const [detailsData, proposalCountData] = (await Promise.all([
+      detailsResponse.json(),
+      proposalCountResponse.json(),
+    ])) as [unknown, { count?: string | number }];
+
+    const parsedCount = Number(proposalCountData.count);
+
+    return NextResponse.json(
+      {
+        quest: detailsData,
+        offersReceived: Number.isFinite(parsedCount) ? parsedCount : 0,
+      },
+      { status: 200 }
+    );
   } catch {
     return NextResponse.json(
       {

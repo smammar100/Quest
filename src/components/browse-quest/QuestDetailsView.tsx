@@ -199,12 +199,19 @@ const requestQuestDetails = async (questID: string, userID: string) => {
     throw new Error('Could not load quest details right now.');
   }
 
-  const payload = (await response.json()) as QuestDetailsApiResponse;
-  if (!Array.isArray(payload) || payload.length === 0) {
-    return null;
+  const payload = (await response.json()) as {
+    quest?: QuestDetailsApiResponse;
+    offersReceived?: string | number;
+  };
+
+  if (!Array.isArray(payload.quest) || payload.quest.length === 0) {
+    return { quest: null, offersReceived: 0 };
   }
 
-  return payload[0];
+  return {
+    quest: payload.quest[0],
+    offersReceived: parseNumber(payload.offersReceived) ?? 0,
+  };
 };
 
 type Props = {
@@ -214,6 +221,7 @@ type Props = {
 export default function QuestDetailsView({ questID }: Props) {
   const { user, userProfile, profileLoaded, loading: authLoading } = useAuthContext();
   const [quest, setQuest] = useState<QuestDetails | null>(null);
+  const [offersReceived, setOffersReceived] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -232,18 +240,19 @@ export default function QuestDetailsView({ questID }: Props) {
 
     try {
       const payload = await requestQuestDetails(questID, userID);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[QuestDetails] raw payload:', payload);
-      }
-      if (!payload) {
+
+      if (!payload.quest) {
         setQuest(null);
+        setOffersReceived(0);
         setError('This quest could not be found.');
         return;
       }
 
-      setQuest(payload);
+      setQuest(payload.quest);
+      setOffersReceived(payload.offersReceived);
     } catch (fetchError) {
       setQuest(null);
+      setOffersReceived(0);
       setError(fetchError instanceof Error ? fetchError.message : 'Something went wrong.');
     } finally {
       setLoading(false);
@@ -255,6 +264,7 @@ export default function QuestDetailsView({ questID }: Props) {
 
     if (!user) {
       setQuest(null);
+      setOffersReceived(0);
       setLoading(false);
       setError('Your session has expired. Please sign in again.');
       return;
@@ -321,7 +331,6 @@ export default function QuestDetailsView({ questID }: Props) {
     const endLocationValue = readEndLocationValue(quest);
     const endLocationMapUrl = readEndLocationMapUrl(quest);
     const completionDate = readCompletionDate(quest);
-    const offersReceived = parseNumber(quest.proposalsCount) ?? 0;
 
     const images = Array.isArray(quest.jobImgURL)
       ? quest.jobImgURL
@@ -362,7 +371,7 @@ export default function QuestDetailsView({ questID }: Props) {
       endingCountry,
       images,
     };
-  }, [countryCode, quest]);
+  }, [countryCode, offersReceived, quest]);
 
   if (shouldWaitForAuth || loading) {
     return (
