@@ -61,28 +61,23 @@ export async function GET(request: Request) {
       );
     }
 
-    if (!proposalCountResponse.ok) {
-      return NextResponse.json(
-        {
-          error: 'Quest proposal count upstream error',
-          status: proposalCountResponse.status,
-        },
-        { status: 502 }
-      );
+    const detailsData: unknown = await detailsResponse.json();
+
+    let offersReceived = 0;
+    if (proposalCountResponse.ok) {
+      try {
+        const proposalCountData = (await proposalCountResponse.json()) as {
+          count?: string | number;
+        };
+        const parsedCount = Number(proposalCountData.count);
+        if (Number.isFinite(parsedCount)) offersReceived = parsedCount;
+      } catch {
+        // keep 0
+      }
     }
 
-    const [detailsData, proposalCountData] = (await Promise.all([
-      detailsResponse.json(),
-      proposalCountResponse.json(),
-    ])) as [unknown, { count?: string | number }];
-
-    const parsedCount = Number(proposalCountData.count);
-
     return NextResponse.json(
-      {
-        quest: detailsData,
-        offersReceived: Number.isFinite(parsedCount) ? parsedCount : 0,
-      },
+      { quest: detailsData, offersReceived },
       { status: 200 }
     );
   } catch {
