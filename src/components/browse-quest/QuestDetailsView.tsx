@@ -305,16 +305,11 @@ export default function QuestDetailsView({ questID }: Props) {
     const isPerHour = rawRecurrence.includes('hour');
     const isOneTime = !rawRecurrence || rawRecurrence.includes('one') || rawRecurrence.includes('fixed');
 
-    // If per-hour, price is the hourly rate; derive total from rate × hours
+    // price is the total budget; for per-hour quests derive the hourly rate from price ÷ hours
     let displayPrice = formattedPrice;
     let hourlyRate: string | null = null;
-    if (isPerHour) {
-      if (durationHours != null) {
-        displayPrice = formatMoney(symbol, price * durationHours);
-        hourlyRate = formattedPrice;
-      } else {
-        hourlyRate = formattedPrice;
-      }
+    if (isPerHour && durationHours != null && durationHours > 0) {
+      hourlyRate = formatMoney(symbol, price / durationHours);
     }
     const recurrence = !isPerHour && !isOneTime ? quest.payment_recurrence?.trim() || null : null;
 
