@@ -8,7 +8,9 @@ import {
   resolveSupportedCountryCode,
 } from '@/lib/constants/country-pricing';
 import type { QuestDetails, QuestDetailsApiResponse } from '@/lib/models/quest-details';
+import DownloadAppModal from '@/components/layout/DownloadAppModal';
 import LoadingState from './LoadingState';
+import QuestCard from './QuestCard';
 import s from './QuestDetailsView.module.css';
 
 const DEFAULT_USER_ID = process.env.NEXT_PUBLIC_QUEST_BROWSE_USER_ID ?? 'web_guest';
@@ -131,26 +133,28 @@ const readLocationMapUrl = (quest: QuestDetails) => {
 };
 
 const readLocationValue = (quest: QuestDetails) => {
-  if (isOnlineQuest(quest)) {
-    return 'Online';
+  if (isOnlineQuest(quest)) return 'Online';
+  return (
+    quest.starting_location?.primaryText ||
+    quest.address?.trim() ||
+    'No location provided'
+  );
+};
+
+const readEndLocationValue = (quest: QuestDetails) => {
+  if (isOnlineQuest(quest)) return null;
+  return quest.ending_location?.primaryText?.trim() || null;
+};
+
+const readEndLocationMapUrl = (quest: QuestDetails) => {
+  const text = quest.ending_location?.primaryText?.trim();
+  if (!text) return null;
+  const lat = parseNumber(quest.ending_location?.lat);
+  const lng = parseNumber(quest.ending_location?.lng);
+  if (lat != null && lng != null) {
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   }
-
-  const start = quest.starting_location?.primaryText;
-  const end = quest.ending_location?.primaryText;
-
-  if (start && end) {
-    return `${start} -> ${end}`;
-  }
-
-  if (start) {
-    return start;
-  }
-
-  if (quest.address?.trim()) {
-    return quest.address.trim();
-  }
-
-  return 'No location provided';
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(text)}`;
 };
 
 const readHeroesRequired = (quest: QuestDetails) => {
@@ -168,6 +172,10 @@ const readQuestStatus = (status?: string) => {
 
   if (normalized.includes('delete') || normalized === 'restricted') {
     return 'Removed';
+  }
+
+  if (normalized === 'pending') {
+    return 'Open';
   }
 
   if (normalized === 'accepted' || normalized === 'completed') {
@@ -208,6 +216,8 @@ export default function QuestDetailsView({ questID }: Props) {
   const [quest, setQuest] = useState<QuestDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   const shouldWaitForAuth = authLoading || (user !== null && !profileLoaded);
 
@@ -222,6 +232,9 @@ export default function QuestDetailsView({ questID }: Props) {
 
     try {
       const payload = await requestQuestDetails(questID, userID);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[QuestDetails] raw payload:', payload);
+      }
       if (!payload) {
         setQuest(null);
         setError('This quest could not be found.');
@@ -250,6 +263,15 @@ export default function QuestDetailsView({ questID }: Props) {
     void loadQuestDetails();
   }, [loadQuestDetails, shouldWaitForAuth, user]);
 
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setLightboxOpen(false); setZoom(1); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxOpen]);
+
   const viewModel = useMemo(() => {
     if (!quest) return null;
 
@@ -276,16 +298,34 @@ export default function QuestDetailsView({ questID }: Props) {
     const price = parseNumber(quest.price) ?? 0;
     const formattedPrice = formatMoney(symbol, price);
 
-    const additional = parseNumber(quest.additional_purchases_price) ?? 0;
-    const recurrence = quest.payment_recurrence?.trim() || null;
+    const additional = (parseNumber(quest.additional_purchases_price) ?? 0) / 100;
+    const durationHours = parseNumber(quest.number_of_hours);
+
+    const rawRecurrence = quest.payment_recurrence?.trim().toLowerCase() ?? '';
+    const isPerHour = rawRecurrence.includes('hour');
+    const isOneTime = !rawRecurrence || rawRecurrence.includes('one') || rawRecurrence.includes('fixed');
+
+    // If per-hour, price is the hourly rate; derive total from rate × hours
+    let displayPrice = formattedPrice;
+    let hourlyRate: string | null = null;
+    if (isPerHour) {
+      if (durationHours != null) {
+        displayPrice = formatMoney(symbol, price * durationHours);
+        hourlyRate = formattedPrice;
+      } else {
+        hourlyRate = formattedPrice;
+      }
+    }
+    const recurrence = !isPerHour && !isOneTime ? quest.payment_recurrence?.trim() || null : null;
 
     const startingCountry = readCountryName(quest.starting_country);
     const endingCountry = readCountryName(quest.ending_country);
 
     const locationValue = readLocationValue(quest);
     const locationMapUrl = readLocationMapUrl(quest);
+    const endLocationValue = readEndLocationValue(quest);
+    const endLocationMapUrl = readEndLocationMapUrl(quest);
     const completionDate = readCompletionDate(quest);
-    const durationHours = parseNumber(quest.number_of_hours);
     const offersReceived = parseNumber(quest.proposalsCount) ?? 0;
 
     const images = Array.isArray(quest.jobImgURL)
@@ -305,18 +345,22 @@ export default function QuestDetailsView({ questID }: Props) {
       reviewCount,
       ratingValue,
       avatar: quest.image,
-      formattedPrice,
+      displayPrice,
+      hourlyRate,
       symbol,
       recurrence,
       additional,
       negotiable: Boolean(quest.price_negotiable),
       locationValue,
       locationMapUrl,
+      endLocationValue,
+      endLocationMapUrl,
       completionDate,
       durationHours,
       heroesRequired: readHeroesRequired(quest),
       offersReceived,
       urgent: Boolean(quest.urgent),
+      similarQuests: quest.similarQuests ?? [],
       timeRange: quest.time_range?.trim() || null,
       postingPersona: quest.posting_persona?.trim() || null,
       startingCountry,
@@ -361,8 +405,65 @@ export default function QuestDetailsView({ questID }: Props) {
 
       {!error && viewModel && (
         <>
+          {lightboxOpen && viewModel.images.length > 0 ? (
+            <div
+              className={s.lightboxBackdrop}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Quest image"
+              onClick={() => { setLightboxOpen(false); setZoom(1); }}
+            >
+              <div className={s.lightboxInner} onClick={(e) => e.stopPropagation()}>
+                <img
+                  className={s.lightboxImg}
+                  src={viewModel.images[0]}
+                  alt="Quest image"
+                  style={{ transform: `scale(${zoom})` }}
+                />
+              </div>
+              <div className={s.lightboxControls}>
+                <button
+                  type="button"
+                  className={s.lightboxBtn}
+                  aria-label="Zoom in"
+                  onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.min(z + 0.5, 4)); }}
+                >+</button>
+                <button
+                  type="button"
+                  className={s.lightboxBtn}
+                  aria-label="Zoom out"
+                  onClick={(e) => { e.stopPropagation(); setZoom((z) => Math.max(z - 0.5, 0.5)); }}
+                >−</button>
+                <button
+                  type="button"
+                  className={s.lightboxBtn}
+                  aria-label="Close"
+                  onClick={() => { setLightboxOpen(false); setZoom(1); }}
+                >✕</button>
+              </div>
+            </div>
+          ) : null}
+
           <article className={s.hero}>
-            <p className={s.eyebrow}>Quest Details</p>
+            {viewModel.images.length > 0 ? (
+              <div
+                className={s.cover}
+                role="button"
+                tabIndex={0}
+                aria-label="View full image"
+                onClick={() => setLightboxOpen(true)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLightboxOpen(true); }}
+              >
+                <img src={viewModel.images[0]} alt="Quest image" />
+              </div>
+            ) : null}
+
+            <div className={s.heroTop}>
+              <span className={`${s.status} ${s[`status${viewModel.status.replace(/\s/g, '')}`] ?? ''}`}>
+                {viewModel.status}
+              </span>
+              {viewModel.urgent ? <span className={s.urgent}>Urgent</span> : null}
+            </div>
 
             <div className={s.titleRow}>
               <div className={s.titleWrap}>
@@ -373,20 +474,7 @@ export default function QuestDetailsView({ questID }: Props) {
                 ) : null}
                 <h1 className={s.title}>{viewModel.title}</h1>
               </div>
-              <span className={s.status}>{viewModel.status}</span>
             </div>
-
-            <div className={s.priceRow}>
-              <p className={s.price}>{viewModel.formattedPrice}</p>
-              {viewModel.recurrence ? <p className={s.recurring}>{viewModel.recurrence}</p> : null}
-              {viewModel.negotiable ? <p className={s.negotiable}>Negotiable</p> : null}
-            </div>
-
-            {viewModel.additional > 0 ? (
-              <p className={s.additional}>
-                Additional purchase required: {formatMoney(viewModel.symbol, viewModel.additional)}
-              </p>
-            ) : null}
 
             <div className={s.posterRow}>
               <div className={s.posterMain}>
@@ -401,138 +489,159 @@ export default function QuestDetailsView({ questID }: Props) {
                 <div>
                   <p className={s.posterLabel}>Posted by</p>
                   <p className={s.posterName}>{viewModel.name}</p>
-                  <p className={s.posterMeta}>
-                    {viewModel.reviewCount > 0 && viewModel.ratingValue
-                      ? `${viewModel.ratingValue} stars (${viewModel.reviewCount} reviews)`
-                      : 'No reviews yet'}
-                  </p>
+                  {viewModel.reviewCount > 0 && viewModel.ratingValue ? (
+                    <p className={s.posterMeta}>
+                      <span className={s.starIcon}>★</span> {viewModel.ratingValue} ({viewModel.reviewCount} reviews)
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
-              <div>
-                {viewModel.postedDate ? <p className={s.postedAt}>Posted {viewModel.postedDate}</p> : null}
-                {viewModel.urgent ? <span className={s.urgent}>Urgent</span> : null}
-              </div>
+              {viewModel.postedDate ? (
+                <p className={s.postedAt}>Posted {viewModel.postedDate}</p>
+              ) : null}
             </div>
-
-            {viewModel.images.length > 0 ? (
-              <div className={s.cover}>
-                <img src={viewModel.images[0]} alt="Quest image" />
-              </div>
-            ) : null}
           </article>
 
+          <div className={s.priceCard}>
+            <p className={s.priceCardLabel}>Budget</p>
+            <p className={s.priceCardAmount}>
+              {viewModel.displayPrice}
+              {viewModel.hourlyRate ? (
+                <span className={s.priceCardHourly}> ({viewModel.hourlyRate}/hr)</span>
+              ) : null}
+            </p>
+            {viewModel.recurrence ? (
+              <div className={s.priceCardMeta}>
+                <span>{viewModel.recurrence}</span>
+              </div>
+            ) : null}
+            {viewModel.negotiable ? (
+              <span className={s.negotiableBadge}>Negotiable</span>
+            ) : null}
+            <DownloadAppModal>
+              <button type="button" className={s.offerBtn}>Make an offer</button>
+            </DownloadAppModal>
+            <p className={s.offersNote}>
+              {viewModel.offersReceived === 0
+                ? 'Be the first to make an offer'
+                : `${viewModel.offersReceived} ${viewModel.offersReceived === 1 ? 'offer' : 'offers'} received so far`}
+            </p>
+          </div>
+
           <div className={s.grid}>
+            {/* Location */}
             <article className={s.block}>
               <p className={s.blockLabelRow}>
-                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                  location_on
-                </span>
-                <span className={s.blockLabel}>Location</span>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">location_on</span>
+                <span className={s.blockLabel}>{viewModel.endLocationValue ? 'Starting Location' : 'Location'}</span>
               </p>
-              {viewModel.locationMapUrl ? (
-                <a
-                  className={`${s.blockValue} ${s.locationLink}`}
-                  href={viewModel.locationMapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {viewModel.locationValue}
-                </a>
-              ) : (
+              <div className={s.blockValueRow}>
                 <p className={s.blockValue}>{viewModel.locationValue}</p>
-              )}
-              {viewModel.startingCountry || viewModel.endingCountry ? (
-                <p className={s.blockValue}>
-                  {viewModel.startingCountry ?? 'Unknown'}
-                  {viewModel.endingCountry ? ` -> ${viewModel.endingCountry}` : ''}
-                </p>
-              ) : null}
+                {viewModel.locationMapUrl ? (
+                  <a className={s.mapLink} href={viewModel.locationMapUrl} target="_blank" rel="noopener noreferrer">View map</a>
+                ) : null}
+              </div>
             </article>
 
+            {viewModel.endLocationValue ? (
+              <article className={s.block}>
+                <p className={s.blockLabelRow}>
+                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">location_on</span>
+                  <span className={s.blockLabel}>Ending Location</span>
+                </p>
+                <div className={s.blockValueRow}>
+                  <p className={s.blockValue}>{viewModel.endLocationValue}</p>
+                  {viewModel.endLocationMapUrl ? (
+                    <a className={s.mapLink} href={viewModel.endLocationMapUrl} target="_blank" rel="noopener noreferrer">View map</a>
+                  ) : null}
+                </div>
+              </article>
+            ) : null}
+
+            {/* Completion Date */}
             <article className={s.block}>
               <p className={s.blockLabelRow}>
-                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                  event
-                </span>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">event</span>
                 <span className={s.blockLabel}>Completion Date</span>
               </p>
               <p className={s.blockValue}>
-                {viewModel.completionDate}
-                {viewModel.timeRange ? ` (${viewModel.timeRange})` : ''}
+                {viewModel.completionDate}{viewModel.timeRange ? ` (${viewModel.timeRange})` : ''}
               </p>
             </article>
 
-            <article className={s.block}>
-              <p className={s.blockLabelRow}>
-                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                  schedule
-                </span>
-                <span className={s.blockLabel}>Duration</span>
-              </p>
-              <p className={s.blockValue}>
-                {viewModel.durationHours != null
-                  ? `${Number.isInteger(viewModel.durationHours) ? viewModel.durationHours : viewModel.durationHours.toFixed(1)} Hour(s)`
-                  : 'Not specified'}
-              </p>
-            </article>
-
-            <article className={s.block}>
-              <p className={s.blockLabelRow}>
-                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                  group
-                </span>
-                <span className={s.blockLabel}>Heroes Required</span>
-              </p>
-              <p className={s.blockValue}>{viewModel.heroesRequired}</p>
-            </article>
-
-            <article className={s.block}>
-              <p className={s.blockLabelRow}>
-                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                  local_offer
-                </span>
-                <span className={s.blockLabel}>Offers Received</span>
-              </p>
-              <p className={s.blockValue}>{viewModel.offersReceived}</p>
-            </article>
-
-            {viewModel.postingPersona ? (
+            {/* Duration */}
+            {viewModel.durationHours != null ? (
               <article className={s.block}>
                 <p className={s.blockLabelRow}>
-                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                    person
-                  </span>
-                  <span className={s.blockLabel}>Posting Persona</span>
+                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">schedule</span>
+                  <span className={s.blockLabel}>Duration</span>
                 </p>
-                <p className={s.blockValue}>{viewModel.postingPersona}</p>
+                <p className={s.blockValue}>
+                  {Number.isInteger(viewModel.durationHours) ? viewModel.durationHours : viewModel.durationHours.toFixed(1)}{' '}
+                  {viewModel.durationHours === 1 ? 'hour' : 'hours'}
+                </p>
               </article>
             ) : null}
-          </div>
 
-          <div className={s.detailsStack}>
+            {/* Additional Purchase */}
+            {viewModel.additional > 0 ? (
+              <article className={s.block}>
+                <p className={s.blockLabelRow}>
+                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">shopping_cart</span>
+                  <span className={s.blockLabel}>Additional Purchase</span>
+                </p>
+                <p className={s.blockValue}>
+                  Requires an additional purchase of {formatMoney(viewModel.symbol, viewModel.additional)}
+                </p>
+              </article>
+            ) : null}
+
+            {/* Description */}
             <article className={s.block}>
               <p className={s.blockLabelRow}>
-                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                  description
-                </span>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">description</span>
                 <span className={s.blockLabel}>Description</span>
               </p>
               <p className={`${s.blockValue} ${s.multilineValue}`}>{viewModel.description}</p>
             </article>
 
+            {/* Requirements */}
             {viewModel.requirements ? (
               <article className={s.block}>
                 <p className={s.blockLabelRow}>
-                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">
-                    checklist
-                  </span>
+                  <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">checklist</span>
                   <span className={s.blockLabel}>Requirements</span>
                 </p>
                 <p className={`${s.blockValue} ${s.multilineValue}`}>{viewModel.requirements}</p>
               </article>
             ) : null}
+
+            {/* Heroes Required */}
+            <article className={s.block}>
+              <p className={s.blockLabelRow}>
+                <span className={`material-symbols-outlined ${s.blockIcon}`} aria-hidden="true">group</span>
+                <span className={s.blockLabel}>Heroes Required</span>
+              </p>
+              <p className={s.blockValue}>{viewModel.heroesRequired}</p>
+            </article>
+
           </div>
+
+          {viewModel.similarQuests.length > 0 ? (
+            <div className={s.similarSection}>
+              <p className={s.similarLabel}>Similar Quests</p>
+              <div className={s.similarGrid}>
+                {viewModel.similarQuests.map((sq, i) => (
+                  <QuestCard
+                    key={sq.idQuests ?? `similar-${i}`}
+                    quest={sq}
+                    userCountryCode={countryCode}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </>
       )}
     </section>
