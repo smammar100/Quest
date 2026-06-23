@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { User } from "firebase/auth";
 import { useAuth } from "@/controllers/useAuth";
+import { handleAuthRedirectResult } from "@/lib/firebase/auth";
 import {
   SOURCE_PLATFORMS,
 } from "@/lib/data/dial-codes";
@@ -25,6 +27,45 @@ type PendingSignupProfile = {
   dateOfBirth: string;
   sourcePlatform?: string;
 };
+
+type PendingSocialSignup = {
+  provider: "google" | "apple";
+  countryCode: string;
+  dateOfBirth: string;
+  sourcePlatform?: string;
+};
+
+const PENDING_SOCIAL_SIGNUP_KEY = "quest.pending-social-signup";
+
+function readPendingSocialSignup(): PendingSocialSignup | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const value = window.sessionStorage.getItem(PENDING_SOCIAL_SIGNUP_KEY);
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(value) as PendingSocialSignup;
+  } catch {
+    return null;
+  }
+}
+
+function writePendingSocialSignup(pending: PendingSocialSignup | null) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (!pending) {
+    window.sessionStorage.removeItem(PENDING_SOCIAL_SIGNUP_KEY);
+    return;
+  }
+
+  window.sessionStorage.setItem(PENDING_SOCIAL_SIGNUP_KEY, JSON.stringify(pending));
+}
 
 export type AuthMode = "login" | "signup";
 export type AuthLayout = "centered" | "split" | "social";
@@ -123,6 +164,19 @@ function Field({
   placeholder?: string;
   autoComplete?: string;
 }) {
+  const inputProps: Record<string, string> = {};
+
+  if (type === "date" && id === "dob") {
+    const today = new Date();
+    const maxYear = today.getFullYear() - 16;
+    const maxDate = new Date(today);
+    maxDate.setFullYear(maxYear);
+    const yyyy = String(maxDate.getFullYear()).padStart(4, "0");
+    const mm = String(maxDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(maxDate.getDate()).padStart(2, "0");
+    inputProps.max = `${yyyy}-${mm}-${dd}`;
+  }
+
   return (
     <label className={s.field} htmlFor={id}>
       <span className={s.fieldLabel}>{label}</span>
@@ -133,6 +187,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        {...inputProps}
       />
     </label>
   );
@@ -185,7 +240,13 @@ function AuthForm({
   onSwitch,
   onSubmit,
   onGoogleSignIn,
+  onAppleSignIn,
+  onGoogleSignupStep2,
+  onAppleSignupStep2,
+  signupMethod,
+  onSignupMethodChange,
   errorMessage,
+  redirectStatus,
   busy,
   signupRestrictionMessage,
 }: {
@@ -193,9 +254,15 @@ function AuthForm({
   layout: AuthLayout;
   switchHref: string;
   onSwitch?: () => void;
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit?: (event: React.SyntheticEvent<HTMLFormElement>) => void;
   onGoogleSignIn?: () => void;
+  onAppleSignIn?: () => void;
+  onGoogleSignupStep2?: (event: React.SyntheticEvent<HTMLFormElement>) => void;
+  onAppleSignupStep2?: (event: React.SyntheticEvent<HTMLFormElement>) => void;
+  signupMethod?: SignupMethod | null;
+  onSignupMethodChange?: (method: SignupMethod | null, isStep2: boolean) => void;
   errorMessage?: string | null;
+  redirectStatus?: string | null;
   busy?: boolean;
   signupRestrictionMessage?: string | null;
 }) {
@@ -204,13 +271,18 @@ function AuthForm({
   const [agreed, setAgreed] = useState(false);
   // Signup-only: step 1 = choose method, step 2 = details for that method.
   const [step, setStep] = useState<1 | 2>(1);
-  const [method, setMethod] = useState<SignupMethod | null>(null);
+  const method = signupMethod; // Use prop instead of local state
   const stacked = layout === "social";
   const isSignup = mode === "signup";
 
   function chooseMethod(m: SignupMethod) {
-    setMethod(m);
+    onSignupMethodChange?.(m, true);
     setStep(2);
+  }
+
+  function goBackToStep1() {
+    onSignupMethodChange?.(null, false);
+    setStep(1);
   }
 
   const loginSocial = (
@@ -219,25 +291,19 @@ function AuthForm({
         <GoogleIcon />
         <span>{stacked ? "Continue with Google" : "Google"}</span>
       </button>
-      <button type="button" className={s.social} disabled={busy}>
+      <button
+        type="button"
+        className={s.social}
+        onClick={onAppleSignIn}
+        disabled={busy}
+      >
         <AppleIcon />
         <span>{stacked ? "Continue with Apple" : "Apple"}</span>
       </button>
     </div>
   );
 
-  const social = (
-    <div className={stacked ? s.socialStack : s.socialRow}>
-      <button type="button" className={s.social} onClick={onGoogleSignIn} disabled={busy}>
-        <GoogleIcon />
-        <span>{stacked ? "Continue with Google" : "Google"}</span>
-      </button>
-      <button type="button" className={s.social} disabled={busy}>
-        <AppleIcon />
-        <span>{stacked ? "Continue with Apple" : "Apple"}</span>
-      </button>
-    </div>
-  );
+
 
   const termsLabel = (
     <label className={s.agree} htmlFor="agree">
@@ -342,8 +408,7 @@ function AuthForm({
       type="button"
       className={s.backBtn}
       onClick={() => {
-        setStep(1);
-        setMethod(null);
+        goBackToStep1();
       }}
     >
       <span className="material-symbols-outlined" aria-hidden="true">
@@ -387,7 +452,18 @@ function AuthForm({
   );
 
   return (
-    <form className={s.form} onSubmit={onSubmit ?? ((e) => e.preventDefault())}>
+    <form
+      className={s.form}
+      onSubmit={(e) => {
+        if (isSignup && step === 2 && method === "google") {
+          onGoogleSignupStep2?.(e);
+        } else if (isSignup && step === 2 && method === "apple") {
+          onAppleSignupStep2?.(e);
+        } else {
+          onSubmit?.(e) ?? e.preventDefault();
+        }
+      }}
+    >
       {isSignup ? (
         step === 1 ? (
           signupStep1
@@ -413,6 +489,11 @@ function AuthForm({
       {errorMessage ? (
         <p className={s.error} role="alert" aria-live="polite">
           {errorMessage}
+        </p>
+      ) : null}
+      {redirectStatus ? (
+        <p className={s.warning} role="status" aria-live="polite">
+          {redirectStatus}
         </p>
       ) : null}
       <p className={s.switch}>
@@ -455,9 +536,11 @@ export default function AuthScreen({
     refreshVerificationStatus,
     sendVerificationEmail,
     signIn,
+    signInWithApple,
     signInWithGoogle,
     signOut,
     signUp,
+    user,
   } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -467,6 +550,8 @@ export default function AuthScreen({
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
   const [pendingSignupProfile, setPendingSignupProfile] = useState<PendingSignupProfile | null>(null);
   const [profilePersisted, setProfilePersisted] = useState(false);
+  const [signupMethod, setSignupMethod] = useState<SignupMethod | null>(null);
+  const [redirectStatus, setRedirectStatus] = useState<string | null>(null);
   const other: AuthMode = mode === "login" ? "signup" : "login";
   // default switch link stays within the prototype set; real /login + /signup
   // routes pass an explicit switchHref to point at each other.
@@ -488,11 +573,21 @@ export default function AuthScreen({
     if (code === "auth/too-many-requests") {
       return "Too many attempts. Please try again in a bit.";
     }
-    if (code === "auth/popup-closed-by-user") {
-      return "Google sign-in was cancelled.";
-    }
 
     return "Could not log in right now. Please try again.";
+  }
+
+  function mapSocialLoginError(error: unknown, providerName: string) {
+    if (!error || typeof error !== "object" || !("code" in error)) {
+      return `Could not sign in with ${providerName} right now. Please try again.`;
+    }
+
+    const code = String((error as { code?: unknown }).code ?? "");
+    if (code === "auth/popup-closed-by-user") {
+      return `${providerName} sign-in was cancelled.`;
+    }
+
+    return `Could not sign in with ${providerName} right now. Please try again.`;
   }
 
   function mapSignupError(error: unknown) {
@@ -534,6 +629,33 @@ export default function AuthScreen({
     }
   }
 
+  async function checkUserExistsInBackend(
+    userID: string
+  ): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `/api/auth/self?userID=${encodeURIComponent(userID)}`,
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
+
+      if (response.status === 204) {
+        return false;
+      }
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = (await response.json()) as { user: unknown };
+      return data.user !== null && data.user !== undefined;
+    } catch {
+      return false;
+    }
+  }
+
   useEffect(() => {
     if (mode !== "signup") {
       return;
@@ -567,6 +689,89 @@ export default function AuthScreen({
       cancelled = true;
     };
   }, [mode]);
+
+  useEffect(() => {
+    let active = true;
+
+    const finalizeSocialRedirect = async () => {
+      try {
+        const result = await handleAuthRedirectResult();
+        if (!active) {
+          return;
+        }
+
+        const redirectUser = result?.user ?? getCurrentUser();
+
+        if (!redirectUser) {
+          return;
+        }
+
+        setRedirectStatus(null);
+
+        const pendingSignup = readPendingSocialSignup();
+        writePendingSocialSignup(null);
+
+        if (!pendingSignup) {
+          router.replace(postLoginDestination);
+          return;
+        }
+
+        if (!redirectUser.email) {
+          setErrorMessage("We could not complete your sign-in because no email was returned.");
+          return;
+        }
+
+        const firstName = redirectUser.displayName?.split(" ")[0] ?? "";
+        const lastName = redirectUser.displayName?.split(" ").slice(1).join(" ") ?? "";
+        const profile: PendingSignupProfile = {
+          email: redirectUser.email,
+          firstName,
+          lastName,
+          countryCode: pendingSignup.countryCode,
+          dateOfBirth: pendingSignup.dateOfBirth,
+          sourcePlatform: pendingSignup.sourcePlatform,
+        };
+
+        setPendingSignupProfile(profile);
+        setProfilePersisted(false);
+
+        if (!redirectUser.emailVerified) {
+          await sendVerificationEmail(redirectUser);
+          setVerificationEmail(redirectUser.email);
+          setEmailVerified(false);
+          setVerificationMessage("We sent a verification link to your email.");
+          return;
+        }
+
+        await completeSignupProfile(redirectUser, profile);
+        setProfilePersisted(true);
+        setVerificationMessage(null);
+        router.replace(postLoginDestination);
+      } catch (error) {
+        if (!active) {
+          return;
+        }
+
+        const providerName = readPendingSocialSignup()?.provider === "apple" ? "Apple" : "Google";
+        setRedirectStatus(`The ${providerName} sign-in redirect failed.`);
+        setErrorMessage(mapSocialLoginError(error, providerName));
+      }
+    };
+
+    void finalizeSocialRedirect();
+
+    return () => {
+      active = false;
+    };
+  }, [completeSignupProfile, postLoginDestination, router, sendVerificationEmail]);
+
+  useEffect(() => {
+    if (mode !== "login" || !user) {
+      return;
+    }
+
+    router.replace(postLoginDestination);
+  }, [mode, postLoginDestination, router, user]);
 
   useEffect(() => {
     if (!verificationEmail || emailVerified) {
@@ -693,7 +898,7 @@ export default function AuthScreen({
     }
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setErrorMessage(null);
@@ -745,6 +950,21 @@ export default function AuthScreen({
 
     if (!dateOfBirth) {
       setErrorMessage("Please enter your date of birth.");
+      return;
+    }
+
+    if (!isAtLeastAge(dateOfBirth, 16)) {
+      setErrorMessage("You must be at least 16 years old to sign up.");
+      return;
+    }
+
+    if (!isAtLeastAge(dateOfBirth, 16)) {
+      setErrorMessage("You must be at least 16 years old to sign up.");
+      return;
+    }
+
+    if (!isAtLeastAge(dateOfBirth, 16)) {
+      setErrorMessage("You must be at least 16 years old to sign up.");
       return;
     }
 
@@ -859,10 +1079,171 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      await signInWithGoogle();
-      router.push(postLoginDestination);
+      const credential = await signInWithGoogle();
+      if (credential?.user) {
+        router.replace(postLoginDestination);
+      }
     } catch (error) {
-      setErrorMessage(mapLoginError(error));
+      setErrorMessage(mapSocialLoginError(error, "Google"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleAppleSignIn() {
+    if (mode !== "login") {
+      return;
+    }
+
+    setErrorMessage(null);
+
+    try {
+      setBusy(true);
+      const credential = await signInWithApple();
+      if (credential?.user) {
+        router.replace(postLoginDestination);
+      }
+    } catch (error) {
+      setErrorMessage(mapSocialLoginError(error, "Apple"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function continueSocialSignup(
+    socialUser: User,
+    socialPending: PendingSocialSignup
+  ) {
+    if (!socialUser.email) {
+      setErrorMessage("We could not complete your sign-in because no email was returned.");
+      return;
+    }
+
+    const firstName = socialUser.displayName?.split(" ")[0] ?? "";
+    const lastName = socialUser.displayName?.split(" ").slice(1).join(" ") ?? "";
+    const profile: PendingSignupProfile = {
+      email: socialUser.email,
+      firstName,
+      lastName,
+      countryCode: socialPending.countryCode,
+      dateOfBirth: socialPending.dateOfBirth,
+      sourcePlatform: socialPending.sourcePlatform,
+    };
+
+    setPendingSignupProfile(profile);
+    setProfilePersisted(false);
+
+    if (!socialUser.emailVerified) {
+      await sendVerificationEmail(socialUser);
+      setVerificationEmail(socialUser.email);
+      setEmailVerified(false);
+      setVerificationMessage("We sent a verification link to your email.");
+      return;
+    }
+
+    await completeSignupProfile(socialUser, profile);
+    setProfilePersisted(true);
+    setVerificationMessage(null);
+    router.replace(postLoginDestination);
+  }
+
+  async function handleGoogleSignupStep2(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErrorMessage(null);
+
+    const formData = new FormData(event.currentTarget);
+    const dateOfBirth = String(formData.get("dob") ?? "").trim();
+    const sourcePlatform = String(formData.get("source") ?? "").trim();
+
+    if (!dateOfBirth) {
+      setErrorMessage("Please enter your date of birth.");
+      return;
+    }
+
+    const detection = await detectCountry();
+    if (!detection || !detection.detected) {
+      setErrorMessage(
+        "We could not verify your country yet. Please try again on a stable connection."
+      );
+      return;
+    }
+
+    if (!detection.supported) {
+      setErrorMessage(
+        detection.message ?? "Quest signup is not available in your country yet."
+      );
+      return;
+    }
+
+    try {
+      setBusy(true);
+      const socialPending: PendingSocialSignup = {
+        provider: "google",
+        countryCode: detection.countryCode,
+        dateOfBirth,
+        sourcePlatform: sourcePlatform || undefined,
+      };
+      const credential = await signInWithGoogle();
+
+      if (!credential?.user) {
+        writePendingSocialSignup(socialPending);
+        return;
+      }
+
+      await continueSocialSignup(credential.user, socialPending);
+    } catch (error) {
+      setErrorMessage(mapSignupError(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleAppleSignupStep2(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErrorMessage(null);
+
+    const formData = new FormData(event.currentTarget);
+    const dateOfBirth = String(formData.get("dob") ?? "").trim();
+    const sourcePlatform = String(formData.get("source") ?? "").trim();
+
+    if (!dateOfBirth) {
+      setErrorMessage("Please enter your date of birth.");
+      return;
+    }
+
+    const detection = await detectCountry();
+    if (!detection || !detection.detected) {
+      setErrorMessage(
+        "We could not verify your country yet. Please try again on a stable connection."
+      );
+      return;
+    }
+
+    if (!detection.supported) {
+      setErrorMessage(
+        detection.message ?? "Quest signup is not available in your country yet."
+      );
+      return;
+    }
+
+    try {
+      setBusy(true);
+      const socialPending: PendingSocialSignup = {
+        provider: "apple",
+        countryCode: detection.countryCode,
+        dateOfBirth,
+        sourcePlatform: sourcePlatform || undefined,
+      };
+      const credential = await signInWithApple();
+
+      if (!credential?.user) {
+        writePendingSocialSignup(socialPending);
+        return;
+      }
+
+      await continueSocialSignup(credential.user, socialPending);
+    } catch (error) {
+      setErrorMessage(mapSignupError(error));
     } finally {
       setBusy(false);
     }
@@ -911,7 +1292,13 @@ export default function AuthScreen({
                 onSwitch={onSwitch}
                 onSubmit={handleSubmit}
                 onGoogleSignIn={handleGoogleSignIn}
+                onAppleSignIn={handleAppleSignIn}
+                onGoogleSignupStep2={handleGoogleSignupStep2}
+                onAppleSignupStep2={handleAppleSignupStep2}
+                signupMethod={signupMethod}
+                onSignupMethodChange={(m) => setSignupMethod(m)}
                 errorMessage={errorMessage}
+                redirectStatus={redirectStatus}
                 busy={busy}
                 signupRestrictionMessage={signupRestrictionMessage}
               />
@@ -941,7 +1328,13 @@ export default function AuthScreen({
             onSwitch={onSwitch}
             onSubmit={handleSubmit}
             onGoogleSignIn={handleGoogleSignIn}
+            onAppleSignIn={handleAppleSignIn}
+            onGoogleSignupStep2={handleGoogleSignupStep2}
+            onAppleSignupStep2={handleAppleSignupStep2}
+            signupMethod={signupMethod}
+            onSignupMethodChange={(m) => setSignupMethod(m)}
             errorMessage={errorMessage}
+            redirectStatus={redirectStatus}
             busy={busy}
             signupRestrictionMessage={signupRestrictionMessage}
           />
@@ -949,4 +1342,15 @@ export default function AuthScreen({
       </section>
     </main>
   );
+}
+
+function isAtLeastAge(dobValue: string, minAge = 16) {
+  if (!dobValue) return false;
+  const d = new Date(dobValue);
+  if (Number.isNaN(d.getTime())) return false;
+  const today = new Date();
+  let age = today.getFullYear() - d.getFullYear();
+  const m = today.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+  return age >= minAge;
 }
