@@ -79,7 +79,19 @@
   gap: 0.45rem;
   overflow-x: auto;
   padding-bottom: 0.35rem;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
+.categoryRail:active {
+  cursor: grabbing;
 }
 
 .categoryRail::-webkit-scrollbar {

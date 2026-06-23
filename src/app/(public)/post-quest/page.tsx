@@ -4,7 +4,7 @@ import PostQuestPageContent from '@/components/post-quest/PostQuestPageContent';
 
 export default function PostQuestPage() {
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <PostQuestPageContent />
     </Suspense>
   );

@@ -8,6 +8,7 @@ import {
   logOut,
   refreshUserVerificationStatus,
   sendSignupVerificationEmail,
+  signInApple,
   signInEmail,
   signInGoogle,
   signUpEmail,
@@ -33,6 +34,7 @@ export function useAuth() {
     getCurrentUser: getCurrentAuthUser,
     deleteCurrentUser: deleteCurrentAuthUser,
     signInWithGoogle: signInGoogle,
+    signInWithApple: signInApple,
     signOut: logOut,
   };
 }

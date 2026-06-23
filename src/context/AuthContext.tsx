@@ -3,7 +3,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { UserProfile } from '@/lib/models/user';
-import { auth } from '@/lib/firebase/auth';
+import { auth, handleAuthRedirectResult } from '@/lib/firebase/auth';
 import { getUserProfileByUid } from '@/lib/firebase/firestore';
 
 type BackendSelfUserPayload = {
@@ -11,6 +11,22 @@ type BackendSelfUserPayload = {
     countryCode?: unknown;
     country_code?: unknown;
   } | null;
+};
+
+const AUTH_COOKIE_NAME = 'quest_auth';
+const backendCountryCodeRequestCache = new Map<string, Promise<string | undefined>>();
+
+const setAuthCookie = (isAuthenticated: boolean) => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  if (isAuthenticated) {
+    document.cookie = `${AUTH_COOKIE_NAME}=1; Path=/; Max-Age=2592000; SameSite=Lax`;
+    return;
+  }
+
+  document.cookie = `${AUTH_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`;
 };
 
 const normalizeCountryCode = (value: unknown): string | undefined => {
@@ -23,21 +39,29 @@ const normalizeCountryCode = (value: unknown): string | undefined => {
 };
 
 const getBackendCountryCodeByUid = async (uid: string): Promise<string | undefined> => {
-  const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`, {
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    return undefined;
+  const cachedRequest = backendCountryCodeRequestCache.get(uid);
+  if (cachedRequest) {
+    return cachedRequest;
   }
 
-  const payload = (await response.json()) as BackendSelfUserPayload;
-  const backendUser = payload.user;
+  const request = (async () => {
+    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`);
 
-  return (
-    normalizeCountryCode(backendUser?.country_code) ??
-    normalizeCountryCode(backendUser?.countryCode)
-  );
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const payload = (await response.json()) as BackendSelfUserPayload;
+    const backendUser = payload.user;
+
+    return (
+      normalizeCountryCode(backendUser?.country_code) ??
+      normalizeCountryCode(backendUser?.countryCode)
+    );
+  })();
+
+  backendCountryCodeRequestCache.set(uid, request);
+  return request;
 };
 
 export type AuthUser = {
@@ -69,16 +93,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    void (async () => {
+      try {
+        const result = await handleAuthRedirectResult();
+        console.info('[auth] redirect result', {
+          hasUser: Boolean(result?.user),
+          providerId: result?.providerId ?? null,
+          operationType: result?.operationType ?? null,
+        });
+      } catch (error) {
+        console.error('[auth] redirect result error', error);
+      }
+    })();
+
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!mounted) return;
 
       if (!firebaseUser) {
+        setAuthCookie(false);
         setUser(null);
         setUserProfile(null);
         setProfileLoaded(true);
         setLoading(false);
         return;
       }
+
+      setAuthCookie(true);
 
       setUser({
         uid: firebaseUser.uid,

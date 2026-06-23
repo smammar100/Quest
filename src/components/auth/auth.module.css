@@ -526,6 +526,8 @@
 .verifyTitle {
   margin: 0;
   text-align: center;
+  width: 100%;
+  max-width: none;
   font-family: var(--q-display);
   font-size: clamp(1.4rem, 2.3vw, 1.8rem);
   line-height: 1.15;

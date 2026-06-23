@@ -9,6 +9,7 @@ import SocialProof from '../../components/sections/SocialProof';
 import FaqSection from '../../components/sections/FaqSection';
 import CtaSection from '../../components/sections/CtaSection';
 import SiteFooter from '../../components/layout/SiteFooter';
+import HomeAuthRedirectGate from '../../components/auth/HomeAuthRedirectGate';
 
 // #bento use-case tiles — colour-blocked across the full Quest palette.
 // `img` paths for the 5 new cards 404 silently (CSS background-image) and fall
@@ -27,6 +28,8 @@ const useCases = [
 export default function Home() {
   return (
     <>
+      <HomeAuthRedirectGate />
+
       <SiteHeader />
 
       <section id="welcome" className="center">

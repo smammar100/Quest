@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { BrowseQuest } from '@/lib/models/browse-quest';
 import {
   resolveCurrencySymbolForCountry,
@@ -143,6 +144,7 @@ const isFullyVerified = (quest: BrowseQuest) => {
 };
 
 export default function QuestCard({ quest, userCountryCode }: Props) {
+  const questID = quest.idQuests?.trim();
   const title = quest.title?.trim() ? quest.title.trim() : 'No Title';
   const location = getLocationLabel(quest, userCountryCode);
   const timing = quest.timing?.trim() ? quest.timing.trim() : 'No Timing';
@@ -168,7 +170,7 @@ export default function QuestCard({ quest, userCountryCode }: Props) {
   const highlighted = (quest.paid_features ?? '').includes('highlight');
   const priceNegotiable = Boolean(quest.priceNegotiable ?? quest.price_negotiable);
 
-  return (
+  const cardBody = (
     <article className={s.card}>
       <div className={s.headRow}>
         <div className={s.titleWrap}>
@@ -241,5 +243,15 @@ export default function QuestCard({ quest, userCountryCode }: Props) {
         </div>
       </div>
     </article>
+  );
+
+  if (!questID) {
+    return cardBody;
+  }
+
+  return (
+    <Link href={`/browse-quest/list/${encodeURIComponent(questID)}`} className={s.cardLink}>
+      {cardBody}
+    </Link>
   );
 };
