@@ -290,6 +290,10 @@ export default function QuestDetailsView({ questID }: Props) {
     const requirements = quest.requirements?.trim() || null;
     const status = readQuestStatus(quest.status);
     const highlight = (quest.paid_features ?? '').includes('highlight');
+    const resolvedCountry = resolveSupportedCountryCode(quest.country_code ?? countryCode);
+    const verified = resolvedCountry === 'SG'
+      ? Boolean(quest.my_info) && Boolean(quest.phone_verified) && Boolean(quest.email_verified)
+      : Boolean(quest.email_verified);
 
     const name = normalizeName(quest.firstName, quest.lastName);
     const postedDate = formatDate(quest.datePosted);
@@ -344,6 +348,7 @@ export default function QuestDetailsView({ questID }: Props) {
       requirements,
       status,
       highlight,
+      verified,
       name,
       postedDate,
       reviewCount,
@@ -492,7 +497,15 @@ export default function QuestDetailsView({ questID }: Props) {
 
                 <div>
                   <p className={s.posterLabel}>Posted by</p>
-                  <p className={s.posterName}>{viewModel.name}</p>
+                  <p className={s.posterName}>
+                    {viewModel.name}
+                    {viewModel.verified ? (
+                      <svg className={s.verified} viewBox="0 0 24 24" aria-label="Verified" role="img">
+                        <circle cx="12" cy="12" r="12" fill="#1D9BF0" />
+                        <path d="M6.5 12.5l3.5 3.5 7.5-7.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : null}
+                  </p>
                   {viewModel.reviewCount > 0 && viewModel.ratingValue ? (
                     <p className={s.posterMeta}>
                       <span className={s.starIcon}>★</span> {viewModel.ratingValue} ({viewModel.reviewCount} reviews)

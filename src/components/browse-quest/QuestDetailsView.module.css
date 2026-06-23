@@ -271,6 +271,15 @@
   color: #e6a817;
 }
 
+.verified {
+  display: inline-block;
+  width: 0.88rem;
+  height: 0.88rem;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 .postedAt {
   margin: 0;
   color: #7a7488;
