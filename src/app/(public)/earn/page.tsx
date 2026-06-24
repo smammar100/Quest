@@ -4,6 +4,7 @@ import ScrollFX from '@/components/sections/ScrollFX';
 import CtaSection from '@/components/sections/CtaSection';
 import EarnHowItWorks from '@/components/sections/EarnHowItWorks';
 import EarnTaskShowcase from '@/components/sections/EarnTaskShowcase';
+import DownloadAppModal from '@/components/layout/DownloadAppModal';
 
 // Why humans choose Quest — 4 cards
 const WHY_HERO = [
@@ -54,7 +55,7 @@ export default function EarnPage() {
             </p>
           </div>
 
-          <a href="/signup" className="fh-btn fh-btn--primary">Earn as a human</a>
+          <DownloadAppModal className="fh-btn fh-btn--primary">Earn as a human</DownloadAppModal>
         </div>
 
         <div className="fh-media">
@@ -110,10 +111,9 @@ export default function EarnPage() {
 
       {/* ── 6. Final CTA ── */}
       <CtaSection
+        appModal
         title="Start earning as a Human."
         sub="Create your profile and pick up your first real-world quest today."
-        ctaText="Earn as a human"
-        ctaHref="/signup"
       />
 
       <SiteFooter />

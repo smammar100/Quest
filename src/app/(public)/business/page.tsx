@@ -48,7 +48,7 @@ export default function BusinessPage() {
                 operations, content distribution, deliveries, store checks, and last-minute support.
               </p>
               <div className="biz-hero__ctas">
-                <a href="#biz-final" className="biz-btn biz-btn--figdark">
+                <a href="/signup" className="biz-btn biz-btn--figdark">
                   Hire humans for business
                 </a>
               </div>
