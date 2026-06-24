@@ -3998,6 +3998,20 @@ nav a {
   .menu-checkbox:checked ~ nav .nav-cta:active {
     transform: scale(0.985);
   }
+  /* secondary action (Log in / Log out): outlined pill above the primary CTA */
+  .menu-checkbox:checked ~ nav .nav-cta--ghost {
+    margin-top: auto;
+    margin-bottom: 12px;
+    background: #fff;
+    color: var(--near-black);
+    box-shadow: inset 0 0 0 1.5px var(--theme-outline);
+    cursor: pointer;
+    animation-delay: 0.24s;
+  }
+  /* the ghost already pushes the foot group down; reset the primary's auto */
+  .menu-checkbox:checked ~ nav .nav-cta--ghost ~ .nav-cta {
+    margin-top: 0;
+  }
 }
 @keyframes q-menu-in {
   from {
@@ -4764,6 +4778,9 @@ button.ft-link {
     align-items: flex-start;
     gap: 16px;
   }
+  /* left-align the socials + credit on mobile (they're right-aligned on desktop) */
+  .ft-social-col { align-items: flex-start; }
+  .ft-made { text-align: left; }
 }
 
 /* ---------- Reduced motion ---------- */
@@ -8875,4 +8892,470 @@ button.ft-cta-btn {
   .biz-hero__ctas { width: 100%; }
   .biz-hero__ctas .biz-btn { flex: 1 1 auto; justify-content: center; }
   .biz-hero__statcard { rotate: 0deg; animation: none; }
+}
+
+/* ============================================================
+   /earn — "For humans · Become a Hero" page
+   ============================================================ */
+#earn-hero,
+#earn-tasks,
+#earn-why,
+#earn-how,
+#earn-safety {
+  padding-inline: var(--page-pad);
+  /* neutralize the Antigravity base `section { min-height: 100dvh }` */
+  min-height: 0;
+}
+.earn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--coral);
+}
+.earn-label .material-symbols-outlined { font-size: 18px; }
+.earn-label--invert { color: var(--coral-tint); }
+.earn-h2 {
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.9rem, 3.6vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--near-black);
+  margin: 0;
+}
+.earn-h2--invert { color: #fff; }
+#earn-tasks { padding-block: var(--section-pad-y); }
+/* ---------- 2. Why humans choose Quest (4-card row) ---------- */
+#earn-why { padding-block: var(--section-pad-y); }
+.earn-why__head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: clamp(36px, 5vw, 56px);
+}
+.earn-why__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(18px, 1.6vw, 24px);
+}
+.earn-why__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: clamp(24px, 2vw, 32px);
+  background: var(--offwhite, #f7f4ed);
+  border-radius: var(--q-radius-lg);
+}
+.earn-why__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--coral-tint);
+  color: var(--coral);
+  margin-bottom: 6px;
+}
+.earn-why__icon .material-symbols-outlined { font-size: 23px; }
+.earn-why__title {
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  color: var(--near-black);
+  margin: 0;
+}
+.earn-why__desc {
+  font-family: var(--q-work);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(20, 16, 31, 0.58);
+  margin: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .earn-why__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .earn-why__grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   /earn live hero — Figma "Earn" frame (fh)
+   ============================================================ */
+#earn-hero.fh {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(40px, 5vw, 64px);
+  background: #fff;
+  padding-inline: var(--page-pad);
+  /* match the landing hero (#welcome) rhythm: larger top clears the fixed
+     header, bottom uses the shared inter-section gap */
+  min-height: 0;
+  padding-block: clamp(96px, 10vw, 140px) var(--section-pad-y);
+  min-width: 0;
+}
+.fh-col { display: flex; flex-direction: column; align-items: flex-start; gap: 40px; }
+
+/* trust pill */
+.fh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 360px;
+  padding: 4px 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+.fh-avatars { display: inline-flex; }
+.fh-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #fff;
+  margin-left: -16px;
+}
+.fh-avatar:first-child { margin-left: 0; }
+.fh-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fh-pill__text {
+  padding-right: 8px;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.33;
+  letter-spacing: -0.2px;
+  color: var(--near-black);
+  white-space: nowrap;
+}
+
+/* title block */
+.fh-head { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+.fh-title {
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 600;
+  font-size: clamp(2.6rem, 4.6vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -1px;
+  color: var(--near-black);
+}
+.fh-body {
+  margin: 0;
+  font-family: var(--q-work);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(20, 16, 31, 0.6);
+  max-width: 50ch;
+}
+
+/* button (rounded-8) */
+.fh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--near-black);
+  color: #fff;
+  border-radius: 999px;
+  padding: 13px 28px;
+  font-family: var(--q-work);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.064px;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.fh-btn:hover { background: #000; transform: translateY(-2px); }
+/* primary (electric blue) variant */
+.fh-btn--primary { background: #2e5bff; box-shadow: 0 16px 30px -16px #2e5bff; }
+.fh-btn--primary:hover { background: #1e45e0; }
+
+/* illustration */
+.fh-media {
+  position: relative;
+  align-self: stretch;
+  min-height: 620px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.fh-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 900px) {
+  #earn-hero.fh { grid-template-columns: 1fr; min-height: 0; }
+  .fh-media { min-height: 0; aspect-ratio: 4 / 3; align-self: auto; }
+  .fh-pill__text { white-space: normal; }
+}
+
+/* ============================================================
+   /earn — "How it works" Mews-style accordion (ehow + ehmock)
+   ============================================================ */
+#earn-how { padding-block: var(--section-pad-y); }
+.ehow-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(28px, 4vw, 44px);
+}
+.ehow-head__text { display: flex; flex-direction: column; gap: 14px; }
+/* escape the global `h2 { width: 50% }` base rule so the headline lands on 2 lines */
+.ehow-head__text .earn-h2 { width: auto; max-width: 18ch; }
+.ehow-arrows { display: flex; gap: 10px; flex: 0 0 auto; }
+.ehow-arrow {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; color: var(--near-black);
+  box-shadow: inset 0 0 0 1.5px var(--theme-outline);
+  cursor: pointer; transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+.ehow-arrow:hover:not(:disabled) { background: #faf8f3; transform: translateY(-1px); }
+.ehow-arrow:disabled { opacity: 0.35; cursor: default; }
+.ehow-arrow .material-symbols-outlined { font-size: 22px; }
+
+.ehow-track {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+.ehow-card {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--offwhite, #f7f4ed);
+  border-radius: var(--q-radius-lg);
+  padding: clamp(20px, 1.6vw, 28px);
+  min-height: 480px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: flex-grow 0.45s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+}
+.ehow-card.is-active {
+  flex: 2.6 1 0;
+  background: var(--coral-tint);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  cursor: default;
+}
+.ehow-card__text { display: flex; flex-direction: column; gap: 8px; }
+.ehow-card__title {
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.2rem, 1.5vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--near-black);
+}
+.ehow-card__desc {
+  margin: 0;
+  font-family: var(--q-work);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: rgba(20, 16, 31, 0.62);
+}
+.ehow-card:not(.is-active) .ehow-card__desc { display: none; }
+.ehow-card__visual { flex: 0 0 auto; display: flex; align-items: flex-start; justify-content: center; min-width: 0; }
+.ehow-card__num {
+  position: absolute;
+  left: clamp(20px, 1.6vw, 28px);
+  bottom: clamp(18px, 1.6vw, 26px);
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--near-black);
+}
+.ehow-card.is-active .ehow-card__num { position: static; margin-top: auto; padding-top: 10px; }
+
+/* ----- mockups inside the active card ----- */
+.ehmock {
+  width: min(360px, 100%);
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px 16px 18px;
+  box-shadow: 0 2px 6px rgba(20,16,31,0.05), 0 26px 50px -34px rgba(20,16,31,0.38);
+  font-family: var(--q-work);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ehmock__head { display: flex; align-items: center; justify-content: space-between; }
+.ehmock__title { font-family: var(--q-display); font-weight: 800; font-size: 1.02rem; color: var(--near-black); }
+.ehmock__pill { font-size: 0.72rem; font-weight: 700; color: rgba(20,16,31,0.55); background: rgba(20,16,31,0.06); border-radius: 999px; padding: 4px 10px; }
+.ehmock__pill--live { color: #1f9d4d; background: #e8f7ec; }
+
+/* step 1 — profile */
+.ehmock__profile { display: flex; align-items: center; gap: 12px; }
+.ehmock__avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+.ehmock__profile div { display: flex; flex-direction: column; line-height: 1.3; }
+.ehmock__profile b { font-size: 0.95rem; color: var(--near-black); }
+.ehmock__profile small { font-size: 0.8rem; color: rgba(20,16,31,0.55); }
+.ehmock__chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.ehmock__chip { font-size: 0.78rem; font-weight: 600; color: rgba(20,16,31,0.55); background: rgba(20,16,31,0.05); border-radius: 999px; padding: 6px 12px; }
+.ehmock__chip.is-on { color: var(--coral-dark, #f0402c); background: var(--coral-tint); }
+
+/* shared cta */
+.ehmock__cta { background: var(--coral); color: #fff; font-weight: 700; font-size: 0.92rem; border-radius: 12px; padding: 12px; text-align: center; }
+.ehmock__cta--inline { flex: 1 1 auto; }
+.ehmock__ghost { flex: 0 0 auto; background: #fff; color: var(--near-black); font-weight: 700; font-size: 0.92rem; border-radius: 12px; padding: 12px 18px; box-shadow: inset 0 0 0 1.5px var(--theme-outline); }
+.ehmock__actions { display: flex; gap: 10px; }
+
+/* step 2 — feed */
+.ehmock__feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ehmock__feed li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1px solid var(--theme-outline); }
+.ehmock__feed li:first-child { border-top: 0; }
+.ehmock__feed div { display: flex; flex-direction: column; line-height: 1.3; }
+.ehmock__feed b { font-size: 0.88rem; color: var(--near-black); }
+.ehmock__feed small { font-size: 0.76rem; color: rgba(20,16,31,0.55); }
+.ehmock__pay { font-family: var(--q-display); font-weight: 800; font-size: 0.98rem; color: var(--coral); flex: 0 0 auto; }
+.ehmock__foot { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: rgba(20,16,31,0.6); }
+.ehmock__foot .material-symbols-outlined { font-size: 18px; color: var(--coral); }
+
+/* step 3 — offer */
+.ehmock__offer h4 { margin: 0 0 10px; font-family: var(--q-display); font-weight: 700; font-size: 1rem; color: var(--near-black); }
+.ehmock__offer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ehmock__offer li { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; color: rgba(20,16,31,0.6); }
+.ehmock__offer li b { margin-left: auto; color: var(--near-black); }
+.ehmock__offer .material-symbols-outlined { font-size: 18px; color: rgba(20,16,31,0.45); }
+
+/* step 4 — complete */
+.ehmock__check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.ehmock__check li { display: flex; align-items: center; gap: 9px; font-size: 0.88rem; color: rgba(20,16,31,0.5); }
+.ehmock__check li.is-done { color: var(--near-black); }
+.ehmock__check .material-symbols-outlined { font-size: 20px; color: rgba(20,16,31,0.3); }
+.ehmock__check li.is-done .material-symbols-outlined { color: #1f9d4d; font-variation-settings: 'FILL' 1; }
+.ehmock__upload { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: rgba(20,16,31,0.6); background: rgba(20,16,31,0.04); border-radius: 10px; padding: 10px 12px; }
+.ehmock__upload .material-symbols-outlined { font-size: 18px; color: var(--coral); }
+
+/* step 5 — paid */
+.ehmock--paid { align-items: center; text-align: center; gap: 8px; padding: 26px 18px; }
+.ehmock__paidicon { width: 56px; height: 56px; border-radius: 50%; background: #e8f7ec; color: #1f9d4d; display: inline-flex; align-items: center; justify-content: center; }
+.ehmock__paidicon .material-symbols-outlined { font-size: 30px; font-variation-settings: 'FILL' 1; }
+.ehmock__paidlabel { font-size: 0.85rem; color: rgba(20,16,31,0.55); margin-top: 4px; }
+.ehmock__paidbig { font-family: var(--q-display); font-weight: 800; font-size: 2.2rem; line-height: 1; color: var(--near-black); }
+.ehmock__paidsub { font-size: 0.82rem; color: rgba(20,16,31,0.55); }
+.ehmock__balance { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 8px; padding: 12px 14px; background: var(--coral-tint); border-radius: 12px; }
+.ehmock__balance span { font-size: 0.84rem; color: var(--coral-dark, #f0402c); font-weight: 600; }
+.ehmock__balance b { font-family: var(--q-display); font-weight: 800; font-size: 1.2rem; color: var(--near-black); }
+
+/* responsive */
+@media (max-width: 900px) {
+  .ehow-track { flex-direction: column; }
+  /* size each card to its own content (collapsed pill, or expanded when
+     active) — basis:0 from the desktop flex grow would clip the active card */
+  .ehow-card { min-height: 0; flex: 0 0 auto; overflow: visible; }
+  .ehow-card.is-active { flex: 0 0 auto; flex-direction: column; }
+  .ehow-card.is-active .ehow-card__text { flex: none; }
+  .ehow-card__num { position: static; margin-top: 18px; }
+  .ehow-card.is-active .ehow-card__num { order: 3; }
+  .ehow-card__visual { margin-top: 16px; justify-content: flex-start; }
+}
+
+/* ============================================================
+   /earn — task grid (Figma tabbed cards — mw)
+   ============================================================ */
+.mw-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 1.6vw, 24px);
+}
+
+/* heading occupies the centre cell (no card); Create content takes top-left */
+.mw-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  align-self: center;
+  grid-column: 2;
+  grid-row: 2;
+  padding-inline: clamp(8px, 1.5vw, 24px);
+}
+.mw-card--lime { grid-column: 1; grid-row: 1; }
+.mw-title {
+  margin: 0;
+  width: auto; /* escape global h2{width:50%} */
+  font-family: var(--q-display);
+  font-weight: 800;
+  font-size: clamp(1.7rem, 2.2vw, 2.3rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--near-black);
+}
+.mw-sub {
+  margin: 0;
+  font-family: var(--q-work);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(20, 16, 31, 0.6);
+}
+
+/* cards */
+.mw-card {
+  --mw-bg: #f4f5f9;
+  --mw-fg: var(--near-black);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  min-height: 220px;
+  padding: clamp(28px, 2.6vw, 44px) clamp(26px, 2.4vw, 44px);
+  background: var(--mw-bg);
+  color: var(--mw-fg);
+  border-radius: 8px;
+}
+/* solid palette colour per card (light bgs get dark text, dark bgs get white) */
+.mw-card--coral    { --mw-bg: #ff5a47; --mw-fg: #fff; }
+.mw-card--violet   { --mw-bg: #7b5cff; --mw-fg: #fff; }
+.mw-card--electric { --mw-bg: #2e5bff; --mw-fg: #fff; }
+.mw-card--mint     { --mw-bg: #16b673; --mw-fg: #fff; }
+.mw-card--sky      { --mw-bg: #9fd2ff; --mw-fg: var(--near-black); }
+.mw-card--lime     { --mw-bg: #c6f23c; --mw-fg: var(--near-black); }
+.mw-card--marigold { --mw-bg: #ffb627; --mw-fg: var(--near-black); }
+.mw-card--peach    { --mw-bg: #ffc9a6; --mw-fg: var(--near-black); }
+.mw-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mw-fg);
+  margin-bottom: 2px;
+}
+.mw-card__icon .material-symbols-outlined { font-size: 34px; }
+.mw-card__title {
+  margin: 0;
+  font-family: var(--q-display);
+  font-weight: 700;
+  font-size: 1.28rem;
+  letter-spacing: -0.01em;
+  color: var(--mw-fg);
+}
+.mw-card__desc {
+  margin: 0;
+  font-family: var(--q-work);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--mw-fg);
+  opacity: 0.78;
+  max-width: 24ch;
+}
+
+@media (max-width: 900px) {
+  .mw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* restore natural flow: heading back to top spanning full width */
+  .mw-head { grid-column: 1 / -1; grid-row: auto; align-self: start; padding-right: 0; }
+  .mw-card--lime { grid-column: auto; grid-row: auto; }
+}
+@media (max-width: 560px) {
+  .mw-grid { grid-template-columns: 1fr; }
+  .mw-card { min-height: 0; }
 }

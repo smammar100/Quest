@@ -130,7 +130,29 @@ export default function ScrollFX() {
         ".biz-step",
         ".cz-trust__title, .cz-trust__item",
         ".biz-final__title, .biz-final__sub, .biz-final__ctas",
+        ".mw-head",
       ].forEach(revealUp);
+
+      // ── /earn task grid — staggered pop-in (cooler than the default rise) ──
+      const mwCards = gsap.utils.toArray<HTMLElement>(".mw-card");
+      if (mwCards.length) {
+        gsap.set(mwCards, { opacity: 0, y: 34, scale: 0.9 });
+        ScrollTrigger.batch(mwCards, {
+          start: "top 90%",
+          once: true,
+          onEnter: (batch) =>
+            gsap.to(batch, {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.6,
+              ease: "back.out(1.5)",
+              stagger: { each: 0.08, from: "start" },
+              overwrite: true,
+              clearProps: "transform,opacity",
+            }),
+        });
+      }
 
       // Recalc positions after client sections / fonts / images settle.
       ScrollTrigger.refresh();

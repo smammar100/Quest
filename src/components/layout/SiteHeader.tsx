@@ -146,6 +146,7 @@ export default function SiteHeader() {
 
         <nav>
           <ul>
+            {/* mobile drawer: Categories link surfaced for both states */}
             {isAuthenticated ? (
               <li>
                 <Link href={browseHref}>
@@ -164,7 +165,11 @@ export default function SiteHeader() {
                   </a>
                 </li>
                 <li>
-                  <a href="/#tasks">
+                  <a
+                    href="/earn"
+                    className={pathname === "/earn" ? "is-active" : undefined}
+                    aria-current={pathname === "/earn" ? "page" : undefined}
+                  >
                     <span className="nav-rn">For humans</span>
                   </a>
                 </li>
@@ -306,6 +311,24 @@ export default function SiteHeader() {
               </>
             )}
           </ul>
+          {/* mobile drawer secondary action — keeps Log in / Log out reachable
+              on phones, where the desktop .nav-actions group is hidden */}
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className="nav-cta nav-cta--ghost"
+              onClick={() => {
+                setSignOutError(null);
+                setShowLogoutDialog(true);
+              }}
+            >
+              Log out
+            </button>
+          ) : (
+            <Link href="/login" className="nav-cta nav-cta--ghost">
+              Log in
+            </Link>
+          )}
           <a href={hireHref} className="nav-cta">
             Hire a human
           </a>
