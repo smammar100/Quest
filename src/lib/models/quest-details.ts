@@ -5,6 +5,8 @@ export type QuestDetailsLocation = {
   lng?: number;
 };
 
+import type { BrowseQuest } from './browse-quest';
+
 export type QuestDetails = {
   idQuests?: string;
   title?: string;
@@ -47,6 +49,10 @@ export type QuestDetails = {
   scope_of_reach?: string;
   country_code?: string;
   user_country_code?: string;
+  my_info?: boolean | string | number;
+  phone_verified?: boolean | string | number;
+  email_verified?: boolean | string | number;
+  similarQuests?: BrowseQuest[];
 };
 
 export type QuestDetailsApiResponse = QuestDetails[];

@@ -28,30 +28,58 @@ export async function GET(request: Request) {
     userID,
   });
 
-  const upstreamURL = `${backendURL}/quest/view-quest/?${upstreamParams.toString()}`;
+  const detailsURL = `${backendURL}/quest/view-quest/?${upstreamParams.toString()}`;
+  const proposalCountURL = `${backendURL}/proposal/count-by-quest?${new URLSearchParams({ questID }).toString()}`;
 
   try {
-    const response = await fetch(upstreamURL, {
-      method: 'GET',
-      cache: 'no-store',
-      signal: AbortSignal.timeout(15000),
-      headers: {
-        Accept: 'application/json',
-      },
-    });
+    const [detailsResponse, proposalCountResponse] = await Promise.all([
+      fetch(detailsURL, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(15000),
+        headers: {
+          Accept: 'application/json',
+        },
+      }),
+      fetch(proposalCountURL, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(15000),
+        headers: {
+          Accept: 'application/json',
+        },
+      }),
+    ]);
 
-    if (!response.ok) {
+    if (!detailsResponse.ok) {
       return NextResponse.json(
         {
           error: 'Quest details upstream error',
-          status: response.status,
+          status: detailsResponse.status,
         },
         { status: 502 }
       );
     }
 
-    const data: unknown = await response.json();
-    return NextResponse.json(data, { status: 200 });
+    const detailsData: unknown = await detailsResponse.json();
+
+    let offersReceived = 0;
+    if (proposalCountResponse.ok) {
+      try {
+        const proposalCountData = (await proposalCountResponse.json()) as {
+          count?: string | number;
+        };
+        const parsedCount = Number(proposalCountData.count);
+        if (Number.isFinite(parsedCount)) offersReceived = parsedCount;
+      } catch {
+        // keep 0
+      }
+    }
+
+    return NextResponse.json(
+      { quest: detailsData, offersReceived },
+      { status: 200 }
+    );
   } catch {
     return NextResponse.json(
       {
