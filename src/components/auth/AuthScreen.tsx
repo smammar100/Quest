@@ -917,7 +917,7 @@ export default function AuthScreen({
         setBusy(true);
         await signIn(email, password);
 
-        router.push(postLoginDestination);
+        // router.push(postLoginDestination);
       } catch (error) {
         setErrorMessage(mapLoginError(error));
       } finally {
@@ -1079,10 +1079,9 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      const credential = await signInWithGoogle();
-      if (credential?.user) {
-        router.replace(postLoginDestination);
-      }
+      await signInWithGoogle();
+      // Navigation handled by the useEffect watching `user` after
+      // onAuthStateChanged fires and sets the quest_auth cookie.
     } catch (error) {
       setErrorMessage(mapSocialLoginError(error, "Google"));
     } finally {
@@ -1099,10 +1098,9 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      const credential = await signInWithApple();
-      if (credential?.user) {
-        router.replace(postLoginDestination);
-      }
+      await signInWithApple();
+      // Navigation handled by the useEffect watching `user` after
+      // onAuthStateChanged fires and sets the quest_auth cookie.
     } catch (error) {
       setErrorMessage(mapSocialLoginError(error, "Apple"));
     } finally {

@@ -93,7 +93,7 @@ export default function QuestList() {
     if (!authLoading && user === null) {
       router.replace('/login');
     }
-  }, [authLoading, user, router]);
+  }, [authLoading, user, router, profileLoaded]);
   const [category, setCategory] = useState<BrowseCategory>('All');
   const [quests, setQuests] = useState<BrowseQuest[]>([]);
   const [resultCount, setResultCount] = useState<string | number>('0');
