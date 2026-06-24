@@ -13,7 +13,7 @@ type BackendSelfUserPayload = {
   } | null;
 };
 
-const AUTH_COOKIE_NAME = 'quest_auth';
+const AUTH_COOKIE_NAME = '__session';
 const backendCountryCodeRequestCache = new Map<string, Promise<string | undefined>>();
 
 const setAuthCookie = (isAuthenticated: boolean) => {
