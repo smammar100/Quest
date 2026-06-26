@@ -13,20 +13,19 @@ type BackendSelfUserPayload = {
   } | null;
 };
 
-const AUTH_COOKIE_NAME = '__session';
 const backendCountryCodeRequestCache = new Map<string, Promise<string | undefined>>();
 
-const setAuthCookie = (isAuthenticated: boolean) => {
-  if (typeof document === 'undefined') {
-    return;
+const setAuthCookie = async (firebaseUser: import('firebase/auth').User | null) => {
+  if (firebaseUser) {
+    const idToken = await firebaseUser.getIdToken();
+    await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+  } else {
+    await fetch('/api/auth/session', { method: 'DELETE' });
   }
-
-  if (isAuthenticated) {
-    document.cookie = `${AUTH_COOKIE_NAME}=1; Path=/; Max-Age=2592000; SameSite=Lax`;
-    return;
-  }
-
-  document.cookie = `${AUTH_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`;
 };
 
 const normalizeCountryCode = (value: unknown): string | undefined => {
@@ -110,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       if (!firebaseUser) {
-        setAuthCookie(false);
+        void setAuthCookie(null);
         setUser(null);
         setUserProfile(null);
         setProfileLoaded(true);
@@ -118,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setAuthCookie(true);
+      void setAuthCookie(firebaseUser);
 
       setUser({
         uid: firebaseUser.uid,
