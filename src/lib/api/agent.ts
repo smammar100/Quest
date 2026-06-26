@@ -63,11 +63,11 @@ export function parseAgentEvents(events: AgentEvent[]): AgentTurnResponse {
 export async function createAgentSession(
   userId: string,
   state: SessionState,
-  _idToken: string,
+  idToken: string,
 ): Promise<AgentSession> {
   const res = await fetch('/api/agent/sessions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
     body: JSON.stringify({ userId, state }),
   });
   if (!res.ok) throw new Error(`Session error: ${res.status}`);
@@ -78,11 +78,11 @@ export async function sendAgentMessage(
   userId: string,
   sessionId: string,
   text: string,
-  _idToken: string,
+  idToken: string,
 ): Promise<AgentTurnResponse> {
   const res = await fetch('/api/agent/run', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
     body: JSON.stringify({ userId, sessionId, text }),
   });
   if (!res.ok) throw new Error(`Agent error: ${res.status}`);
@@ -93,9 +93,11 @@ export async function sendAgentMessage(
 export async function getAgentSession(
   userId: string,
   sessionId: string,
-  _idToken: string,
+  idToken: string,
 ): Promise<QuestPostResult | null> {
-  const res = await fetch(`/api/agent/sessions/result?userId=${userId}&sessionId=${sessionId}`);
+  const res = await fetch(`/api/agent/sessions/result?userId=${userId}&sessionId=${sessionId}`, {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
   if (!res.ok) throw new Error(`Session GET error: ${res.status}`);
   return res.json();
 }

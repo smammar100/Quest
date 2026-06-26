@@ -36,5 +36,10 @@ export function useAuth() {
     signInWithGoogle: signInGoogle,
     signInWithApple: signInApple,
     signOut: logOut,
+    getIdToken: async () => {
+      const currentUser = getCurrentAuthUser();
+      if (!currentUser) throw new Error('Not authenticated');
+      return currentUser.getIdToken();
+    },
   };
 }

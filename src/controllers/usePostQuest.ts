@@ -26,7 +26,7 @@ const resolveClientTimeZone = () => {
 };
 
 export function usePostQuest(initialPrompt?: string) {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, getIdToken } = useAuth();
   const [phase, setPhase] = useState<PostQuestPhase>('prompt');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [agentTyping, setAgentTyping] = useState(false);
@@ -66,8 +66,9 @@ export function usePostQuest(initialPrompt?: string) {
   async function ensureSession(): Promise<SessionRef> {
     if (sessionRef.current) return sessionRef.current;
 
-    // TODO: replace '' with real Firebase ID token once auth is wired.
-    const userId = user?.uid ?? 'cit-42';
+    if (!user) throw new Error('Not authenticated');
+
+    const userId = user.uid;
     const countryCode = resolveSupportedCountryCode(
       userProfile?.countryCode ?? DEFAULT_COUNTRY_CODE
     );
@@ -80,7 +81,8 @@ export function usePostQuest(initialPrompt?: string) {
       country_name: countryCode,
     };
 
-    const session = await createAgentSession(userId, state, '');
+    const idToken = await getIdToken();
+    const session = await createAgentSession(userId, state, idToken);
     sessionRef.current = { userId, sessionId: session.id };
     return sessionRef.current;
   }
@@ -88,14 +90,16 @@ export function usePostQuest(initialPrompt?: string) {
   async function runAgentTurn(text: string) {
     setAgentTyping(true);
     try {
+      if (!user) throw new Error('Not authenticated');
       const { userId, sessionId } = await ensureSession();
-      // TODO: replace '' with real Firebase ID token once auth is wired.
-      const response = await sendAgentMessage(userId, sessionId, text, '');
+      // getIdToken() refreshes automatically if the token is within 5 min of expiry.
+      const idToken = await getIdToken();
+      const response = await sendAgentMessage(userId, sessionId, text, idToken);
 
       setMessages(prev => [...prev, { role: 'agent', content: response.message }]);
 
       if (response.readyToPost) {
-        const result = await getAgentSession(userId, sessionId, '');
+        const result = await getAgentSession(userId, sessionId, await getIdToken());
         setPhase(result?.status === 'success' ? 'done' : 'error');
       }
     } catch {
