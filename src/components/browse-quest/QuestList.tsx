@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import { useAuthContext } from '@/context/AuthContext';
 import {
   BROWSE_CATEGORIES,
@@ -289,6 +290,7 @@ export default function QuestList() {
               onClick={() => {
                 if (dragStateRef.current.suppressNextClick) return;
                 if (item === category) return;
+                posthog.capture('browse_category_changed', { category: item, previous_category: category });
                 setLoading(true);
                 setError(null);
                 setCategory(item);
@@ -329,7 +331,7 @@ export default function QuestList() {
             <button
               type="button"
               className={s.moreBtn}
-              onClick={() => void fetchQuests(currentPage + 1, offset, 'append')}
+              onClick={() => { posthog.capture('browse_load_more_clicked', { page: currentPage + 1, category }); void fetchQuests(currentPage + 1, offset, 'append'); }}
               disabled={!hasMore || loadingMore}
             >
               {loadingMore ? 'Loading more quests...' : hasMore ? 'Load more quests' : 'No more quests'}

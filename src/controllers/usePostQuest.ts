@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import posthog from 'posthog-js';
 import { useAuth } from '@/controllers/useAuth';
 import type { ChatMessage } from '@/lib/models/quest';
 import { createAgentSession, sendAgentMessage, getAgentSession } from '@/lib/api/agent';
@@ -43,6 +44,7 @@ export function usePostQuest(initialPrompt?: string) {
   }, []);
 
   function submitInitialPrompt(prompt: string) {
+    posthog.capture('post_quest_prompt_submitted', { prompt_length: prompt.length });
     setMessages([{ role: 'user', content: prompt }]);
     setPhase('chat');
     void runAgentTurn(prompt);
@@ -100,9 +102,17 @@ export function usePostQuest(initialPrompt?: string) {
 
       if (response.readyToPost) {
         const result = await getAgentSession(userId, sessionId, await getIdToken());
-        setPhase(result?.status === 'success' ? 'done' : 'error');
+        const success = result?.status === 'success';
+        if (success) {
+          posthog.capture('post_quest_completed', { session_id: sessionId });
+        } else {
+          posthog.capture('post_quest_failed', { session_id: sessionId, reason: 'agent_status_not_success' });
+        }
+        setPhase(success ? 'done' : 'error');
       }
-    } catch {
+    } catch (err) {
+      posthog.captureException(err);
+      posthog.capture('post_quest_failed', { reason: 'exception' });
       setPhase('error');
     } finally {
       setAgentTyping(false);

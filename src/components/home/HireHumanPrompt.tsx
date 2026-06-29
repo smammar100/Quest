@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/controllers/useAuth';
+import posthog from 'posthog-js';
 
 const SUGGESTIONS = [
   'Pick up a parcel in New York',
@@ -16,10 +17,15 @@ export default function HireHumanPrompt() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
 
-  function submit(text: string) {
+  function submit(text: string, isSuggestion = false) {
     const trimmed = text.trim();
     if (!trimmed) return;
     const encoded = encodeURIComponent(trimmed);
+    if (isSuggestion) {
+      posthog.capture('home_suggestion_clicked', { suggestion: trimmed });
+    } else {
+      posthog.capture('home_prompt_submitted', { prompt: trimmed });
+    }
     if (!loading && isAuthenticated) {
       router.push(`/post-quest?prompt=${encoded}`);
     } else {
@@ -49,7 +55,7 @@ export default function HireHumanPrompt() {
         <p className="quest-suggest__label">What do you need a human to do?</p>
         <div className="quest-suggest__pills">
           {SUGGESTIONS.map(s => (
-            <button key={s} type="button" className="quest-pill" onClick={() => submit(s)}>
+            <button key={s} type="button" className="quest-pill" onClick={() => submit(s, true)}>
               {s}
             </button>
           ))}
