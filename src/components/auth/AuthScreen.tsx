@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { User } from "firebase/auth";
 import { useAuth } from "@/controllers/useAuth";
 import { handleAuthRedirectResult } from "@/lib/firebase/auth";
+import posthog from "posthog-js";
 import {
   SOURCE_PLATFORMS,
 } from "@/lib/data/dial-codes";
@@ -276,6 +277,7 @@ function AuthForm({
   const isSignup = mode === "signup";
 
   function chooseMethod(m: SignupMethod) {
+    posthog.capture('signup_method_selected', { method: m });
     onSignupMethodChange?.(m, true);
     setStep(2);
   }
@@ -915,8 +917,9 @@ export default function AuthScreen({
 
       try {
         setBusy(true);
-        await signIn(email, password);
-
+        const credential = await signIn(email, password);
+        posthog.identify(credential.user.uid, { email: credential.user.email ?? undefined });
+        posthog.capture('user_logged_in', { method: 'email' });
         // router.push(postLoginDestination);
       } catch (error) {
         setErrorMessage(mapLoginError(error));
@@ -988,6 +991,8 @@ export default function AuthScreen({
     try {
       setBusy(true);
       const credential = await signUp(email, password);
+      posthog.identify(credential.user.uid, { email });
+      posthog.capture('user_signed_up', { method: 'email', source_platform: sourcePlatform || null });
       setPendingSignupProfile({
         email,
         firstName,
@@ -1079,7 +1084,11 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      await signInWithGoogle();
+      const credential = await signInWithGoogle();
+      if (credential?.user) {
+        posthog.identify(credential.user.uid, { email: credential.user.email ?? undefined });
+        posthog.capture('user_logged_in', { method: 'google' });
+      }
       // Navigation handled by the useEffect watching `user` after
       // onAuthStateChanged fires and sets the quest_auth cookie.
     } catch (error) {
@@ -1098,7 +1107,11 @@ export default function AuthScreen({
 
     try {
       setBusy(true);
-      await signInWithApple();
+      const credential = await signInWithApple();
+      if (credential?.user) {
+        posthog.identify(credential.user.uid, { email: credential.user.email ?? undefined });
+        posthog.capture('user_logged_in', { method: 'apple' });
+      }
       // Navigation handled by the useEffect watching `user` after
       // onAuthStateChanged fires and sets the quest_auth cookie.
     } catch (error) {
@@ -1139,6 +1152,8 @@ export default function AuthScreen({
       return;
     }
 
+    posthog.identify(socialUser.uid, { email: socialUser.email });
+    posthog.capture('user_signed_up', { method: socialPending.provider, source_platform: socialPending.sourcePlatform ?? null });
     await completeSignupProfile(socialUser, profile);
     setProfilePersisted(true);
     setVerificationMessage(null);

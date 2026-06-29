@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/firestore";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(request: Request) {
   let body: Record<string, unknown>;
@@ -21,6 +22,18 @@ export async function POST(request: Request) {
       budget: body.budget ?? "",
       country: body.country ?? "",
       submittedAt: serverTimestamp(),
+    });
+
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: String(body.email ?? "anonymous"),
+      event: "server_waitlist_signup",
+      properties: {
+        volume: body.volume ?? null,
+        budget: body.budget ?? null,
+        country: body.country ?? null,
+        has_company: Boolean(body.company),
+      },
     });
 
     return NextResponse.json({ success: true }, { status: 200 });
