@@ -45,3 +45,4 @@ package-lock.json
 
 # local prototype pages — not for shared branches
 src/app/prototype/
+.env.local

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import posthog from 'posthog-js';
 
 export default function AgentWaitlistForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -31,6 +32,7 @@ export default function AgentWaitlistForm() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Submission failed');
+      posthog.capture('agent_waitlist_submitted', { volume: data.volume, budget: data.budget, country: data.country });
       setSubmitted(true);
     } catch {
       setError('Something went wrong. Please try again.');

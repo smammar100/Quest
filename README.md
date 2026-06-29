@@ -17,9 +17,11 @@ src/
 ├── lib/
 │   ├── data/              # Static/seed data
 │   ├── firebase/          # Firebase init, auth helpers, Firestore helpers
-│   └── models/            # TypeScript types for domain objects
+│   ├── models/            # TypeScript types for domain objects
+│   └── posthog-server.ts  # Server-side PostHog singleton (posthog-node)
 ├── middleware.ts           # Route protection (runs before page render)
 └── types/                 # Shared type re-exports
+instrumentation-client.ts  # Client-side PostHog init (Next.js 15.3+ pattern)
 ```
 
 ## Flutter → Next.js concept map
@@ -89,14 +91,6 @@ The login ↔ signup toggle on the inline auth screen is handled via local `auth
 | `src/lib/api/quests.ts` | Model — POSTs the completed quest to the backend |
 | `src/lib/models/quest.ts` | Types — `ChatMessage`, `AgentTurnResponse`, `PostQuestPayload` |
 
-### What's stubbed (TODOs before production)
-
-- `src/lib/firebase/auth.ts` — Firebase functions are commented out; uncomment after `config.ts` is wired
-- `src/context/AuthContext.tsx` — `onAuthStateChanged` listener is commented out; `user` is hardcoded `null`
-- `src/controllers/usePostQuest.ts` — Firebase ID token passed as `''` to agent and quest APIs
-- `src/components/auth/AuthScreen.tsx` — form `onSubmit` calls `e.preventDefault()` only; no real submission
-- `src/middleware.ts` — session-cookie check is commented out; all protected routes pass through
-
 ---
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
@@ -135,6 +129,47 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## PostHog analytics
+
+PostHog is integrated for product analytics, session replay, and error tracking.
+
+### Required env vars
+
+```bash
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=<your_token>
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+```
+
+Add these to `.env.local` for local development and to your deployment environment (Vercel / Cloud Run) before going live.
+
+### How it works
+
+- **Client-side** — `instrumentation-client.ts` at the project root initialises `posthog-js` once on page load. `$pageview` is captured automatically on every navigation. Custom events (`user_logged_in`, `user_signed_up`, `post_quest_completed`, etc.) are captured from components and controllers.
+- **Server-side** — `src/lib/posthog-server.ts` provides a `getPostHogClient()` singleton used in API routes to capture server-side events (`server_user_signup`, `server_waitlist_signup`).
+- **Reverse proxy** — `next.config.ts` rewrites `/ingest/*` to PostHog's ingest endpoint so events are less likely to be blocked by ad blockers.
+- **User identity** — `posthog.identify(uid, { email })` is called on login and signup, and `posthog.reset()` on sign-out.
+
+### Tracked events
+
+| Event | Where |
+|---|---|
+| `user_logged_in` | `AuthScreen.tsx` — email, Google, Apple |
+| `user_signed_up` | `AuthScreen.tsx` — email, Google, Apple |
+| `user_logged_out` | `useAuth.ts` |
+| `signup_method_selected` | `AuthScreen.tsx` |
+| `post_quest_prompt_submitted` | `usePostQuest.ts` |
+| `post_quest_completed` | `usePostQuest.ts` |
+| `post_quest_failed` | `usePostQuest.ts` |
+| `home_prompt_submitted` | `HireHumanPrompt.tsx` |
+| `home_suggestion_clicked` | `HireHumanPrompt.tsx` |
+| `browse_category_changed` | `QuestList.tsx` |
+| `browse_load_more_clicked` | `QuestList.tsx` |
+| `agent_waitlist_submitted` | `AgentWaitlistForm.tsx` |
+| `server_user_signup` | `api/auth/signup/route.ts` |
+| `server_waitlist_signup` | `api/waitlist/route.ts` |
+
+---
 
 ## Sanity CMS
 

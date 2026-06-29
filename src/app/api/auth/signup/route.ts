@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 const FALLBACK_BACKEND_URL =
   "https://quest-backend-container-dev-840826949824.asia-southeast1.run.app";
@@ -58,6 +59,18 @@ export async function POST(request: Request) {
         { status: 502 }
       );
     }
+
+    const distinctId =
+      String((body.user_info as Record<string, unknown>)?.uid ?? "") ||
+      String((body.private_info as Record<string, unknown>)?.email ?? "anonymous");
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId,
+      event: "server_user_signup",
+      properties: {
+        country_code: (body.user_info as Record<string, unknown>)?.countryCode ?? null,
+      },
+    });
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch {
