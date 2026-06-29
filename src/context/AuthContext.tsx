@@ -37,14 +37,16 @@ const normalizeCountryCode = (value: unknown): string | undefined => {
   return normalized.length === 2 ? normalized : undefined;
 };
 
-const getBackendCountryCodeByUid = async (uid: string): Promise<string | undefined> => {
+const getBackendCountryCodeByUid = async (uid: string, idToken: string): Promise<string | undefined> => {
   const cachedRequest = backendCountryCodeRequestCache.get(uid);
   if (cachedRequest) {
     return cachedRequest;
   }
 
   const request = (async () => {
-    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`);
+    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
 
     if (!response.ok) {
       return undefined;
@@ -109,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       if (!firebaseUser) {
-        void setAuthCookie(null);
+        await setAuthCookie(null).catch(() => undefined);
         setUser(null);
         setUserProfile(null);
         setProfileLoaded(true);
@@ -117,7 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      void setAuthCookie(firebaseUser);
+      // Must complete before setUser so the __session cookie exists by the
+      // time any navigation triggered by the user state change hits middleware.
+      await setAuthCookie(firebaseUser).catch((err) => {
+        console.error('[auth] failed to set session cookie', err);
+      });
 
       setUser({
         uid: firebaseUser.uid,
@@ -137,8 +143,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
 
       try {
+        const idToken = await firebaseUser.getIdToken();
         const [backendCountryResult, firestoreProfileResult] = await Promise.allSettled([
-          getBackendCountryCodeByUid(firebaseUser.uid),
+          getBackendCountryCodeByUid(firebaseUser.uid, idToken),
           getUserProfileByUid(firebaseUser.uid),
         ]);
 

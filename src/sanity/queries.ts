@@ -64,7 +64,7 @@ export async function getSanityCategory(
     return await sanityClient.fetch(
       CATEGORY_BY_SLUG,
       { slug },
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
   } catch (err) {
     console.error(`[sanity] getSanityCategory("${slug}") failed:`, err);
@@ -186,7 +186,7 @@ export async function getSanityCitizen(
     return await sanityClient.fetch(
       CITIZEN_BY_SLUG,
       { slug },
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
   } catch (err) {
     console.error(`[sanity] getSanityCitizen("${slug}") failed:`, err);
