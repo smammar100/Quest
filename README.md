@@ -93,6 +93,68 @@ The login ↔ signup toggle on the inline auth screen is handled via local `auth
 
 ---
 
+## Security model
+
+### Session cookie (`__session`)
+
+Firebase Hosting only forwards one cookie to Cloud Run: **`__session`**. All other cookies are stripped at the CDN layer. Do not rename this cookie or introduce a second session mechanism.
+
+The cookie is issued exclusively by the server (`POST /api/auth/session`) after verifying a Firebase ID token with the Admin SDK. It is set with `HttpOnly` and `Secure` flags — client JavaScript cannot read or write it. Never set it via `document.cookie`.
+
+```
+Sign-in flow
+  Firebase onAuthStateChanged (client)
+    → getIdToken()
+    → POST /api/auth/session  { idToken }   ← verifyIdToken() runs here
+    → Set-Cookie: __session=1; HttpOnly; Secure; SameSite=Lax
+    → middleware reads cookie → grants access to protected routes
+
+Sign-out flow
+  Firebase signOut() (client)
+    → onAuthStateChanged fires with null
+    → DELETE /api/auth/session
+    → Set-Cookie: __session=; Max-Age=0
+```
+
+### API route authentication
+
+Every route handler that touches user data must:
+
+1. Extract the `Authorization: Bearer <idToken>` header
+2. Call `verifyIdToken()` from `src/lib/firebase/admin.ts`
+3. Assert that the verified `uid` matches the `userId` in the request body or query params before proceeding
+
+The session cookie is for **page-level routing only** (middleware redirects). It is not a substitute for token verification inside API routes — those are independent security boundaries.
+
+### Agent API routes
+
+The three agent routes (`/api/agent/sessions`, `/api/agent/run`, `/api/agent/sessions/result`) all enforce the above pattern. Requests to the upstream ADK agent are authenticated via GCP OIDC (fetched from the Cloud Run metadata server). Locally, the OIDC header is omitted; configure the dev agent to allow unauthenticated requests for local development.
+
+### Cookie scope and the Firebase Hosting constraint
+
+Firebase Hosting acts as a CDN in front of Cloud Run. To enable caching, it strips all cookies from forwarded requests — **except `__session`**, which is a hardcoded whitelist. This means:
+
+| Cookie type | Any name allowed? | Readable server-side (middleware / route handlers)? |
+|---|---|---|
+| Client-side only (theme, preferences, analytics) | Yes | No — but you don't need it to be |
+| Server-readable (auth, middleware checks) | **No — must be `__session`** | Yes |
+
+Purely client-side cookies (e.g. `theme=dark`) work normally — client JS reads and writes them, and no server involvement is needed. You only hit the restriction when you need middleware or a route handler to read the value.
+
+If you need to carry additional server-readable state in future (e.g. a user's country code for SSR), encode it inside `__session` as a JSON payload or signed JWT rather than adding a second cookie. The cookie name must stay `__session` for Firebase Hosting to forward it.
+
+### Key security files
+
+| File | Role |
+|---|---|
+| `src/middleware.ts` | Reads `__session` cookie; redirects unauthenticated users away from protected routes |
+| `src/app/api/auth/session/route.ts` | Issues and clears the `__session` cookie server-side |
+| `src/lib/firebase/admin.ts` | Firebase Admin SDK singleton; exports `verifyIdToken()` |
+| `src/lib/gcp/oidc.ts` | Fetches a GCP OIDC token for agent-to-agent auth on Cloud Run |
+| `src/context/AuthContext.tsx` | Calls the session route on auth state changes; never touches `document.cookie` |
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

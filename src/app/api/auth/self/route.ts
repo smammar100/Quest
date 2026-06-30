@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { verifyIdToken } from "@/lib/firebase/admin";
 
 const FALLBACK_BACKEND_URL =
   "https://quest-backend-container-dev-840826949824.asia-southeast1.run.app";
@@ -10,7 +11,16 @@ const getBackendURL = () =>
     FALLBACK_BACKEND_URL
   ).replace(/\/$/, "");
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get("Authorization") ?? "";
+  let uid: string;
+  try {
+    const decoded = await verifyIdToken(authHeader);
+    uid = decoded.uid;
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const userID = searchParams.get("userID")?.trim();
 
@@ -19,6 +29,10 @@ export async function GET(request: Request) {
       { error: "Missing required userID query parameter" },
       { status: 400 }
     );
+  }
+
+  if (uid !== userID) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const backendURL = getBackendURL();

@@ -13,20 +13,19 @@ type BackendSelfUserPayload = {
   } | null;
 };
 
-const AUTH_COOKIE_NAME = '__session';
 const backendCountryCodeRequestCache = new Map<string, Promise<string | undefined>>();
 
-const setAuthCookie = (isAuthenticated: boolean) => {
-  if (typeof document === 'undefined') {
-    return;
+const setAuthCookie = async (firebaseUser: import('firebase/auth').User | null) => {
+  if (firebaseUser) {
+    const idToken = await firebaseUser.getIdToken();
+    await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+  } else {
+    await fetch('/api/auth/session', { method: 'DELETE' });
   }
-
-  if (isAuthenticated) {
-    document.cookie = `${AUTH_COOKIE_NAME}=1; Path=/; Max-Age=2592000; SameSite=Lax`;
-    return;
-  }
-
-  document.cookie = `${AUTH_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`;
 };
 
 const normalizeCountryCode = (value: unknown): string | undefined => {
@@ -38,14 +37,16 @@ const normalizeCountryCode = (value: unknown): string | undefined => {
   return normalized.length === 2 ? normalized : undefined;
 };
 
-const getBackendCountryCodeByUid = async (uid: string): Promise<string | undefined> => {
+const getBackendCountryCodeByUid = async (uid: string, idToken: string): Promise<string | undefined> => {
   const cachedRequest = backendCountryCodeRequestCache.get(uid);
   if (cachedRequest) {
     return cachedRequest;
   }
 
   const request = (async () => {
-    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`);
+    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
 
     if (!response.ok) {
       return undefined;
@@ -110,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return;
 
       if (!firebaseUser) {
-        setAuthCookie(false);
+        await setAuthCookie(null).catch(() => undefined);
         setUser(null);
         setUserProfile(null);
         setProfileLoaded(true);
@@ -118,7 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setAuthCookie(true);
+      // Must complete before setUser so the __session cookie exists by the
+      // time any navigation triggered by the user state change hits middleware.
+      await setAuthCookie(firebaseUser).catch((err) => {
+        console.error('[auth] failed to set session cookie', err);
+      });
 
       setUser({
         uid: firebaseUser.uid,
@@ -138,8 +143,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
 
       try {
+        const idToken = await firebaseUser.getIdToken();
         const [backendCountryResult, firestoreProfileResult] = await Promise.allSettled([
-          getBackendCountryCodeByUid(firebaseUser.uid),
+          getBackendCountryCodeByUid(firebaseUser.uid, idToken),
           getUserProfileByUid(firebaseUser.uid),
         ]);
 
