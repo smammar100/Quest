@@ -1,6 +1,69 @@
 'use client';
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import type { UserProfile } from '@/lib/models/user';
+import { auth, handleAuthRedirectResult } from '@/lib/firebase/auth';
+import { getUserProfileByUid } from '@/lib/firebase/firestore';
+
+type BackendSelfUserPayload = {
+  user?: {
+    countryCode?: unknown;
+    country_code?: unknown;
+  } | null;
+};
+
+const backendCountryCodeRequestCache = new Map<string, Promise<string | undefined>>();
+
+const setAuthCookie = async (firebaseUser: import('firebase/auth').User | null) => {
+  if (firebaseUser) {
+    const idToken = await firebaseUser.getIdToken();
+    await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+  } else {
+    await fetch('/api/auth/session', { method: 'DELETE' });
+  }
+};
+
+const normalizeCountryCode = (value: unknown): string | undefined => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalized = value.trim().toUpperCase();
+  return normalized.length === 2 ? normalized : undefined;
+};
+
+const getBackendCountryCodeByUid = async (uid: string, idToken: string): Promise<string | undefined> => {
+  const cachedRequest = backendCountryCodeRequestCache.get(uid);
+  if (cachedRequest) {
+    return cachedRequest;
+  }
+
+  const request = (async () => {
+    const response = await fetch(`/api/auth/self?${new URLSearchParams({ userID: uid }).toString()}`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const payload = (await response.json()) as BackendSelfUserPayload;
+    const backendUser = payload.user;
+
+    return (
+      normalizeCountryCode(backendUser?.country_code) ??
+      normalizeCountryCode(backendUser?.countryCode)
+    );
+  })();
+
+  backendCountryCodeRequestCache.set(uid, request);
+  return request;
+};
 
 export type AuthUser = {
   uid: string;
@@ -10,25 +73,122 @@ export type AuthUser = {
 
 type AuthContextValue = {
   user: AuthUser;
+  userProfile: UserProfile | null;
+  profileLoaded: boolean;
   loading: boolean;
 };
 
-const AuthContext = createContext<AuthContextValue>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextValue>({
+  user: null,
+  userProfile: null,
+  profileLoaded: false,
+  loading: true,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user] = useState<AuthUser>(null);
-  const [loading] = useState(false);
+  const [user, setUser] = useState<AuthUser>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // TODO: replace the stubs above with real Firebase listener:
-  // useEffect(() => {
-  //   const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-  //     setUser(firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email, displayName: firebaseUser.displayName } : null);
-  //     setLoading(false);
-  //   });
-  //   return unsub;
-  // }, []);
+  useEffect(() => {
+    let mounted = true;
 
-  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>;
+    void (async () => {
+      try {
+        const result = await handleAuthRedirectResult();
+        console.info('[auth] redirect result', {
+          hasUser: Boolean(result?.user),
+          providerId: result?.providerId ?? null,
+          operationType: result?.operationType ?? null,
+        });
+      } catch (error) {
+        console.error('[auth] redirect result error', error);
+      }
+    })();
+
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!mounted) return;
+
+      if (!firebaseUser) {
+        await setAuthCookie(null).catch(() => undefined);
+        setUser(null);
+        setUserProfile(null);
+        setProfileLoaded(true);
+        setLoading(false);
+        return;
+      }
+
+      // Must complete before setUser so the __session cookie exists by the
+      // time any navigation triggered by the user state change hits middleware.
+      await setAuthCookie(firebaseUser).catch((err) => {
+        console.error('[auth] failed to set session cookie', err);
+      });
+
+      setUser({
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+      });
+      const baseProfile: UserProfile = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        displayName: firebaseUser.displayName ?? '',
+        photoURL: firebaseUser.photoURL ?? undefined,
+        role: 'poster',
+        createdAt: new Date(),
+      };
+      setUserProfile(baseProfile);
+      setProfileLoaded(false);
+      setLoading(false);
+
+      try {
+        const idToken = await firebaseUser.getIdToken();
+        const [backendCountryResult, firestoreProfileResult] = await Promise.allSettled([
+          getBackendCountryCodeByUid(firebaseUser.uid, idToken),
+          getUserProfileByUid(firebaseUser.uid),
+        ]);
+
+        if (!mounted) return;
+
+        const backendCountryCode =
+          backendCountryResult.status === 'fulfilled'
+            ? backendCountryResult.value
+            : undefined;
+        const firestoreProfile =
+          firestoreProfileResult.status === 'fulfilled'
+            ? firestoreProfileResult.value
+            : null;
+
+        setUserProfile({
+          uid: firebaseUser.uid,
+          email: firestoreProfile?.email ?? baseProfile.email,
+          displayName: firestoreProfile?.displayName ?? baseProfile.displayName,
+          photoURL: firestoreProfile?.photoURL ?? baseProfile.photoURL,
+          role: firestoreProfile?.role ?? baseProfile.role,
+          createdAt: firestoreProfile?.createdAt ?? baseProfile.createdAt,
+          countryCode: backendCountryCode ?? firestoreProfile?.countryCode,
+        });
+      } catch {
+        if (!mounted) return;
+      } finally {
+        if (mounted) {
+          setProfileLoaded(true);
+        }
+      }
+    });
+
+    return () => {
+      mounted = false;
+      unsub();
+    };
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, userProfile, profileLoaded, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export const useAuthContext = () => useContext(AuthContext);

@@ -12,6 +12,7 @@ type Aud = {
   card: { label: string; value: string; badge: string };
   asideText: string;
   link: string;
+  href: string;
   chip: { icon: string; text: string };
 };
 
@@ -27,39 +28,42 @@ const AUDS: Aud[] = [
     chip: { icon: 'verified_user', text: 'Vetted & insured' },
     asideText: 'Vetted, reliable people you can book in minutes and trust on the job.',
     link: 'Hire for business',
+    href: '/business',
   },
   {
     key: 'agent',
     icon: 'smart_toy',
     title: 'For AI agents',
-    body: 'Connect agents to trusted humans who can complete real-world tasks.',
+    body: 'Connect agents to trusted humans who can complete real-world quests.',
     image: '/images/cards/for-ai.webp',
     tint: '#E7E0FF',
-    card: { label: 'Tasks dispatched', value: '128', badge: 'live' },
+    card: { label: 'Quests dispatched', value: '128', badge: 'live' },
     chip: { icon: 'sync', text: 'Auto-coordinated' },
-    asideText: 'It only pays once the work is verified done — built for trust.',
+    asideText: 'It only pays once the work is verified done, built for trust.',
     link: 'Connect via MCP',
+    href: '/agents',
   },
   {
     key: 'hero',
     icon: 'bolt',
     title: 'For humans',
-    body: 'Choose flexible tasks and get paid for real-world work.',
+    body: 'Choose flexible quests and get paid for real-world work.',
     image: '/images/cards/for-people.webp',
     tint: '#DCEAFF',
     card: { label: 'Earned this week', value: '$740', badge: '★ 4.9' },
     chip: { icon: 'bolt', text: 'Same-day pay' },
     asideText: 'Get paid fast for work that fits your life.',
     link: 'Earn as a human on Quest',
+    href: '/earn',
   },
 ];
 
-export default function AudiencesSection() {
+export default function AudiencesSection({ className }: { className?: string }) {
   const [active, setActive] = useState(0);
   const a = AUDS[active];
 
   return (
-    <section id="audiences">
+    <section id="audiences" className={className}>
       <h2 className="aud-title">Built for everyone who gets things done.</h2>
 
       <div className="aud-content">
@@ -108,7 +112,7 @@ export default function AudiencesSection() {
 
         <div className="aud-aside">
           <p className="aud-aside__text">{a.asideText}</p>
-          <a href="#welcome" className="aud-aside__link">
+          <a href={a.href} className="aud-aside__link">
             {a.link}
           </a>
         </div>

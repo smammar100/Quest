@@ -57,6 +57,34 @@ If you know Flutter, use this table to orient yourself before writing code.
 | `setState` | `useState` / `useReducer` | Inside Client Components |
 | `initState` / `dispose` | `useEffect(() => { … return cleanup }, [])` | Inside Client Components |
 
+### Security Rules
+
+These rules exist because we've already been burned by the anti-patterns below. Do not introduce exceptions without explicit review.
+
+**Session cookie — never touch `document.cookie`**
+The `__session` cookie is `HttpOnly`. Client JS cannot read or write it. All cookie management goes through `POST /api/auth/session` (set) and `DELETE /api/auth/session` (clear). `AuthContext` already calls these — do not duplicate the logic elsewhere.
+
+**API routes — always verify the Firebase ID token**
+Every route handler that reads or writes user data must call `verifyIdToken()` from `src/lib/firebase/admin.ts` and assert the decoded `uid` matches the `userId` in the request. The session cookie is only for middleware redirects — it is not proof of identity inside an API route.
+
+```ts
+// Required pattern for every authenticated route handler
+const decoded = await verifyIdToken(req.headers.get('Authorization') ?? '');
+if (decoded.uid !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+```
+
+**URL path segments — always `encodeURIComponent`**
+When constructing upstream URLs with user-supplied values (userId, sessionId), always wrap them in `encodeURIComponent()`. Values that come from a verified Firebase token are safe alphanumeric strings, but the encoding is still required as a defence-in-depth convention.
+
+**Error responses — never forward raw upstream bodies to the client**
+Log upstream errors server-side. Return only a generic message to the caller. Detailed backend error bodies (stack traces, field names, service identifiers) are useful to attackers.
+
+**`__session` cookie name — do not rename**
+Firebase Hosting strips all cookies except `__session` before forwarding requests to Cloud Run. Renaming it will silently break middleware-based route protection in production.
+
+**Other cookies are fine — the restriction is server-readability only**
+The `__session` constraint applies only to cookies that need to be read server-side (middleware, route handlers). Client-side cookies — theme preferences, dismissed banners, analytics identifiers — can use any name and work normally. If you need to carry additional server-readable state in future (e.g. country code for SSR), encode it inside `__session` as a JSON payload rather than adding a second cookie.
+
 ### State Management
 
 State changes should flow cleanly through the MVC layers:

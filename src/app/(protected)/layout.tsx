@@ -1,8 +1,13 @@
-// Auth guard for all routes under (protected)/.
-// TODO: add real session check here once Firebase is wired up.
-// Example:
-//   const session = await getServerSession();
-//   if (!session) redirect('/login');
+import SiteHeader from '@/components/layout/SiteHeader';
+
+// Every route under (protected)/ gets the authenticated nav automatically.
+// Middleware (src/middleware.ts) is responsible for redirecting unauthenticated
+// users away from these routes before this layout renders.
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <SiteHeader />
+      {children}
+    </>
+  );
 }
