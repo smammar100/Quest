@@ -7,6 +7,7 @@ import TasksShowcase from '../../components/sections/TasksShowcase';
 import AudiencesSection from '../../components/sections/AudiencesSection';
 import SocialProof from '../../components/sections/SocialProof';
 import FaqSection from '../../components/sections/FaqSection';
+import BlogSection from '../../components/sections/BlogSection';
 import CtaSection from '../../components/sections/CtaSection';
 import SiteFooter from '../../components/layout/SiteFooter';
 import HomeAuthRedirectGate from '../../components/auth/HomeAuthRedirectGate';
@@ -186,6 +187,8 @@ export default function Home() {
       <SocialProof />
 
       <FaqSection />
+
+      <BlogSection />
 
       <CtaSection />
 
