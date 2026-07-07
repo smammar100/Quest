@@ -7,7 +7,7 @@ import TasksShowcase from '../../components/sections/TasksShowcase';
 import AudiencesSection from '../../components/sections/AudiencesSection';
 import SocialProof from '../../components/sections/SocialProof';
 import FaqSection from '../../components/sections/FaqSection';
-import BlogSection from '../../components/sections/BlogSection';
+// import BlogSection from '../../components/sections/BlogSection'; // hidden on landing page for now
 import CtaSection from '../../components/sections/CtaSection';
 import SiteFooter from '../../components/layout/SiteFooter';
 import HomeAuthRedirectGate from '../../components/auth/HomeAuthRedirectGate';
@@ -188,7 +188,8 @@ export default function Home() {
 
       <FaqSection />
 
-      <BlogSection />
+      {/* Blog section hidden on the landing page for now — the /blog page stays live */}
+      {/* <BlogSection /> */}
 
       <CtaSection />
 

@@ -308,6 +308,16 @@ export default function SiteHeader() {
                     </div>
                   </div>
                 </li>
+                {/* sits to the right of Categories */}
+                <li>
+                  <Link
+                    href="/manifesto"
+                    className={pathname === "/manifesto" ? "is-active" : undefined}
+                    aria-current={pathname === "/manifesto" ? "page" : undefined}
+                  >
+                    <span className="nav-rn">Manifesto</span>
+                  </Link>
+                </li>
               </>
             )}
           </ul>
