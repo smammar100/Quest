@@ -28,6 +28,7 @@ const COLUMNS = [
     links: [
       { label: 'About us', href: 'https://quest-inc.co/aboutus/', external: true },
       { label: 'Careers', href: 'https://quest-inc.co/careers/', external: true },
+      { label: 'Blogs', href: '/blog' },
       { label: 'Media', href: 'https://quest-inc.co/quest-in-the-news/', external: true },
     ],
   },

@@ -1,5 +1,7 @@
 import type { SanityImageSource } from "@sanity/image-url";
 import { sanityClient } from "./client";
+import { urlForImage } from "./image";
+import type { BlogPost } from "@/lib/data/blog-posts";
 
 // Shape returned by the category-by-slug query. All sections are optional
 // so the template can fall back to lib/data/quests-data.ts where a field
@@ -191,5 +193,138 @@ export async function getSanityCitizen(
   } catch (err) {
     console.error(`[sanity] getSanityCitizen("${slug}") failed:`, err);
     return null;
+  }
+}
+
+// ── Blogs (the "blog" schema → /blog index + /blog/[slug] detail) ────────────
+
+// Category (string field on the blog) → Tailwind chip/cover classes.
+// Mirrors CATEGORY_ACCENT in lib/data/blog-posts.ts.
+const CATEGORY_ACCENT_CLASS: Record<string, { bg: string; text: string }> = {
+  Manifesto: { bg: "bg-coral", text: "text-white" },
+  Product: { bg: "bg-electric", text: "text-white" },
+  Community: { bg: "bg-marigold", text: "text-ink" },
+  "Field data": { bg: "bg-violet", text: "text-white" },
+  News: { bg: "bg-lime", text: "text-ink" },
+  Guides: { bg: "bg-sky", text: "text-ink" },
+};
+
+// Raw shape returned by the GROQ blog projection.
+type RawBlog = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  author?: string;
+  publishedAt?: string;
+  readMinutes?: number;
+  featured?: boolean;
+  popular?: boolean;
+  category?: string;
+  coverImage?: { asset?: SanityImageSource; alt?: string } | null;
+  coverImageUrl?: string;
+  coverAlt?: string;
+  body?: unknown[] | null;
+};
+
+const BLOG_FIELDS = /* groq */ `
+  "slug": slug.current,
+  title,
+  excerpt,
+  author,
+  publishedAt,
+  readMinutes,
+  featured,
+  popular,
+  category,
+  coverImage{asset, alt},
+  coverImageUrl,
+  coverAlt,
+  body
+`;
+
+const ALL_BLOGS = /* groq */ `*[_type == "blog" && defined(slug.current)]
+  | order(publishedAt desc){${BLOG_FIELDS}}`;
+
+const BLOG_BY_SLUG = /* groq */ `*[_type == "blog" && slug.current == $slug][0]{${BLOG_FIELDS}}`;
+
+function fmtDate(iso?: string): string {
+  if (!iso) return "";
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(iso));
+  } catch {
+    return "";
+  }
+}
+
+// Map a raw Sanity blog doc onto the BlogPost shape the app already renders.
+function toBlogPost(raw: RawBlog): BlogPost {
+  const img = raw.coverImage?.asset
+    ? urlForImage(raw.coverImage).width(1200).height(800).fit("crop").url()
+    : raw.coverImageUrl ?? "";
+  const category = raw.category ?? "News";
+  return {
+    slug: raw.slug,
+    category,
+    title: raw.title,
+    excerpt: raw.excerpt ?? "",
+    date: fmtDate(raw.publishedAt),
+    read: `${raw.readMinutes ?? 4} min read`,
+    author: raw.author ?? "The Quest Team",
+    img,
+    alt: raw.coverImage?.alt ?? raw.coverAlt ?? raw.title,
+    featured: raw.featured ?? false,
+    popular: raw.popular ?? false,
+    accent: CATEGORY_ACCENT_CLASS[category],
+    body: raw.body ?? undefined,
+  };
+}
+
+// All published blog posts, newest first. Returns [] on failure/empty so the
+// page can fall back to local mock data (mirrors the category/citizen pattern).
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  try {
+    const raws = await sanityClient.fetch<RawBlog[]>(
+      ALL_BLOGS,
+      {},
+      { next: { revalidate: 60 } }
+    );
+    return (raws ?? []).map(toBlogPost);
+  } catch (err) {
+    console.error("[sanity] getBlogPosts failed:", err);
+    return [];
+  }
+}
+
+// A single blog post by slug (includes Portable Text `body`). null if absent.
+export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  try {
+    const raw = await sanityClient.fetch<RawBlog | null>(
+      BLOG_BY_SLUG,
+      { slug },
+      { next: { revalidate: 60 } }
+    );
+    return raw ? toBlogPost(raw) : null;
+  } catch (err) {
+    console.error(`[sanity] getBlogPost("${slug}") failed:`, err);
+    return null;
+  }
+}
+
+// Distinct category titles used by published posts — drives the filter pills.
+export async function getBlogCategories(): Promise<string[]> {
+  try {
+    const titles = await sanityClient.fetch<string[]>(
+      /* groq */ `array::unique(*[_type == "blog" && defined(category)].category)`,
+      {},
+      { next: { revalidate: 60 } }
+    );
+    return (titles ?? []).filter(Boolean);
+  } catch (err) {
+    console.error("[sanity] getBlogCategories failed:", err);
+    return [];
   }
 }

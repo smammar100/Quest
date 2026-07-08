@@ -110,6 +110,9 @@ export default function ScrollFX() {
         ".proof-title, .proof-lede",
         ".faq-title, .faq-lede",
         ".faq-item",
+        ".blog-title, .blog-lede",
+        ".blog-card",
+        ".blog-cta",
         ".ft-cta",
         /* footer is NOT scroll-revealed — on short pages it sits at the very
            bottom and never crosses the trigger line, which would leave it
