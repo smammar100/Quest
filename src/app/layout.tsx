@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Your AI can't do everything. Hire a human.",
   description: "Quest connects you with trusted people for real-world work, errands, events, content, deliveries, and anything AI still can't do.",
 };
